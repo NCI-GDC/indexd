@@ -1326,6 +1326,10 @@ def migrate_12(session, **kwargs):
             WHERE main.did=s.did and main.url=s.url
         """.format(from_chunk, to_chunk))
 
+        # Commit after each chunk so the transaction doesn't get too huge.
+        # This should speed things up.
+        session.commit()
+
 
 # ordered schema migration functions that the index should correspond to
 # CURRENT_SCHEMA_VERSION - 1 when it's written
