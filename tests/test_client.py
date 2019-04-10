@@ -5,9 +5,10 @@ import pytest
 from indexd.index.blueprint import ACCEPTABLE_HASHES
 from swagger_client.rest import ApiException
 from tests.util import assert_blank
+import uuid
 
 
-def get_doc(has_metadata=True, has_baseid=False,has_version=False):
+def get_doc(baseid=None, has_metadata=True, has_version=False):
     doc = {
         'form': 'object',
         'size': 123,
@@ -17,8 +18,8 @@ def get_doc(has_metadata=True, has_baseid=False,has_version=False):
     }
     if has_metadata:
         doc['metadata'] = {'project_id': 'bpa-UChicago'}
-    if has_baseid:
-        doc['baseid'] = 'e044a62c-fd60-4203-b1e5-a62d1005f027'
+    if baseid:
+        doc['baseid'] = baseid
     if has_version:
         doc['version'] = '1'
     return doc
@@ -416,7 +417,7 @@ def test_get_urls(swg_index_client, swg_global_client):
 
 
 def test_index_create(swg_index_client):
-    data = get_doc(has_baseid=True)
+    data = get_doc(baseid=str(uuid.uuid4()))
 
     result = swg_index_client.add_entry(data)
     assert result.did
@@ -426,7 +427,7 @@ def test_index_create(swg_index_client):
 
 
 def test_index_get(swg_index_client):
-    data = get_doc(has_baseid=True)
+    data = get_doc(baseid=str(uuid.uuid4()))
 
     result = swg_index_client.add_entry(data)
     r = swg_index_client.get_entry(result.did)
@@ -445,10 +446,10 @@ def test_index_prepend_prefix(swg_index_client):
 
 
 def test_index_get_with_baseid(swg_index_client):
-    data1 = get_doc(has_baseid=True)
+    data1 = get_doc(baseid=str(uuid.uuid4()))
     swg_index_client.add_entry(data1)
 
-    data2 = get_doc(has_baseid=True)
+    data2 = get_doc(baseid=data1['baseid'])
     r2 = swg_index_client.add_entry(data2)
 
     r = swg_index_client.get_entry(data1['baseid'])
@@ -461,8 +462,8 @@ def test_delete_and_recreate(swg_index_client):
     recreate it with the same fields.
     """
 
-    old_data = get_doc(has_baseid=True)
-    new_data = get_doc(has_baseid=True)
+    old_data = get_doc(baseid=str(uuid.uuid4()))
+    new_data = get_doc(old_data['baseid'])
     new_data['hashes'] = {'md5': '11111111111111111111111111111111'}
 
     old_result = swg_index_client.add_entry(old_data)
@@ -675,7 +676,7 @@ def test_update_uploader_field(swg_index_client):
 
 
 def test_index_delete(swg_index_client):
-    data = get_doc(has_metadata=False, has_baseid=False)
+    data = get_doc(has_metadata=False)
 
     r = swg_index_client.add_entry(data)
     assert r.did
@@ -692,7 +693,7 @@ def test_index_delete(swg_index_client):
 
 
 def test_create_index_version(swg_index_client):
-    data = get_doc(has_metadata=False, has_baseid=False)
+    data = get_doc(has_metadata=False)
 
     r = swg_index_client.add_entry(data)
     assert r.did
@@ -717,11 +718,11 @@ def test_create_index_version(swg_index_client):
 
 
 def test_get_latest_version(swg_index_client):
-    data = get_doc(has_metadata=False, has_baseid=False, has_version=True)
+    data = get_doc(has_metadata=False, has_version=True)
     r = swg_index_client.add_entry(data)
     assert r.did
 
-    data = get_doc(has_metadata=False, has_baseid=False, has_version=False)
+    data = get_doc(has_metadata=False, has_version=False)
     r2 = swg_index_client.add_new_version(r.did, body=data)
     r3 = swg_index_client.get_latest_version(r.did)
     assert r3.did == r2.did
@@ -734,7 +735,7 @@ def test_get_latest_version(swg_index_client):
 
 
 def test_get_all_versions(swg_index_client):
-    data = get_doc(has_metadata=False, has_baseid=False)
+    data = get_doc(has_metadata=False)
     r = swg_index_client.add_entry(data)
     assert r.did
     swg_index_client.add_new_version(r.did, body=data)
@@ -885,8 +886,9 @@ def test_bad_hashes(client, user, typ, h):
     else:
         assert 'does not match' in json_resp['error']
 
+
 def test_dos_get(swg_index_client, swg_dos_client):
-    data = get_doc(has_metadata=True, has_baseid=True)
+    data = get_doc(has_metadata=True, baseid=str(uuid.uuid4()))
 
     result = swg_index_client.add_entry(data)
     r = swg_dos_client.get_data_object(result.did)
@@ -902,7 +904,7 @@ def test_dos_get(swg_index_client, swg_dos_client):
 
 
 def test_dos_list(swg_index_client, swg_dos_client):
-    data = get_doc(has_metadata=True, has_baseid=True)
+    data = get_doc(has_metadata=True, baseid=str(uuid.uuid4()))
 
     result = swg_index_client.add_entry(data)
     r = swg_dos_client.list_data_objects(page_size=100)
@@ -918,7 +920,7 @@ def test_dos_list(swg_index_client, swg_dos_client):
 
 def test_update_without_changing_fields(swg_index_client):
     # setup test
-    data = get_doc(has_metadata=True, has_baseid=True)
+    data = get_doc(has_metadata=True, baseid=str(uuid.uuid4()))
 
     result = swg_index_client.add_entry(data)
     first_doc = swg_index_client.get_entry(result.did)
@@ -952,7 +954,7 @@ def test_update_without_changing_fields(swg_index_client):
 def test_bulk_get_documents(swg_index_client, swg_bulk_client):
     # just make a bunch of entries in indexd
     dids = [
-        swg_index_client.add_entry(get_doc(has_baseid=True)).did
+        swg_index_client.add_entry(get_doc(baseid=str(uuid.uuid4()))).did
         for _ in range(20)
     ]
 
@@ -962,6 +964,24 @@ def test_bulk_get_documents(swg_index_client, swg_bulk_client):
     # compare that they are the same by did
     for doc in docs:
         assert doc['did'] in dids
+
+
+def test_bulk_get_latest_version(swg_index_client, swg_bulk_client):
+    # just make a bunch of entries in indexd
+    dids = [
+        swg_index_client.add_entry(get_doc(baseid=str(uuid.uuid4()))).did
+        for _ in range(3)
+    ]
+
+    # create new versions
+    latest_dids = [
+        swg_index_client.add_new_version(did, body=get_doc()).did
+        for did in dids
+    ]
+
+    # do a bulk query to get all latest version
+    docs = swg_bulk_client.get_bulk_latest(dids)
+    assert set(doc['did'] for doc in docs) == set(latest_dids)
 
 
 def test_special_case_metadata_get_and_set(swg_index_client):

@@ -1029,6 +1029,27 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             return record.to_document_dict()
 
+    def bulk_get_latest_versions(self, dids):
+        """
+        Get the lattest record version given a list of did
+        """
+        with self.session as session:
+            # get baseid from all dids
+            baseid_subq = session.query(IndexRecord.baseid).filter(IndexRecord.did.in_(dids))
+
+            # a group by sub query to get max date for each baseid
+            max_date_subq = session.query(IndexRecord.baseid, func.max(IndexRecord.created_date).label('max_date')) \
+                                          .filter(IndexRecord.baseid.in_(baseid_subq)) \
+                                          .group_by(IndexRecord.baseid).subquery()
+
+            # the query to get latest record
+            query = session.query(IndexRecord).join(
+                max_date_subq, and_(
+                    max_date_subq.c.max_date == IndexRecord.created_date,
+                    max_date_subq.c.baseid == IndexRecord.baseid)
+            )
+            return [q.to_document_dict() for q in query]
+
     def health_check(self):
         """
         Does a health check of the backend.
