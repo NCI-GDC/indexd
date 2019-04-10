@@ -8,7 +8,9 @@ CONFIG = {}
 
 CONFIG['JSONIFY_PRETTYPRINT_REGULAR'] = False
 AUTO_MIGRATE = True
-SQLALCHEMY_VERBOSE = bool(os.getenv('SQLALCHEMY_VERBOSE', 1))
+SQLALCHEMY_VERBOSE = not (
+    os.getenv('INDEXD_VERBOSE') in ['0', 'no', 'No', 'false', 'False']
+)
 PG_URL = 'postgres://test:test@localhost/indexd_test'
 
 CONFIG['INDEX'] = {
