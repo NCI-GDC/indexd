@@ -21,11 +21,17 @@ def bulk_get_documents():
     """
     Returns a list of records.
     """
+
     ids = flask.request.json
     if not ids:
         raise UserError('No ids provided')
     if not isinstance(ids, list):
         raise UserError('ids is not a list')
+
+    latest = flask.request.args.get('latest')
+    if latest:
+        docs = blueprint.index_driver.bulk_get_latest_versions(ids)
+        return json.dumps(docs), 200
 
     docs = []
     with blueprint.index_driver.session as session:
@@ -44,21 +50,6 @@ def bulk_get_documents():
         docs = [q.to_document_dict() for q in query]
 
     return json.dumps(docs), 200
-
-
-@blueprint.route('/bulk/latest_versions', methods=['POST'])
-def bulk_get_latest_versions():
-    """
-    Returns a list of records.
-    """
-    ids = flask.request.json
-    if not ids:
-        raise UserError('No ids provided')
-    if not isinstance(ids, list):
-        raise UserError('ids is not a list')
-
-    docs = blueprint.index_driver.bulk_get_latest_versions(ids)
-    return flask.jsonify(docs), 200
 
 
 @blueprint.record

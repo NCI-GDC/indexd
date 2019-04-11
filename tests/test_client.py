@@ -980,8 +980,9 @@ def test_bulk_get_latest_version(swg_index_client, swg_bulk_client):
     ]
 
     # do a bulk query to get all latest version
-    docs = swg_bulk_client.get_bulk_latest(dids)
-    assert set(doc['did'] for doc in docs) == set(latest_dids)
+    docs = swg_bulk_client.get_bulk_ids(dids, latest=True)
+    assert set(doc['did'] for doc in docs) == set(dids)
+    assert set(doc['latest_id'] for doc in docs) == set(latest_dids)
 
 
 def test_special_case_metadata_get_and_set(swg_index_client):

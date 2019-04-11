@@ -743,32 +743,13 @@ paths:
       produces:
         - application/json
       parameters:
+        - in: query
+          name: latest
+          type: string
+          description: return latest id or not
         - in: body
           name: body
           description: List of dids to retrieve
-          required: true
-          schema:
-            $ref: '#/definitions/BulkInputInfo'
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            $ref: '#/definitions/BulkOutputInfo'
-        '400':
-          description: Invalid status value
-      security: []
-  '/bulk/latest_versions':
-    post:
-      tags:
-        - bulk
-      summary: Get the latest verions given a list of dids
-      operationId: getBulkLatest
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: body
-          description: List of dids
           required: true
           schema:
             $ref: '#/definitions/BulkInputInfo'
