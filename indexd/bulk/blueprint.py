@@ -31,7 +31,7 @@ def bulk_get_documents():
     latest = flask.request.args.get('latest')
     if latest:
         docs = blueprint.index_driver.bulk_get_latest_versions(ids)
-        return json.dumps(docs), 200
+        return flask.jsonify(docs), 200
 
     docs = []
     with blueprint.index_driver.session as session:

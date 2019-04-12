@@ -1034,8 +1034,12 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
         Get the lattest record version given a list of did
         """
         with self.session as session:
-            # get max date form each baseid
+            # only query on the baseid to optimize the maxdate subquery
+            baseid_subq = session.query(IndexRecord.baseid).filter(IndexRecord.did.in_(dids))
+
+            # get max date form each baseid (this subquery needs to filter on baseid again for performance)
             max_date_subq = session.query(IndexRecord.baseid, func.max(IndexRecord.created_date).label('max_date')) \
+                .filter(IndexRecord.baseid.in_(baseid_subq)) \
                 .group_by(IndexRecord.baseid).subquery()
 
             # get the latest id with max date
