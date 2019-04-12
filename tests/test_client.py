@@ -967,6 +967,10 @@ def test_bulk_get_documents(swg_index_client, swg_bulk_client):
 
 
 def test_bulk_get_latest_version(swg_index_client, swg_bulk_client):
+    """
+    Create multiple docs and add one new version for each doc
+    Check the response docs have the correct did and latest_id
+    """
     # just make a bunch of entries in indexd
     dids = [
         swg_index_client.add_entry(get_doc(baseid=str(uuid.uuid4()))).did
@@ -974,15 +978,18 @@ def test_bulk_get_latest_version(swg_index_client, swg_bulk_client):
     ]
 
     # create new versions
-    latest_dids = [
-        swg_index_client.add_new_version(did, body=get_doc()).did
+    latest_dids = {
+        did: swg_index_client.add_new_version(did, body=get_doc()).did
         for did in dids
-    ]
+
+    }
 
     # do a bulk query to get all latest version
     docs = swg_bulk_client.get_bulk_ids(dids, latest=True)
-    assert set(doc['did'] for doc in docs) == set(dids)
-    assert set(doc['latest_id'] for doc in docs) == set(latest_dids)
+
+    for doc in docs:
+        assert doc["did"] in latest_dids, "doc with given did should exist in return docs"
+        assert latest_dids[doc["did"]] == doc["latest_id"], "doc with given did has incorrect latest_id"
 
 
 def test_special_case_metadata_get_and_set(swg_index_client):

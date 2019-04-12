@@ -1031,7 +1031,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
     def bulk_get_latest_versions(self, dids):
         """
-        Get the lattest record version given a list of did
+        Get doc with latest_id given a list of did
+
+        returns [doc]: list of doc where doc[latest_id] is the did of the latest version doc
         """
         with self.session as session:
             # only query on the baseid to optimize the maxdate subquery
