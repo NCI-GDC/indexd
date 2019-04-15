@@ -1029,20 +1029,27 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             return record.to_document_dict()
 
-    def bulk_get_latest_versions(self, dids):
+    def bulk_get_latest_versions(self, dids, latest_only=False):
         """
         Get doc with latest_id given a list of did
 
         returns [doc]: list of doc where doc[latest_id] is the did of the latest version doc
         """
         with self.session as session:
-            # only query on the baseid to optimize the maxdate subquery
-            baseid_subq = session.query(IndexRecord.baseid).filter(IndexRecord.did.in_(dids))
+            # only query on the baseid to filter the maxdate subquery
+            subq = session.query(IndexRecord.baseid).filter(IndexRecord.did.in_(dids))
 
             # get max date form each baseid (this subquery needs to filter on baseid again for performance)
             max_date_subq = session.query(IndexRecord.baseid, func.max(IndexRecord.created_date).label('max_date')) \
-                .filter(IndexRecord.baseid.in_(baseid_subq)) \
+                .filter(IndexRecord.baseid.in_(subq)) \
                 .group_by(IndexRecord.baseid).subquery()
+
+            if latest_only:
+                query = session.query(IndexRecord).join(max_date_subq, and_(
+                    max_date_subq.c.baseid == IndexRecord.baseid,
+                    max_date_subq.c.max_date == IndexRecord.created_date
+                ))
+                return [q.to_document_dict() for q in query]
 
             # get the latest id with max date
             baseid_subq = session.query(IndexRecord.did.label('latest_id'), IndexRecord.baseid) \

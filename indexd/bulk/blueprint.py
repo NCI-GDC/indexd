@@ -20,6 +20,7 @@ blueprint.index_driver = None
 def bulk_get_documents():
     """
     Returns a list of records.
+    If latest == True, return the same doc but with doc.latest_id
     """
 
     ids = flask.request.json
@@ -36,8 +37,8 @@ def bulk_get_documents():
     docs = []
     with blueprint.index_driver.session as session:
         # Comment it out to compare against the eager loading option.
-        #query = session.query(IndexRecord)
-        #query = query.filter(IndexRecord.did.in_(ids)
+        # query = session.query(IndexRecord)
+        # query = query.filter(IndexRecord.did.in_(ids)
 
         # Use eager loading.
         query = session.query(IndexRecord)
@@ -50,6 +51,22 @@ def bulk_get_documents():
         docs = [q.to_document_dict() for q in query]
 
     return json.dumps(docs), 200
+
+
+@blueprint.route('/bulk/documents/latest', methods=['POST'])
+def bulk_get_latest_documents():
+    """
+    From the given list of dids, get the latest version docs
+    """
+
+    ids = flask.request.json
+    if not ids:
+        raise UserError('No ids provided')
+    if not isinstance(ids, list):
+        raise UserError('ids is not a list')
+
+    docs = blueprint.index_driver.bulk_get_latest_versions(ids, latest_only=True)
+    return flask.jsonify(docs), 200
 
 
 @blueprint.record
