@@ -743,10 +743,6 @@ paths:
       produces:
         - application/json
       parameters:
-        - in: query
-          name: latest
-          type: string
-          description: return latest id or not
         - in: body
           name: body
           description: List of dids to retrieve
@@ -776,6 +772,11 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/BulkInputInfo'
+        - name: has_version
+          in: query
+          description: filter by latest doc that has version value populated
+          required: false
+          type: boolean
       responses:
         '200':
           description: successful operation

@@ -966,32 +966,6 @@ def test_bulk_get_documents(swg_index_client, swg_bulk_client):
         assert doc['did'] in dids
 
 
-def test_bulk_get_with_latest_id(swg_index_client, swg_bulk_client):
-    """
-    Create multiple docs and add one new version for each doc
-    Check the response docs have the correct did and latest_id
-    """
-    # just make a bunch of entries in indexd
-    dids = [
-        swg_index_client.add_entry(get_doc(baseid=str(uuid.uuid4()))).did
-        for _ in range(3)
-    ]
-
-    # create new versions
-    latest_dids = {
-        did: swg_index_client.add_new_version(did, body=get_doc()).did
-        for did in dids
-
-    }
-
-    # do a bulk query to get all latest version
-    docs = swg_bulk_client.get_bulk_ids(dids, latest=True)
-
-    for doc in docs:
-        assert doc["did"] in latest_dids, "doc with given did should exist in return docs"
-        assert latest_dids[doc["did"]] == doc["latest_id"], "doc with given did has incorrect latest_id"
-
-
 def test_bulk_get_latest_version(swg_index_client, swg_bulk_client):
     """
     Create multiple docs and add one new version for each doc

@@ -1029,11 +1029,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             return record.to_document_dict()
 
-    def bulk_get_latest_versions(self, dids, latest_only=False):
+    def bulk_get_latest_versions(self, dids, skip_null=False):
         """
         Get doc with latest_id given a list of did
-
-        returns [doc]: list of doc where doc[latest_id] is the did of the latest version doc
         """
         with self.session as session:
             # only query on the baseid to filter the maxdate subquery
@@ -1042,35 +1040,18 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             # get max date form each baseid (this subquery needs to filter on baseid again for performance)
             max_date_subq = session.query(IndexRecord.baseid, func.max(IndexRecord.created_date).label('max_date')) \
                 .filter(IndexRecord.baseid.in_(subq)) \
-                .group_by(IndexRecord.baseid).subquery()
+                .group_by(IndexRecord.baseid)
 
-            if latest_only:
-                query = session.query(IndexRecord).join(max_date_subq, and_(
-                    max_date_subq.c.baseid == IndexRecord.baseid,
-                    max_date_subq.c.max_date == IndexRecord.created_date
-                ))
-                return [q.to_document_dict() for q in query]
+            if skip_null:
+                max_date_subq = max_date_subq.filter(IndexRecord.version.isnot(None))
 
-            # get the latest id with max date
-            baseid_subq = session.query(IndexRecord.did.label('latest_id'), IndexRecord.baseid) \
-                .join(max_date_subq, and_(
+            max_date_subq = max_date_subq.subquery()
+
+            query = session.query(IndexRecord).join(max_date_subq, and_(
                 max_date_subq.c.baseid == IndexRecord.baseid,
                 max_date_subq.c.max_date == IndexRecord.created_date
-            )) \
-                .subquery()
-
-            # get the did and latest id
-            query = session.query(IndexRecord, baseid_subq.c.latest_id).join(
-                baseid_subq, and_(baseid_subq.c.baseid == IndexRecord.baseid)) \
-                .filter(IndexRecord.did.in_(dids))
-
-            res = []
-            for q in query:
-                doc = q[0].to_document_dict()
-                doc['latest_id'] = q[1]
-                res.append(doc)
-
-            return res
+            ))
+            return [q.to_document_dict() for q in query]
 
     def health_check(self):
         """
