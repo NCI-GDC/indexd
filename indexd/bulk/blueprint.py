@@ -58,9 +58,9 @@ def bulk_get_latest_documents():
     if not isinstance(ids, list):
         raise UserError('ids is not a list')
 
-    has_version = flask.request.args.get('latest')
+    skip_null = flask.request.args.get('skip_null', "false").lower() in ["true", "t"]
 
-    docs = blueprint.index_driver.bulk_get_latest_versions(ids, has_version=has_version)
+    docs = blueprint.index_driver.bulk_get_latest_versions(ids, skip_null=skip_null)
     return flask.jsonify(docs), 200
 
 
