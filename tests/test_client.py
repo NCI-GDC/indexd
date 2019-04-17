@@ -978,23 +978,23 @@ def test_bulk_get_latest_version(swg_index_client, swg_bulk_client):
     ]
 
     # create new versions
-    latest_dids_with_version = [
+    latest_dids_with_version = {
         swg_index_client.add_new_version(did, body=get_doc(version="2")).did
         for did in dids
-    ]
+    }
 
     # create new null versions
-    latest_dids_null_version = [
+    latest_dids_null_version = {
         swg_index_client.add_new_version(did, body=get_doc()).did
         for did in dids
-    ]
+    }
 
     # do a bulk query to get all latest version
     docs = swg_bulk_client.get_bulk_latest(dids, skip_null=True)
     docs_null = swg_bulk_client.get_bulk_latest(dids, skip_null=False)
 
-    assert set(latest_dids_with_version) == set([doc["did"] for doc in docs])
-    assert set(latest_dids_null_version) == set([doc["did"] for doc in docs_null])
+    assert latest_dids_with_version == {doc["did"] for doc in docs}
+    assert latest_dids_null_version == {doc["did"] for doc in docs_null}
 
 
 def test_special_case_metadata_get_and_set(swg_index_client):
