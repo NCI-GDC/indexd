@@ -61,7 +61,7 @@ def bulk_get_latest_documents():
     skip_null = flask.request.args.get('skip_null', "false").lower() in ["true", "t"]
 
     docs = blueprint.index_driver.bulk_get_latest_versions(ids, skip_null=skip_null)
-    return flask.jsonify(docs), 200
+    return json.dumps(docs), 200
 
 
 @blueprint.record
