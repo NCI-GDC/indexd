@@ -772,7 +772,7 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/BulkInputInfo'
-        - name: has_version
+        - name: skip_null
           in: query
           description: filter by latest doc that has version value populated
           required: false

@@ -8,7 +8,7 @@ from tests.util import assert_blank
 import uuid
 
 
-def get_doc(baseid=None, has_metadata=True, has_version=False):
+def get_doc(baseid=None, version=None, has_metadata=True):
     doc = {
         'form': 'object',
         'size': 123,
@@ -20,8 +20,8 @@ def get_doc(baseid=None, has_metadata=True, has_version=False):
         doc['metadata'] = {'project_id': 'bpa-UChicago'}
     if baseid:
         doc['baseid'] = baseid
-    if has_version:
-        doc['version'] = '1'
+    if version:
+        doc['version'] = version
     return doc
 
 
@@ -718,11 +718,11 @@ def test_create_index_version(swg_index_client):
 
 
 def test_get_latest_version(swg_index_client):
-    data = get_doc(has_metadata=False, has_version=True)
+    data = get_doc(has_metadata=False, version="1")
     r = swg_index_client.add_entry(data)
     assert r.did
 
-    data = get_doc(has_metadata=False, has_version=False)
+    data = get_doc(has_metadata=False)
     r2 = swg_index_client.add_new_version(r.did, body=data)
     r3 = swg_index_client.get_latest_version(r.did)
     assert r3.did == r2.did
@@ -968,25 +968,33 @@ def test_bulk_get_documents(swg_index_client, swg_bulk_client):
 
 def test_bulk_get_latest_version(swg_index_client, swg_bulk_client):
     """
-    Create multiple docs and add one new version for each doc
+    Create multiple docs with version 1, for each doc add version 2 and version null
     Check the response docs matches with the created new version docs
     """
     # just make a bunch of entries in indexd
     dids = [
-        swg_index_client.add_entry(get_doc(baseid=str(uuid.uuid4()))).did
-        for _ in range(3)
+        swg_index_client.add_entry(get_doc(baseid=str(uuid.uuid4()), version="1")).did
+        for _ in range(5)
     ]
 
     # create new versions
-    latest_dids = [
+    latest_dids_with_version = [
+        swg_index_client.add_new_version(did, body=get_doc(version="2")).did
+        for did in dids
+    ]
+
+    # create new null versions
+    latest_dids_null_version = [
         swg_index_client.add_new_version(did, body=get_doc()).did
         for did in dids
     ]
 
     # do a bulk query to get all latest version
-    docs = swg_bulk_client.get_bulk_latest(dids)
+    docs = swg_bulk_client.get_bulk_latest(dids, skip_null=True)
+    docs_null = swg_bulk_client.get_bulk_latest(dids, skip_null=False)
 
-    assert set(latest_dids) == set([doc["did"] for doc in docs])
+    assert set(latest_dids_with_version) == set([doc["did"] for doc in docs])
+    assert set(latest_dids_null_version) == set([doc["did"] for doc in docs_null])
 
 
 def test_special_case_metadata_get_and_set(swg_index_client):
