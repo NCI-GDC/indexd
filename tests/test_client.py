@@ -1,4 +1,5 @@
 import json
+import random
 
 import pytest
 
@@ -966,35 +967,60 @@ def test_bulk_get_documents(swg_index_client, swg_bulk_client):
         assert doc['did'] in dids
 
 
-def test_bulk_get_latest_version(swg_index_client, swg_bulk_client):
+@pytest.mark.parametrize("add_null", [True, False])
+@pytest.mark.parametrize("skip_null", [True, False])
+def test_bulk_get_latest_version(swg_index_client, swg_bulk_client, add_null, skip_null):
     """
-    Create multiple docs with version 1, for each doc add version 2 and version null
-    Check the response docs matches with the created new version docs
+    Args:
+        add_null (boolean): add null version
+        skip_null (boolean): skip null when get latest version
+
+    Setup:
+    1. Create N docs in indexd that has version 1.
+    2. Choose random N/3 docs, add version 2.
+    3. If add_null: choose random N/3 docs, add version null.
+
+    NOTE: null version will always be the latest version.
+
+    If add_null is True:
+    1. N/3 to 2N/3 docs have version [1]
+    2. 0 to N/3 docs have version [1,2]
+    3. N/3 docs have version [1,2,None] or [1, None]
     """
+    total_files = 15
     # just make a bunch of entries in indexd
     dids = [
         swg_index_client.add_entry(get_doc(baseid=str(uuid.uuid4()), version="1")).did
-        for _ in range(5)
+        for _ in range(total_files)
     ]
 
-    # create new versions
-    latest_dids_with_version = {
-        swg_index_client.add_new_version(did, body=get_doc(version="2")).did
-        for did in dids
-    }
+    # create new NOT null versions for random 1/3 dids
+    chosen_new_version_dids = random.sample(dids, k=total_files/3)
+    latest_dids_excluding_null = []
+    for did in dids:
+        if did in chosen_new_version_dids:
+            latest_dids_excluding_null.append(swg_index_client.add_new_version(did, body=get_doc(version="2")).did)
+        else:
+            latest_dids_excluding_null.append(did)
+    assert len(latest_dids_excluding_null) == len(dids)
 
-    # create new null versions
-    latest_dids_null_version = {
-        swg_index_client.add_new_version(did, body=get_doc()).did
-        for did in dids
-    }
+    # create new null version for random 1/3 dids
+    latest_dids = []
+    if add_null:
+        chosen_null_version_dids = random.sample(latest_dids_excluding_null, k=total_files/3)
+        for did in latest_dids_excluding_null:
+            if did in chosen_null_version_dids:
+                latest_dids.append(swg_index_client.add_new_version(did, body=get_doc()).did)
+            else:
+                latest_dids.append(did)
+        assert len(latest_dids) == len(dids)
 
     # do a bulk query to get all latest version
-    docs = swg_bulk_client.get_bulk_latest(dids, skip_null=True)
-    docs_null = swg_bulk_client.get_bulk_latest(dids, skip_null=False)
-
-    assert latest_dids_with_version == {doc["did"] for doc in docs}
-    assert latest_dids_null_version == {doc["did"] for doc in docs_null}
+    docs = swg_bulk_client.get_bulk_latest(dids, skip_null=skip_null)
+    if add_null and not skip_null:
+        assert set(latest_dids) == {doc["did"] for doc in docs}
+    else:
+        assert set(latest_dids_excluding_null) == {doc["did"] for doc in docs}
 
 
 def test_special_case_metadata_get_and_set(swg_index_client):
