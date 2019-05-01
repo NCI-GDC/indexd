@@ -995,7 +995,7 @@ def test_bulk_get_latest_version(swg_index_client, swg_bulk_client, add_null, sk
     ]
 
     # create new NOT null versions for random 1/3 dids
-    chosen_new_version_dids = random.sample(dids, k=total_files/3)
+    chosen_new_version_dids = random.sample(dids, k=total_files//3)
     latest_dids_excluding_null = []
     for did in dids:
         if did in chosen_new_version_dids:
@@ -1007,7 +1007,7 @@ def test_bulk_get_latest_version(swg_index_client, swg_bulk_client, add_null, sk
     # create new null version for random 1/3 dids
     latest_dids = []
     if add_null:
-        chosen_null_version_dids = random.sample(latest_dids_excluding_null, k=total_files/3)
+        chosen_null_version_dids = random.sample(latest_dids_excluding_null, k=total_files//3)
         for did in latest_dids_excluding_null:
             if did in chosen_null_version_dids:
                 latest_dids.append(swg_index_client.add_new_version(did, body=get_doc()).did)
