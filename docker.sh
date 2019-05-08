@@ -7,7 +7,7 @@ mkdir -p build/src
 pip install \
     --src build/src \
     --no-deps \
-    requirements.txt
+    $(grep '.*egg=' requirements.txt)
 
 cp requirements.txt build/requirements.txt
 sed -i.tmp \
