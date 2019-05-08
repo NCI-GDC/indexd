@@ -19,14 +19,15 @@ install:
     - "python setup.py install --force"
     - "pip install -r test-requirements.txt"
 
+
+script: "py.test -vv tests"
+
 jobs:
    include:
-    - stage: test
-      script: "py.test -vv tests"
     - stage: deploy
       script: 
-      - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
-      - bash docker.sh
+        - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
+        - bash docker.sh
 
 env:
   global:
