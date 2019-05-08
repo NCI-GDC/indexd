@@ -11,8 +11,6 @@ RUN apt-get update \
     python-pip \
     python-setuptools \
     libpq-dev \
- && mkdir -p /src \
- && cp -r build/src-editable/* /src \
  && pip install wheel \
  && pip install -r build/requirements.txt . 
 
@@ -32,4 +30,3 @@ WORKDIR /var/www/indexd
 
 COPY --from=build /usr/local/lib/python2.7/dist-packages /usr/local/lib/python2.7/dist-packages
 
-COPY --from=build /src /src

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-rm -rf build/src build/src-editable
-mkdir -p build/src build/src-editable
+rm -rf build/src
+mkdir -p build/src
 
 pip install \
     --src build/src \
