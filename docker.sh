@@ -7,11 +7,11 @@ mkdir -p build/src build/src-editable
 pip install \
     --src build/src \
     --no-deps \
-    $(grep '^-e' requirements.txt)
+    requirements.txt
 
 cp requirements.txt build/requirements.txt
 sed -i.tmp \
-  -e 's;^-e.*egg=;build/src/;' \
+  -e 's;.*egg=;build/src/;' \
   -e '/^build\/src/s/_/-/g' \
 build/requirements.txt
 
