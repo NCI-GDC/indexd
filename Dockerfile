@@ -12,7 +12,7 @@ RUN apt-get update \
     python-setuptools \
     libpq-dev \
  && pip install wheel \
- && pip install -r build/requirements.txt . 
+ && pip install -r build/requirements.txt 
 
 FROM quay.io/ncigdc/apache-base:2.4.18-1.0.0
 
