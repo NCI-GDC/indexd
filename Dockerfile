@@ -26,7 +26,10 @@ LABEL org.label-schema.name="indexd" \
 
 RUN mkdir -p /var/www/indexd/ \
     && chmod 777 /var/www/indexd \
-    && a2dissite 000-default 
+    && a2dissite 000-default \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+       libpq5  
 
 COPY wsgi.py /var/www/indexd/ 
 COPY bin/indexd /var/www/indexd/ 
