@@ -24,8 +24,8 @@ LABEL org.label-schema.name="indexd" \
 
 RUN mkdir -p /var/www/indexd/ \
     && chmod 777 /var/www/indexd \
-    && cp /indexd/wsgi.py /var/www/indexd/wsgi.py \
-    && cp /indexd/bin/indexd /var/www/indexd/indexd
+    && cp wsgi.py /var/www/indexd/wsgi.py \
+    && cp bin/indexd /var/www/indexd/indexd
 
 WORKDIR /var/www/indexd
 
