@@ -11,6 +11,7 @@ RUN apt-get update \
     python-pip \
     python-setuptools \
     libpq-dev \
+    libpq5 \
     gcc \
  && pip install wheel \
  && pip install -r build/requirements.txt \
