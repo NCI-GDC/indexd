@@ -23,7 +23,8 @@ LABEL org.label-schema.name="indexd" \
       org.label-schema.schema-version="1.0"
 
 RUN mkdir -p /var/www/indexd/ \
-    && chmod 777 /var/www/indexd 
+    && chmod 777 /var/www/indexd \
+    && a2dissite 000-default 
 
 COPY wsgi.py /var/www/indexd/ 
 COPY bin/indexd /var/www/indexd/ 
