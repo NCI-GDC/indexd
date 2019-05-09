@@ -11,8 +11,7 @@ pip install \
 
 cp requirements.txt build/requirements.txt
 sed -i.tmp \
-  -e 's;.*egg=;build/src/;' \
-  -e '/^build\/src/s/_/-/g' \
+  -e 's;^-e.*egg=;build/src/;' \
 build/requirements.txt
 
 
