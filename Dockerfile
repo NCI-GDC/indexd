@@ -23,11 +23,12 @@ LABEL org.label-schema.name="indexd" \
       org.label-schema.schema-version="1.0"
 
 RUN mkdir -p /var/www/indexd/ \
-    && chmod 777 /var/www/indexd \
-    && cp wsgi.py /var/www/indexd/wsgi.py \
-    && cp bin/indexd /var/www/indexd/indexd
+    && chmod 777 /var/www/indexd 
+
+COPY wsgi.py /var/www/indexd/ 
+COPY bin/indexd /var/www/indexd/ 
+COPY --from=build /usr/local/lib/python2.7/dist-packages /usr/local/lib/python2.7/dist-packages
 
 WORKDIR /var/www/indexd
 
-COPY --from=build /usr/local/lib/python2.7/dist-packages /usr/local/lib/python2.7/dist-packages
 
