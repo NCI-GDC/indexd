@@ -1,4 +1,4 @@
-FROM quay.io/ncigdc/apache-base:2.4.18-1.0.0 as build
+FROM quay.io/ncigdc/apache-base:feat_add-logrotate as build
 
 
 COPY . /indexd
@@ -17,7 +17,7 @@ RUN apt-get update \
  && pip install -r build/requirements.txt \
  && python setup.py install 
 
-FROM quay.io/ncigdc/apache-base:2.4.18-1.0.0
+FROM quay.io/ncigdc/apache-base:feat_add-logrotate
 
 LABEL org.label-schema.name="indexd" \
       org.label-schema.description="indexd container image" \
