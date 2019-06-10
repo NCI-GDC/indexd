@@ -1,9 +1,5 @@
 language: python
 
-python:
-  - "2.7"
-  - "3.5"
-
 addons:
   postgresql: '9.4'
 
@@ -12,14 +8,21 @@ jdk:
 
 sudo: false
 
-script: "tox -e py27,py35"
+matrix:
+  include:
+    - python: 2.7
+      env: TOXENV=py27
+    - python: 3.5
+      env: TOXENV=py35
+
+script: tox
 
 jobs:
-   include:
-    - stage: deploy
-      script: 
-        - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
-        - bash docker.sh
+  include:
+     - stage: deploy
+       script:
+         - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
+         - bash docker.sh
 
 env:
   global:
