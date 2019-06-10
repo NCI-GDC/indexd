@@ -4,25 +4,24 @@ addons:
   postgresql: '9.4'
 
 jdk:
-    - oraclejdk8
+  - oraclejdk8
 
 sudo: false
 
-matrix:
-  include:
-    - python: 2.7
-      env: TOXENV=py27
-    - python: 3.5
-      env: TOXENV=py35
-
-script: tox
-
 jobs:
   include:
-     - stage: deploy
-       script:
-         - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
-         - bash docker.sh
+    - stage: test
+      script: tox
+      python: '2.7'
+      env: TOXENV=py27
+    - stage: test
+      script: tox
+      python: '3.5'
+      env: TOXENV=py35
+    - stage: deploy
+      script:
+        - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
+        - bash docker.sh
 
 env:
   global:
