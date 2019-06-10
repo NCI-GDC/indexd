@@ -8,6 +8,9 @@ jdk:
 
 sudo: false
 
+install:
+  - pip install 'tox>=3,<4'
+
 jobs:
   include:
     - stage: test
