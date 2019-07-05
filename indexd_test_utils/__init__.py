@@ -237,7 +237,7 @@ def create_random_index_version(index_client, did, version_did=None, version=Non
     data = {}
     if version_did:
         data["did"] = version_did
-        file_name += version_did
+        file_name = version_did
         md5_hasher.update(version_did.encode("utf-8"))
 
     data["acl"] = ["ax", "bx"]
@@ -246,7 +246,9 @@ def create_random_index_version(index_client, did, version_did=None, version=Non
     data["urls"] = ["s3://super-safe.com/{}_warning_huge_file.svs".format(file_name)]
     data["form"] = "object"
     data["file_name"] = "{}_warning_huge_file.svs".format(file_name)
-    data["urls_metadata"] = {"s3://super-safe.com/{}_warning_huge_file.svs".format(did): {"a": "b"}}
+    data["urls_metadata"] = {
+        "s3://super-safe.com/{}_warning_huge_file.svs".format(file_name): {"a": "b"}
+    }
 
     if version:
         data["version"] = version
