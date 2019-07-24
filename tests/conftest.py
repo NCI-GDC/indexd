@@ -23,7 +23,6 @@ from indexd_test_utils import (
     create_indexd_tables_no_migrate,
     index_driver,
     index_driver_no_migrate,
-    indexd_client,
     indexd_server,
     setup_indexd_test_database,
 )
