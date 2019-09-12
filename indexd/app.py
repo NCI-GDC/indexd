@@ -1,19 +1,18 @@
 import flask
+import os
+import sys
+
 from .bulk.blueprint import blueprint as indexd_bulk_blueprint
 from .index.blueprint import blueprint as indexd_index_blueprint
 from .alias.blueprint import blueprint as indexd_alias_blueprint
 from .dos.blueprint import blueprint as indexd_dos_blueprint
 from .blueprint import blueprint as cross_blueprint
-
 from indexd.urls.blueprint import blueprint as index_urls_blueprint
-
-import os
-import sys
-import cdislogging
+from indexd.utils import get_stream_handler
 
 
 def app_init(app, settings=None):
-    app.logger.addHandler(cdislogging.get_stream_handler())
+    app.logger.addHandler(get_stream_handler())
     if not settings:
         from .default_settings import settings
     app.config.update(settings['config'])

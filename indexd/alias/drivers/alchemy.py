@@ -2,7 +2,6 @@ import json
 import uuid
 from contextlib import contextmanager
 
-from cdislogging import get_logger
 from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String, and_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -16,6 +15,7 @@ from indexd.alias.errors import (
     RevisionMismatch,
 )
 from indexd.utils import (
+    get_logger,
     init_schema_version,
     is_empty_database,
     migrate_database,

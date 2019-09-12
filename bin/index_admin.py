@@ -1,6 +1,6 @@
 import argparse
 import sys
-from cdislogging import get_logger
+from indexd.utils import get_logger
 
 logger = get_logger('index_admin')
 

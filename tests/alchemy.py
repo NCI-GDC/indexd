@@ -1,8 +1,10 @@
-from cdislogging import get_logger
 from indexd.driver_base import SQLAlchemyDriverBase
 from sqlalchemy import String, Column, BigInteger, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
+
+from indexd.utils import get_logger
+
 
 Base = declarative_base()
 CURRENT_SCHEMA_VERSION = 2

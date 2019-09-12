@@ -3,7 +3,6 @@ import datetime
 import uuid
 from contextlib import contextmanager
 
-from cdislogging import get_logger
 from future.utils import iteritems
 from sqlalchemy import (
     BigInteger,
@@ -40,6 +39,7 @@ from indexd.utils import (
     is_empty_database,
     migrate_database,
 )
+from indexd.utils import get_logger
 
 Base = declarative_base()
 
