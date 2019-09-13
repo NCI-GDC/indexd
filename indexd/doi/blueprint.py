@@ -2,7 +2,6 @@ import re
 import flask
 import jsonschema
 
-from indexclient.client import IndexClient
 from .doiclient import DOIClient
 from .dosclient import DOSClient
 
@@ -85,9 +84,10 @@ def dist_get_record(record):
             elif indexd['type'] == "dos":
                 fetcher_client = DOSClient(baseurl=indexd['host'])
                 res = fetcher_client.get(record)
-            else:
-                fetcher_client = IndexClient(baseurl=indexd['host'])
-                res = fetcher_client.global_get(record, no_dist=True)
+            # Break the circular reference
+            # else:
+            #     fetcher_client = IndexClient(baseurl=indexd['host'])
+            #     res = fetcher_client.global_get(record, no_dist=True)
         except:
             # a lot of things can go wrong with the get, but in general we don't care here.
             continue

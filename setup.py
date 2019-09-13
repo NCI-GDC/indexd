@@ -16,9 +16,6 @@ setup(
         'sqlalchemy==1.3.3',
         'sqlalchemy-utils>=0.32.21',
         'future>=0.16.0,<1.0.0',
-        'indexclient',
-    ],
-    dependency_links=[
-        "git+https://github.com/uc-cdis/indexclient.git@1.3.1#egg=indexclient",
+        'requests==2.22.0',
     ],
 )
