@@ -1,6 +1,3 @@
-import hashlib
-import random
-import uuid
 from multiprocessing import Process
 
 import pytest
@@ -119,12 +116,6 @@ def create_indexd_tables_no_migrate(
     Also set up the password to be accessed by the client tests.
     """
     auth_driver.add('admin', 'admin')
-
-
-@pytest.fixture
-def indexd_client(indexd_server, create_indexd_tables):
-    """Create the tables and add an auth user"""
-    return IndexClient('http://localhost:8001', auth=('admin', 'admin'))
 
 
 @pytest.fixture(scope='session')
