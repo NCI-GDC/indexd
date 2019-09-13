@@ -1,19 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-rm -rf build/src
-mkdir -p build/src
-
-pip install \
-    --src build/src \
-    --no-deps \
-    $(grep '^-e.*egg=' requirements.txt)
-
-cp requirements.txt build/requirements.txt
-sed -i.tmp \
-  -e 's;^-e.*egg=;build/src/;' \
-build/requirements.txt
-
 
 # avoid installing git
 COMMIT=`git rev-parse HEAD` && echo "COMMIT=\"${COMMIT}\"" >indexd/index/version_data.py
