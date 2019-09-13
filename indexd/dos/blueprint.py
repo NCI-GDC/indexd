@@ -1,6 +1,6 @@
 import flask
 
-from indexd.blueprint import dist_get_record
+from indexd.doi.blueprint import dist_get_record
 
 from indexd.errors import AuthError
 from indexd.errors import UserError

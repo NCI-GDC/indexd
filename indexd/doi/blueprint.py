@@ -3,8 +3,8 @@ import flask
 import jsonschema
 
 from indexclient.client import IndexClient
-from doiclient.client import DOIClient
-from dosclient.client import DOSClient
+from .doiclient import DOIClient
+from .dosclient import DOSClient
 
 from indexd.utils import hint_match
 

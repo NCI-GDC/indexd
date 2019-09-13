@@ -6,7 +6,7 @@ from .bulk.blueprint import blueprint as indexd_bulk_blueprint
 from .index.blueprint import blueprint as indexd_index_blueprint
 from .alias.blueprint import blueprint as indexd_alias_blueprint
 from .dos.blueprint import blueprint as indexd_dos_blueprint
-from .blueprint import blueprint as cross_blueprint
+from .doi.blueprint import blueprint as cross_blueprint
 from indexd.urls.blueprint import blueprint as index_urls_blueprint
 from indexd.utils import get_stream_handler
 

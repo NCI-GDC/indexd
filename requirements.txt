@@ -5,5 +5,3 @@ sqlalchemy-utils>=0.32.21
 psycopg2>=2.7
 future>=0.16.0,<1.0.0
 -e git+https://github.com/NCI-GDC/indexclient.git@1.5.8#egg=indexclient
--e git+https://github.com/uc-cdis/doiclient.git@1.0.0#egg=doiclient
--e git+https://github.com/uc-cdis/dosclient.git@1.0.0#egg=dosclient
