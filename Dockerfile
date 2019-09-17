@@ -1,4 +1,4 @@
-FROM quay.io/ncigdc/apache-base:python3 as build
+FROM quay.io/ncigdc/apache-base:1.0.2-py3.5 as build
 
 
 COPY . /indexd
