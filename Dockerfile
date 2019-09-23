@@ -1,4 +1,4 @@
-FROM quay.io/ncigdc/apache-base:1.0.2-py3.5 as build
+FROM quay.io/ncigdc/apache-base:1.0.3-py3.5 as build
 
 
 COPY . /indexd
@@ -17,7 +17,7 @@ RUN apt-get update \
  && pip3 install -r build/requirements.txt \
  && python3 setup.py install
 
-FROM quay.io/ncigdc/apache-base:python3
+FROM quay.io/ncigdc/apache-base:1.0.3-py3.5
 
 LABEL org.label-schema.name="indexd" \
       org.label-schema.description="indexd container image" \
