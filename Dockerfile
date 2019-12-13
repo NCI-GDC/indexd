@@ -31,6 +31,8 @@ RUN mkdir -p /var/www/indexd/ \
     && apt-get install -y --no-install-recommends \
        libpq5  
 
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
 COPY wsgi.py /var/www/indexd/ 
 COPY bin/indexd /var/www/indexd/ 
 COPY --from=build /usr/local/lib/python3.5/dist-packages /usr/local/lib/python3.5/dist-packages
