@@ -18,6 +18,19 @@ Digital IDs are intended to be publicly readable documents, and therefore contai
 
 The second layer of user defined aliases are introduced to add flexibility of supporting human readable identifiers and allow referencing existing identifiers that are created in other systems.
 
+
+- [Indexd](#indexd)
+  - [Use Cases For Indexing Data](#use-cases-for-indexing-data)
+  - [Documentation](#documentation)
+  - [Installation](#installation)
+  - [Installation with Docker](#installation-with-docker)
+  - [Configuration](#configuration)
+  - [Index Records](#index-records)
+  - [Testing](#testing)
+  - [Testing with Docker](#testing-with-docker)
+  - [Setup pre-commit hook to check for secrets](#setup-pre-commit-hook-to-check-for-secrets)
+
+
 ## Use Cases For Indexing Data
 
 Data may be loaded into Indexd through a few different means supporting different use cases.
@@ -36,7 +49,7 @@ For existing data in buckets, the SNS or PubSub notifications may be simulated s
 
 Indexd supports void or blank records that allows users to pre-register data files in indexd before actually registering them. The complete flow contains three main steps: pre-register, hash/size/url populating and data node registration:
 - Fence requests blank object from indexd. Indexd creates an object with no hash, size or urls, only the `uploader` and optionally `file_name` fields.
-- Indexd listener mornitors bucket update, update to indexd with url, hash, size.
+- Indexd listener monitors bucket update, update to indexd with url, hash, size.
 - The client application (windmill or gen3-data-client) lists records for data files which the user needs to submit to the graph. The user fills all empty fields and submit the request to indexd to update the `acl`.
 
 See docs on data upload flow for further details:
