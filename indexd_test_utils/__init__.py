@@ -2,6 +2,7 @@ import hashlib
 import random
 import uuid
 from multiprocessing import Process
+from time import sleep
 
 import pytest
 import requests
@@ -168,6 +169,8 @@ def wait_for_indexd_alive(port):
     try:
         requests.get(url)
     except requests.ConnectionError:
+        sleep(0.1)
+        # TODO: Add a counter to fail after X attempts.
         return wait_for_indexd_alive(port)
     else:
         return
@@ -180,6 +183,8 @@ def wait_for_indexd_not_alive(port):
     except requests.ConnectionError:
         return
     else:
+        # TODO: Add a counter to fail after X attempts.
+        sleep(0.10)
         return wait_for_indexd_not_alive(port)
 
 
