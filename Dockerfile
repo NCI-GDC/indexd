@@ -1,14 +1,15 @@
-ARG base_version=fix_mod-wsgi-path-3
-ARG registry=docker.osdc.io
+ARG base_version=pr-4-9
+ARG registry=quay.io
 
 FROM ${registry}/ncigdc/python35-builder:${base_version} as build
 
-# Just copy requirements.txt initially so Docker can cache the layer with
+# Copy only requirements.txt here so Docker can cache the layer with
 # the installed packages if the pins don't change.
 COPY requirements.txt /indexd/
 WORKDIR /indexd
 RUN pip3 install --no-deps -r requirements.txt
 
+# Now install the code for indexd itself.
 COPY . /indexd
 RUN pip3 install --no-deps .
 
