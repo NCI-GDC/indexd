@@ -17,7 +17,8 @@ contextlib2==0.6.0.post1  # via -c requirements.txt, importlib-metadata, importl
 coverage==5.2             # via pytest-cov
 detect-secrets==0.13.0    # via -r dev-requirements.in
 distlib==0.3.1            # via virtualenv
-enum34==1.1.10            # via detect-secrets
+# manual edit to install only with py2
+enum34==1.1.10;python_version=="2.7"            # via detect-secrets
 filelock==3.0.12          # via virtualenv
 flask==1.1.2              # via -c requirements.txt, pytest-flask
 funcsigs==1.0.2           # via pytest
