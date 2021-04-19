@@ -1,6 +1,4 @@
 #!groovy
 
-library identifier: "jenkins-lib@ci/new-git-tag-get"
-dockerPipeline{
-    // testBranches = '(develop|master|release.*)'
-}
+library identifier: "jenkins-lib@develop"
+pipelineHelper.preCommitHooks()
