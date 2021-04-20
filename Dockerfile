@@ -7,6 +7,7 @@ FROM ${registry}/ncigdc/python35-builder:${base_version} as build
 # the installed packages if the pins don't change.
 COPY requirements.txt /indexd/
 WORKDIR /indexd
+RUN pip3 install setuptools_scm==5.0.2
 RUN pip3 install --no-deps -r requirements.txt
 
 # Now install the code for indexd itself.

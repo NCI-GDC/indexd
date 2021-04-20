@@ -6,7 +6,7 @@ setup(
         "local_scheme": "dirty-tag",
         "write_to": "indexd/_version.py",
     },
-    setup_requires=["setuptools_scm"],
+    setup_requires=["setuptools_scm==5.0.2"],
     packages=find_packages(),
     package_data={
         "index": [
