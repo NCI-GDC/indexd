@@ -6,7 +6,7 @@ from tests.test_client import get_doc
 
 
 @pytest.fixture(scope="function")
-def test_data(swg_index_client):
+def url_test_data(swg_index_client):
     system_random = random.SystemRandom()
     url_x_count = system_random.randint(2, 5)
 
@@ -34,14 +34,14 @@ def test_data(swg_index_client):
     return url_x_count, versioned_count, unversioned_count
 
 
-def test_query_urls(swg_index_client, swg_query_client, test_data):
+def test_query_urls(swg_index_client, swg_query_client, url_test_data):
     """
     Args:
         swg_index_client (swagger_client.api.indexurls_api.IndexApi):
         swg_query_client (swagger_client.api.indexurls_api.IndexurlsApi): urls api client
         test_data (tuple[int, int, int]:
     """
-    url_x_count, versioned_count, unversioned_count = test_data
+    url_x_count, versioned_count, unversioned_count = url_test_data
     # test get all
     urls_list = swg_query_client.query_urls()
     print(urls_list)
@@ -64,14 +64,14 @@ def test_query_urls(swg_index_client, swg_query_client, test_data):
     assert len(urls_list) == 2 * url_x_count
 
 
-def test_query_urls_metadata(swg_index_client, swg_query_client, test_data):
+def test_query_urls_metadata(swg_index_client, swg_query_client, url_test_data):
     """
     Args:
         swg_index_client (swagger_client.api.indexurls_api.IndexApi):
         swg_query_client (swagger_client.api.indexurls_api.IndexurlsApi): urls api client
         test_data (tuple[int, int, int]:
     """
-    url_x_count, _, unversioned_count = test_data
+    url_x_count, _, unversioned_count = url_test_data
     # test get all
     urls_list = swg_query_client.query_urls_metadata(key="state", value="uploaded", url="awesome-x")
     assert len(urls_list) == 2 * url_x_count

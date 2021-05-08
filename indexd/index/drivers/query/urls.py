@@ -59,19 +59,22 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
                 query = query.having(~q_func['string_agg'](IndexRecordUrlMetadataJsonb.url, ",").contains(exclude))
             # [('did', 'urls')]
             record_list = query.order_by(IndexRecordUrlMetadataJsonb.did.asc()).offset(offset).limit(limit).all()
-        return self._format_response(fields, record_list)
+        return record_list
 
     def query_metadata_by_key(self, key, value, url=None, versioned=None, offset=0,
-                              limit=1000, fields="did,urls,rev", **kwargs):
+                              limit=1000, fields="did,urls,rev,size", **kwargs):
 
         if kwargs:
             raise UserError("Unexpected query parameter(s) {}".format(kwargs.keys()))
 
         versioned = versioned.lower() in ["true", "t", "yes", "y"] if versioned else None
         with self.driver.session as session:
-            query = session.query(IndexRecordUrlMetadataJsonb.did,
-                                  IndexRecordUrlMetadataJsonb.url,
-                                  IndexRecord.rev)
+            query = session.query(
+                IndexRecordUrlMetadataJsonb.did,
+                IndexRecordUrlMetadataJsonb.url,
+                IndexRecord.rev,
+                IndexRecord.size,
+            )
             if key == 'type':
                 query = query.filter(
                     IndexRecord.did == IndexRecordUrlMetadataJsonb.did,
@@ -95,30 +98,6 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
             if url:
                 query = query.filter(IndexRecordUrlMetadataJsonb.url.like("%{}%".format(url)))
 
-            # [('did', 'url', 'rev')]
+            # [('did', 'url', 'rev', 'size')]
             record_list = query.order_by(IndexRecordUrlMetadataJsonb.did.asc()).offset(offset).limit(limit).all()
-        return self._format_response(fields, record_list)
-
-    @staticmethod
-    def _format_response(requested_fields, record_list):
-        """ loops through the query result and removes undesired columns and converts result of urls string_agg to list
-        Args:
-            requested_fields (str): comma separated list of fields to return, if not specified return all fields
-            record_list (list(tuple]): must be of the form [(did, urls, rev)], rev is not required for urls query
-        Returns:
-            list[dict]: list of response dicts
-        """
-        result = []
-        provided_fields_dict = {k: 1 for k in requested_fields.split(",")}
-        for record in record_list:
-            resp_dict = {}
-            if provided_fields_dict.get("did"):
-                resp_dict["did"] = record[0]
-            if provided_fields_dict.get("urls"):
-                resp_dict["urls"] = record[1].split(",") if record[1] else []
-
-            # check if record is returned in tuple
-            if provided_fields_dict.get("rev") and len(record) == 3:
-                resp_dict["rev"] = record[2]
-            result.append(resp_dict)
-        return result
+        return record_list
