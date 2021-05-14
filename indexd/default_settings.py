@@ -15,7 +15,7 @@ CONFIG["INDEX"] = {
     "driver": SQLAlchemyIndexDriver(
         PG_URL,
         auto_migrate=AUTO_MIGRATE,
-        echo=SQLALCHEMY_VERBOSE,
+        echo=True,
         index_config={
             "DEFAULT_PREFIX": "testprefix:",
             "ADD_PREFIX_ALIAS": True,
@@ -27,7 +27,7 @@ CONFIG["INDEX"] = {
 
 CONFIG["ALIAS"] = {
     "driver": SQLAlchemyAliasDriver(
-        PG_URL, auto_migrate=AUTO_MIGRATE, echo=SQLALCHEMY_VERBOSE, pool_pre_ping=True
+        PG_URL, auto_migrate=AUTO_MIGRATE, echo=True, pool_pre_ping=True
     ),
 }
 
@@ -52,6 +52,6 @@ CONFIG["DIST"] = [
     },
 ]
 
-AUTH = SQLAlchemyAuthDriver(PG_URL, pool_pre_ping=True)
+AUTH = SQLAlchemyAuthDriver(PG_URL, echo=True, pool_pre_ping=True)
 
 settings = {"config": CONFIG, "auth": AUTH}
