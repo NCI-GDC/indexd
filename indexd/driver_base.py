@@ -4,16 +4,17 @@ from sqlalchemy_utils import database_exists, create_database
 
 Base = declarative_base()
 
+
 class SQLAlchemyDriverBase(object):
-    '''
+    """
     SQLAlchemy implementation of index driver.
-    '''
+    """
 
     def __init__(self, conn, **config):
-        '''
+        """
         Initialize the SQLAlchemy database driver.
-        '''
-        engine = create_engine(conn, **config)
+        """
+        engine = create_engine(conn, **config, pool_pre_ping=True, echo=True)
         if not database_exists(engine.url):
             create_database(engine.url)
         self.engine = engine
