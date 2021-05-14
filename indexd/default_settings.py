@@ -6,50 +6,52 @@ from .index.drivers.alchemy import SQLAlchemyIndexDriver
 
 CONFIG = {}
 
-CONFIG['JSONIFY_PRETTYPRINT_REGULAR'] = False
+CONFIG["JSONIFY_PRETTYPRINT_REGULAR"] = False
 AUTO_MIGRATE = True
-SQLALCHEMY_VERBOSE = (
-    os.getenv('INDEXD_VERBOSE', '').lower() in ['1', 'yes', 'true']
-)
-PG_URL = 'postgres://test:test@localhost/indexd_test'
+SQLALCHEMY_VERBOSE = os.getenv("INDEXD_VERBOSE", "").lower() in ["1", "yes", "true"]
+PG_URL = "postgres://test:test@localhost/indexd_test"
 
-CONFIG['INDEX'] = {
-    'driver': SQLAlchemyIndexDriver(
-        PG_URL, auto_migrate=AUTO_MIGRATE, echo=SQLALCHEMY_VERBOSE,
+CONFIG["INDEX"] = {
+    "driver": SQLAlchemyIndexDriver(
+        PG_URL,
+        auto_migrate=AUTO_MIGRATE,
+        echo=SQLALCHEMY_VERBOSE,
         index_config={
-            'DEFAULT_PREFIX': 'testprefix:',
-            'ADD_PREFIX_ALIAS': True,
-            'PREPEND_PREFIX': True,
-        }
+            "DEFAULT_PREFIX": "testprefix:",
+            "ADD_PREFIX_ALIAS": True,
+            "PREPEND_PREFIX": True,
+        },
+        pool_pre_ping=True,
     ),
 }
 
-CONFIG['ALIAS'] = {
-    'driver': SQLAlchemyAliasDriver(
-        PG_URL, auto_migrate=AUTO_MIGRATE, echo=SQLALCHEMY_VERBOSE),
+CONFIG["ALIAS"] = {
+    "driver": SQLAlchemyAliasDriver(
+        PG_URL, auto_migrate=AUTO_MIGRATE, echo=SQLALCHEMY_VERBOSE, pool_pre_ping=True
+    ),
 }
 
-CONFIG['DIST'] = [
+CONFIG["DIST"] = [
     {
-        'name': 'Other IndexD',
-        'host': 'https://indexd.example.io/index/',
-        'hints': ['.*ROCKS.*'],
-        'type': 'indexd',
+        "name": "Other IndexD",
+        "host": "https://indexd.example.io/index/",
+        "hints": [".*ROCKS.*"],
+        "type": "indexd",
     },
     {
-        'name': 'DX DOI',
-        'host': 'https://doi.org/',
-        'hints': ['10\..*'],
-        'type': 'doi',
+        "name": "DX DOI",
+        "host": "https://doi.org/",
+        "hints": ["10\..*"],
+        "type": "doi",
     },
     {
-        'name': 'DOS System',
-        'host': 'https://example.com/api/ga4gh/dos/v1/',
-        'hints': [],
-        'type': 'dos',
+        "name": "DOS System",
+        "host": "https://example.com/api/ga4gh/dos/v1/",
+        "hints": [],
+        "type": "dos",
     },
 ]
 
-AUTH = SQLAlchemyAuthDriver(PG_URL)
+AUTH = SQLAlchemyAuthDriver(PG_URL, pool_pre_ping=True)
 
-settings = {'config': CONFIG, 'auth': AUTH}
+settings = {"config": CONFIG, "auth": AUTH}

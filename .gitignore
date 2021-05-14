@@ -88,3 +88,6 @@ swagger-codegen-cli.jar
 
 # Helm
 helm/*.tgz
+
+# pyenv
+.python-version
