@@ -31,7 +31,7 @@ requests==2.24.0          # via doiclient, dosclient, indexclient
 scandir==1.10.0           # via pathlib2
 six==1.15.0               # via jsonschema, pathlib2, pyrsistent, sqlalchemy-utils
 sqlalchemy-utils==0.36.3  # via indexd (setup.py)
-sqlalchemy==1.3.18        # via indexd (setup.py), sqlalchemy-utils
+sqlalchemy==1.3.19        # via indexd (setup.py), sqlalchemy-utils
 urllib3==1.25.9           # via requests
 werkzeug==0.16.1          # via flask, indexd (setup.py)
 zipp==1.2.0               # via importlib-metadata
