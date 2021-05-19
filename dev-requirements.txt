@@ -40,7 +40,7 @@ nodeenv==1.4.0            # via pre-commit
 pathlib2==2.3.5           # via -c requirements.txt, importlib-metadata, importlib-resources, pytest, virtualenv
 pluggy==0.13.1            # via pytest
 pre-commit==1.21.0        # via -r dev-requirements.in
-py==1.9.0                 # via pytest
+py==1.10.0                 # via pytest
 pyrsistent==0.16.0        # via -c requirements.txt, jsonschema
 pytest-cov==2.9.0         # via -r dev-requirements.in
 pytest-flask==0.15.1      # via -r dev-requirements.in
