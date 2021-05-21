@@ -15,6 +15,7 @@ setup(
     },
     scripts=["bin/index_admin.py", "bin/indexd", "bin/migrate_index.py"],
     install_requires=[
+        "newrelic",
         "flask~=1.1",
         "jsonschema>3,<4",
         "sqlalchemy~=1.3",
