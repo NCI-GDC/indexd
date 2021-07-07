@@ -1,6 +1,6 @@
 #!groovy
 
-library identifier: "jenkins-lib@feat/GDCDEVOPS-801-fix-docker-build-helm-steps"
+library identifier: "jenkins-lib@master"
 dockerPipeline{
     // testBranches = '(develop|master|release.*)'
 }
