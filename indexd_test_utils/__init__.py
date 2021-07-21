@@ -158,7 +158,6 @@ def indexd_server():
     else:
         # fork is the default on Python 2
         proc_handler = mp.Process
-    proc_handler = mp.get_context("fork").Process
     indexd = proc_handler(
         target=app.run,
         args=(hostname, port),
