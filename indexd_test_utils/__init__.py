@@ -2,6 +2,7 @@ import hashlib
 import random
 import uuid
 from multiprocessing import Process
+import multiprocessing as mp
 
 import pytest
 import requests
@@ -149,8 +150,8 @@ def indexd_server():
     hostname = 'localhost'
     port = 8001
     debug = False
-
-    indexd = Process(
+    proc_handler = mp.get_context("fork").Process
+    indexd = proc_handler(
         target=app.run,
         args=(hostname, port),
         kwargs={'debug': debug},
