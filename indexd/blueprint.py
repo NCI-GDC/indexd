@@ -2,12 +2,11 @@ import re
 import flask
 import jsonschema
 
-from indexclient.client import IndexClient
 from doiclient.client import DOIClient
 from dosclient.client import DOSClient
 
+from indexd.client import IndexClient
 from indexd.utils import hint_match
-
 from indexd.errors import AuthError
 from indexd.errors import UserError
 from indexd.alias.errors import NoRecordFound as AliasNoRecordFound
