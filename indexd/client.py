@@ -1,3 +1,7 @@
+# Note: Code below is taken from the indexclient client.py 
+# https://github.com/NCI-GDC/indexclient/blob/master/indexclient/client.py.
+# Changes to this code might also require changes to indexclient
+
 try:
     from urlparse import urljoin
 except ImportError:
