@@ -1,9 +1,9 @@
 import hashlib
 import random
 import uuid
-from multiprocessing import Process
 import multiprocessing as mp
 import six
+import sys
 
 import pytest
 import requests
@@ -152,7 +152,7 @@ def indexd_server():
     port = 8001
     debug = False
     proc_handler = mp.Process
-    if six.PY3:
+    if six.PY3 and sys.platform == 'darwin':
         # Note: explicitly specifying fork, as spawn is the default in
         # py3.8+ on macos.
         proc_handler = mp.get_context("fork").Process
