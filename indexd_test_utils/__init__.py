@@ -1,12 +1,10 @@
 import hashlib
 import random
 import uuid
-import multiprocessing as mp
-import six
-import sys
-
+import threading
 import pytest
 import requests
+
 from indexclient.client import Document, IndexClient
 from indexd import get_app
 from indexd.alias.drivers.alchemy import (
@@ -151,7 +149,6 @@ def indexd_server():
     hostname = 'localhost'
     port = 8001
     debug = False
-    import threading
     t = threading.Thread(target=app.run, kwargs={'host': hostname, 'port': port, 'debug': debug})
     t.setDaemon(True)
     t.start()
