@@ -151,23 +151,13 @@ def indexd_server():
     hostname = 'localhost'
     port = 8001
     debug = False
-    proc_handler = mp.Process
-    if six.PY3 and sys.platform == 'darwin':
-        # Note: explicitly specifying fork, as spawn is the default in
-        # py3.8+ on macos.
-        proc_handler = mp.get_context("fork").Process
-
-    indexd = proc_handler(
-        target=app.run,
-        args=(hostname, port),
-        kwargs={'debug': debug},
-    )
-    indexd.start()
+    import threading
+    t = threading.Thread(target=app.run, kwargs={'host': hostname, 'port': port, 'debug': debug})
+    t.setDaemon(True)
+    t.start()
     wait_for_indexd_alive(port)
 
     yield MockServer(port=port)
-    indexd.terminate()
-    wait_for_indexd_not_alive(port)
 
 
 def wait_for_indexd_alive(port):
