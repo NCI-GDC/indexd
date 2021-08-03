@@ -85,7 +85,7 @@ def dist_get_record(record):
                 fetcher_client = DOSClient(baseurl=indexd['host'])
                 res = fetcher_client.get(record)
             else:
-                res = requests.get(indexd['host'] + '/' + record)
+                res = requests.get(indexd['host'] + '/' + record, params={'no_dist':''})
                 handle_error(res)
         except:
             # a lot of things can go wrong with the get, but in general we don't care here.
