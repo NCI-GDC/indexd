@@ -13,7 +13,7 @@ def handle_error(resp):
     if 400 <= resp.status_code < 600:
         try:
             json = resp.json()
-            resp.reason = json["error"]
+            resp.reason = json.get("error")
         except KeyError:
             pass
         finally:
