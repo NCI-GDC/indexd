@@ -112,7 +112,6 @@ def alias_driver_no_migrate():
     driver.dispose()
 
 
-<<<<<<< HEAD
 @pytest.fixture
 def create_indexd_tables(index_driver, alias_driver, auth_driver):
     """Make sure the tables are created but don't operate on them directly.
@@ -167,9 +166,6 @@ class MockServer(object):
     def __init__(self, port):
         self.port = port
         self.baseurl = 'http://localhost:{}'.format(port)
-=======
-PG_URL = 'postgresql://test:test@localhost/indexd_test'
->>>>>>> develop
 
 
 @pytest.fixture
