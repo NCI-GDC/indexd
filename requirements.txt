@@ -4,8 +4,6 @@
 #
 #    pip-compile setup.py
 #
---index-url https://nexus.osdc.io/repository/pypi-all/simple
---trusted-host nexus.osdc.io
 
 attrs==19.3.0
     # via jsonschema
