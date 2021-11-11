@@ -28,5 +28,6 @@ setup(
         "Werkzeug~=0.16",
         "elastic-apm~=5.10.1",
         "blinker~=1.4",
+        "psutil~=5.8.0",
     ],
 )

@@ -7,7 +7,7 @@ application = get_app()
 application.config['ELASTIC_APM'] = {
     # Set the required service name. Allowed characters:
     # a-z, A-Z, 0-9, -, _, and space
-    'SERVICE_NAME': 'api',
+    'SERVICE_NAME': 'indexd',
 
     # Use if APM Server requires a secret token
     'SECRET_TOKEN': '',
@@ -16,7 +16,7 @@ application.config['ELASTIC_APM'] = {
     'SERVER_URL': 'http://elastic-apm.service.consul:8200',
 
     # Set the service environment
-    'ENVIRONMENT': 'dev-acollet',
+    'ENVIRONMENT': '',
 
     'NO_PROXY': '*',
 }
