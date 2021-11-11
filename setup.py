@@ -26,7 +26,7 @@ setup(
         "dosclient @ git+https://github.com/uc-cdis/dosclient.git@1.0.0#egg=dosclient",
         "future~=0.18",
         "Werkzeug~=0.16",
-        "elastic-apm~=6.6.2",
+        "elastic-apm~=5.10.1",
         "blinker~=1.4",
     ],
 )

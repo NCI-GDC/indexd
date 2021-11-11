@@ -23,7 +23,7 @@ doiclient @ git+https://github.com/uc-cdis/doiclient.git@1.0.0
     # via indexd (setup.py)
 dosclient @ git+https://github.com/uc-cdis/dosclient.git@1.0.0
     # via indexd (setup.py)
-elastic-apm==6.6.2
+elastic-apm==5.10.1
     # via indexd (setup.py)
 flask==1.1.2
     # via indexd (setup.py)
