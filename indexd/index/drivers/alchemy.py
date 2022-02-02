@@ -1002,9 +1002,15 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
         return ret
 
-    def get_latest_version(self, did, has_version=None):
+    def get_latest_version(self, did, has_version=None, not_deleted=None):
         """
-        Get the lattest record version given did
+        Get the latest record version given did
+        Args:
+            did (str): document id (UUID) of existing record
+            has_version (bool): if True, exclude records without a version
+            not_deleted (bool): if True, exclude records marked as deleted in index_metadata
+        Returns:
+            dict: latest record
         """
         with self.session as session:
             query = session.query(IndexRecord)
@@ -1023,8 +1029,10 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 .order_by(IndexRecord.created_date.desc())
             if has_version:
                 query = query.filter(IndexRecord.version.isnot(None))
+            if not_deleted:
+                query = query.filter((func.lower(IndexRecord.index_metadata['deleted'].astext) == 'true').isnot(True))
             record = query.first()
-            if (not record):
+            if not record:
                 raise NoRecordFound('no record found')
 
             return record.to_document_dict()

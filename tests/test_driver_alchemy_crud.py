@@ -1,3 +1,4 @@
+import json
 import uuid
 from datetime import datetime
 
@@ -396,6 +397,41 @@ def test_driver_get_latest_version_with_no_record(index_driver, database_conn):
 
     with pytest.raises(NoRecordFound):
         index_driver.get_latest_version('some base version')
+
+
+def test_driver_get_latest_version_not_deleted(index_driver, database_conn):
+    """
+    Tests retrieval of the latest record version not flagged as deleted in index_metadata
+    """
+    baseid = str(uuid.uuid4())
+
+    is_first_record = True
+    for _ in range(10):
+
+        did = str(uuid.uuid4())
+        rev = str(uuid.uuid4())[:8]
+        size = 512
+        form = 'object'
+        created_date = datetime.now()
+        updated_date = datetime.now()
+
+        if is_first_record:
+            is_first_record = False
+            index_metadata = None
+            non_deleted_did = did
+        else:
+            index_metadata = json.dumps({'deleted': 'true'})
+
+        database_conn.execute(make_sql_statement("""
+            INSERT INTO index_record(did, baseid, rev, form, size, created_date, updated_date, index_metadata) 
+            VALUES (?,?,?,?,?,?,?,?)
+        """, (did, baseid, rev, form, size, created_date, updated_date, index_metadata)))
+
+    record = index_driver.get_latest_version(did, not_deleted=True)
+
+    assert record['baseid'] == baseid, 'record baseid does not match'
+    assert record['did'] != did, 'record did matches deleted record'
+    assert record['did'] == non_deleted_did, 'record id does not match non-deleted record'
 
 
 def test_driver_get_all_version(index_driver, database_conn):
