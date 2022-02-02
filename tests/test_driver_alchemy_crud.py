@@ -500,6 +500,48 @@ def test_driver_get_all_version_with_no_record(index_driver, database_conn):
         index_driver.get_all_versions('some baseid')
 
 
+def test_driver_get_all_version_not_deleted(index_driver, database_conn):
+    """
+    Tests retrieval of all versions of a document not flagged as deleted
+    """
+    baseid = str(uuid.uuid4())
+
+    non_deleted_dids = []
+    deleted_dids = []
+
+    for i in range(10):
+
+        did = str(uuid.uuid4())
+        rev = str(uuid.uuid4())[:8]
+        size = 512
+        form = 'object'
+        created_date = datetime.now()
+        updated_date = created_date
+
+        if i % 2 == 0:
+            non_deleted_dids.append(did)
+            index_metadata = None
+        else:
+            deleted_dids.append(did)
+            index_metadata = json.dumps({'deleted': 'true'})
+
+        database_conn.execute(make_sql_statement("""
+            INSERT INTO index_record(did, baseid, rev, form, size, created_date, updated_date, index_metadata)
+            VALUES (?,?,?,?,?,?,?,?)
+        """, (did, baseid, rev, form, size, created_date, updated_date, index_metadata)))
+
+    records = index_driver.get_all_versions(did, not_deleted=True)
+    assert len(records) == len(non_deleted_dids), 'the number of records does not match'
+
+    for record in records.values():
+        assert record['baseid'] == baseid, 'record baseid does not match'
+        assert record['did'] in non_deleted_dids, 'unexpected record did found'
+        assert record['did'] not in deleted_dids, 'deleted record did found'
+        non_deleted_dids.remove(record['did'])
+
+    assert not non_deleted_dids, 'one or more expected dids not found'
+
+
 def test_driver_get_fails_with_invalid_id(index_driver, database_conn):
     """
     Tests retrieval of a record fails if the record id is not found.

@@ -972,9 +972,14 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             return record.did, record.baseid, record.rev
 
-    def get_all_versions(self, did):
+    def get_all_versions(self, did, not_deleted=None):
         """
         Get all record versions given did
+        Args:
+            did (str): document id (UUID) of existing record
+            not_deleted (bool): if True, exclude records marked as deleted in index_metadata
+        Returns:
+            dict: record versions
         """
         ret = dict()
         with self.session as session:
@@ -994,7 +999,11 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 raise MultipleRecordsFound('multiple records found')
 
             query = session.query(IndexRecord)
-            records = query.filter(IndexRecord.baseid == baseid).all()
+            query = query.filter(IndexRecord.baseid == baseid)
+            if not_deleted:
+                query = query.filter((func.lower(IndexRecord.index_metadata['deleted'].astext) == 'true').isnot(True))
+
+            records = query.all()
 
             for idx, record in enumerate(records):
 

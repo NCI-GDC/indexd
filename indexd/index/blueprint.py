@@ -449,10 +449,11 @@ def add_index_record_version(record):
 
 @blueprint.route('/index/<path:record>/versions', methods=['GET'])
 def get_all_index_record_versions(record):
-    '''
+    """
     Get all record versions
-    '''
-    ret = blueprint.index_driver.get_all_versions(record)
+    """
+    not_deleted = flask.request.args.get('not_deleted', '').lower() == 'true'
+    ret = blueprint.index_driver.get_all_versions(record, not_deleted=not_deleted)
 
     return flask.jsonify(ret), 200
 
