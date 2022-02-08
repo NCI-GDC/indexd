@@ -411,7 +411,7 @@ def test_driver_get_latest_version_not_deleted(index_driver, database_conn):
         did = str(uuid.uuid4())
         rev = str(uuid.uuid4())[:8]
         size = 512
-        form = 'object'
+        form = "object"
         created_date = datetime.now()
         updated_date = datetime.now()
 
@@ -420,7 +420,7 @@ def test_driver_get_latest_version_not_deleted(index_driver, database_conn):
             index_metadata = None
             non_deleted_did = did
         else:
-            index_metadata = json.dumps({'deleted': 'true'})
+            index_metadata = json.dumps({"deleted": "true"})
 
         database_conn.execute(make_sql_statement("""
             INSERT INTO index_record(did, baseid, rev, form, size, created_date, updated_date, index_metadata) 
@@ -429,9 +429,9 @@ def test_driver_get_latest_version_not_deleted(index_driver, database_conn):
 
     record = index_driver.get_latest_version(did, not_deleted=True)
 
-    assert record['baseid'] == baseid, 'record baseid does not match'
-    assert record['did'] != did, 'record did matches deleted record'
-    assert record['did'] == non_deleted_did, 'record id does not match non-deleted record'
+    assert record["baseid"] == baseid, "record baseid does not match"
+    assert record["did"] != did, "record did matches deleted record"
+    assert record["did"] == non_deleted_did, "record id does not match non-deleted record"
 
 
 def test_driver_get_all_version(index_driver, database_conn):
@@ -514,7 +514,7 @@ def test_driver_get_all_version_not_deleted(index_driver, database_conn):
         did = str(uuid.uuid4())
         rev = str(uuid.uuid4())[:8]
         size = 512
-        form = 'object'
+        form = "object"
         created_date = datetime.now()
         updated_date = created_date
 
@@ -523,7 +523,7 @@ def test_driver_get_all_version_not_deleted(index_driver, database_conn):
             index_metadata = None
         else:
             deleted_dids.append(did)
-            index_metadata = json.dumps({'deleted': 'true'})
+            index_metadata = json.dumps({"deleted": "true"})
 
         database_conn.execute(make_sql_statement("""
             INSERT INTO index_record(did, baseid, rev, form, size, created_date, updated_date, index_metadata)
@@ -531,15 +531,9 @@ def test_driver_get_all_version_not_deleted(index_driver, database_conn):
         """, (did, baseid, rev, form, size, created_date, updated_date, index_metadata)))
 
     records = index_driver.get_all_versions(did, not_deleted=True)
-    assert len(records) == len(non_deleted_dids), 'the number of records does not match'
-
-    for record in records.values():
-        assert record['baseid'] == baseid, 'record baseid does not match'
-        assert record['did'] in non_deleted_dids, 'unexpected record did found'
-        assert record['did'] not in deleted_dids, 'deleted record did found'
-        non_deleted_dids.remove(record['did'])
-
-    assert not non_deleted_dids, 'one or more expected dids not found'
+    assert len(records) == len(non_deleted_dids), "the number of records does not match"
+    assert all([doc["baseid"] == baseid for doc in records.values()]), "record baseid does not match"
+    assert set(doc["did"] for doc in records.values()) == set(non_deleted_dids), "record did does not match"
 
 
 def test_driver_get_fails_with_invalid_id(index_driver, database_conn):
