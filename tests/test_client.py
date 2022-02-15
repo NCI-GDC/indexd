@@ -27,7 +27,7 @@ def get_doc(baseid=None, version=None, has_metadata=True):
 
 
 def test_index_list(swg_index_client):
-    r = swg_index_client.list_entries()
+    r = swg_index_client.list_index_entries()
     assert r.records == []
 
 
@@ -38,7 +38,7 @@ def test_index_list_with_params(swg_index_client):
         's3://endpointurl/bucket_2/key_2': {'state': 'error', 'other': 'xxx'},
         's3://anotherurl/bucket_2/key_2': {'state': 'error', 'other': 'xxx'}
     }
-    r_1 = swg_index_client.add_entry(data)
+    r_1 = swg_index_client.add_index_entry(data)
 
     data2 = get_doc()
     data2['metadata'] = {
@@ -49,96 +49,96 @@ def test_index_list_with_params(swg_index_client):
         's3://endpointurl/bucket/key_2': {'state': 'error', 'other': 'xxx'},
         's3://anotherurl/bucket/key_2': {'state': 'error', 'other': 'xxx'},
     }
-    r_2 = swg_index_client.add_entry(data2)
-    r = swg_index_client.list_entries(metadata='project_id:bpa-UChicago')
+    r_2 = swg_index_client.add_index_entry(data2)
+    r = swg_index_client.list_index_entries(metadata='project_id:bpa-UChicago')
     ids = [record.did for record in r.records]
     assert r_1.did in ids
 
-    r = swg_index_client.list_entries(metadata='project_id:other-project')
+    r = swg_index_client.list_index_entries(metadata='project_id:other-project')
     ids = [record.did for record in r.records]
     assert r_2.did in ids
 
-    r = swg_index_client.list_entries(
+    r = swg_index_client.list_index_entries(
         hash='md5:8b9942cf415384b27cadf1f4d2d682e5')
     ids = [record.did for record in r.records]
     assert r_1.did in ids
     assert r_2.did in ids
 
-    r = swg_index_client.list_entries(
+    r = swg_index_client.list_index_entries(
         ids=','.join(ids))
 
     ids = [record.did for record in r.records]
     assert r_1.did in ids
     assert r_2.did in ids
 
-    r = swg_index_client.list_entries(limit=2)
+    r = swg_index_client.list_index_entries(limit=2)
     assert len(r.records) == 2
 
     param = {'bucket': {'state': 'error', 'other': 'xxx'}}
 
-    r = swg_index_client.list_entries(limit=2, urls_metadata=json.dumps(param))
+    r = swg_index_client.list_index_entries(limit=2, urls_metadata=json.dumps(param))
     assert len(r.records) == 2
 
 
 def test_index_list_with_params_negate(swg_index_client):
     data = get_doc()
     data['urls_metadata']['s3://endpointurl/bucket/key'] = {}
-    r_1 = swg_index_client.add_entry(data)
+    r_1 = swg_index_client.add_index_entry(data)
 
     data['metadata'] = {'testkey': 'test', 'project_id': 'negate-project'}
-    r_2 = swg_index_client.add_entry(data)
+    r_2 = swg_index_client.add_index_entry(data)
 
     data['urls_metadata'] = {
         's3://endpointurl/bucket_2/key_2': {'state': 'error'},
         's3://endpointurl/bucket_3/key_3': {'state': 'error'},
     }
     data['urls'] = sorted(data['urls_metadata'].keys())
-    r_3 = swg_index_client.add_entry(data)
+    r_3 = swg_index_client.add_index_entry(data)
 
     data['urls_metadata'] = {'s3://endpointurl/bucket_2/key_2': {'no_state': 'uploaded'}}
     data['urls'] = sorted(data['urls_metadata'].keys())
-    r_4 = swg_index_client.add_entry(data)
+    r_4 = swg_index_client.add_index_entry(data)
 
     data['urls_metadata'] = {'s3://anotherurl/bucket/key': {'state': 'error'}}
     data['urls'] = sorted(data['urls_metadata'].keys())
-    r_5 = swg_index_client.add_entry(data)
+    r_5 = swg_index_client.add_index_entry(data)
 
     negate_params = {'metadata': {'testkey': ''}}
-    r = swg_index_client.list_entries(negate_params=json.dumps(negate_params))
+    r = swg_index_client.list_index_entries(negate_params=json.dumps(negate_params))
     ids = {record.did for record in r.records}
     assert {r_1.did} == ids
 
     negate_params = {'metadata': {'project_id': 'bpa-UChicago'}}
-    r = swg_index_client.list_entries(negate_params=json.dumps(negate_params))
+    r = swg_index_client.list_index_entries(negate_params=json.dumps(negate_params))
     ids = {record.did for record in r.records}
     assert {r_2.did, r_3.did, r_4.did, r_5.did} == ids
 
     # negate url
     negate_params = {'urls': ['s3://endpointurl/bucket_2/key_2']}
-    r = swg_index_client.list_entries(negate_params=json.dumps(negate_params))
+    r = swg_index_client.list_index_entries(negate_params=json.dumps(negate_params))
     ids = {record.did for record in r.records}
     assert ids == {r_1.did, r_2.did, r_5.did}
 
     # negate url key
     negate_params = {'urls_metadata': {'s3://endpointurl/': {}}}
-    r = swg_index_client.list_entries(negate_params=json.dumps(negate_params))
+    r = swg_index_client.list_index_entries(negate_params=json.dumps(negate_params))
     ids = {record.did for record in r.records}
     assert ids == {r_5.did}
 
     negate_params = {'urls_metadata': {'s3://endpointurl/': {}, 's3://anotherurl/': {}}}
-    r = swg_index_client.list_entries(negate_params=json.dumps(negate_params))
+    r = swg_index_client.list_index_entries(negate_params=json.dumps(negate_params))
     ids = {record.did for record in r.records}
     assert ids == set()
 
     # negate url_metadata key
     negate_params = {'urls_metadata': {'s3://endpointurl/': {'state': ''}, 's3://anotherurl/': {}}}
-    r = swg_index_client.list_entries(negate_params=json.dumps(negate_params))
+    r = swg_index_client.list_index_entries(negate_params=json.dumps(negate_params))
     ids = {record.did for record in r.records}
     assert ids == {r_1.did, r_2.did, r_3.did, r_4.did}
 
     # negate url_metadata value
     negate_params = {'urls_metadata': {'s3://endpointurl/': {'state': 'uploaded'}}}
-    r = swg_index_client.list_entries(negate_params=json.dumps(negate_params))
+    r = swg_index_client.list_index_entries(negate_params=json.dumps(negate_params))
     ids = {record.did for record in r.records}
     assert ids == {r_1.did, r_2.did, r_3.did, r_4.did, r_5.did}
 
@@ -149,17 +149,17 @@ def test_list_entries_with_uploader(swg_index_client):
     """
     data = get_doc()
     data['uploader'] = 'uploader_1'
-    swg_index_client.add_entry(data)
+    swg_index_client.add_index_entry(data)
 
     data = get_doc()
     data['uploader'] = 'uploader_123'
-    r2 = swg_index_client.add_entry(data)
+    r2 = swg_index_client.add_index_entry(data)
 
     data = get_doc()
     data['uploader'] = 'uploader_123'
-    r3 = swg_index_client.add_entry(data)
+    r3 = swg_index_client.add_index_entry(data)
 
-    r = swg_index_client.list_entries(uploader='uploader_123')
+    r = swg_index_client.list_index_entries(uploader='uploader_123')
     assert len(r.records) == 2
     assert {r2.did, r3.did} == {r.records[0].did, r.records[1].did}
     assert r.records[0].uploader == 'uploader_123'
@@ -171,17 +171,17 @@ def test_list_entries_with_uploader_wrong_uploader(swg_index_client):
     """
     data = get_doc()
     data['uploader'] = 'uploader_1'
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
 
     data = get_doc()
     data['uploader'] = 'uploader_123'
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
 
     data = get_doc()
     data['uploader'] = 'uploader_123'
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
 
-    r = swg_index_client.list_entries(uploader='wrong_uploader')
+    r = swg_index_client.list_index_entries(uploader='wrong_uploader')
     assert len(r.records) == 0
 
 
@@ -194,12 +194,12 @@ def test_create_blank_record(swg_index_client):
     doc = {
         'uploader': 'uploader_123'
     }
-    r = swg_index_client.create_blank_entry(doc)
+    r = swg_index_client.create_index_blank_entry(doc)
     assert r.did
     assert r.rev
     assert r.baseid
 
-    r = swg_index_client.list_entries(uploader='uploader_123')
+    r = swg_index_client.list_index_entries(uploader='uploader_123')
     assert r.records[0].uploader == 'uploader_123'
     assert not r.records[0].file_name
     assert_blank(r)
@@ -214,12 +214,12 @@ def test_create_blank_record_with_file_name(swg_index_client):
         'uploader': 'uploader_321',
         'file_name': 'myfile.txt'
     }
-    r = swg_index_client.create_blank_entry(doc)
+    r = swg_index_client.create_index_blank_entry(doc)
     assert r.did
     assert r.rev
     assert r.baseid
 
-    r = swg_index_client.list_entries(uploader='uploader_321')
+    r = swg_index_client.list_index_entries(uploader='uploader_321')
     assert r.records[0].uploader == 'uploader_321'
     assert r.records[0].file_name == 'myfile.txt'
     assert_blank(r)
@@ -230,7 +230,7 @@ def test_fill_size_n_hash_for_blank_record(swg_index_client):
     """
     doc = {'uploader': 'uploader_123'}
 
-    r = swg_index_client.create_blank_entry(doc)
+    r = swg_index_client.create_index_blank_entry(doc)
     assert r.did
     assert r.rev
 
@@ -240,11 +240,11 @@ def test_fill_size_n_hash_for_blank_record(swg_index_client):
         'hashes': {'md5': '8b9942cf415384b27cadf1f4d2d981f5'},
     }
 
-    r = swg_index_client.update_blank_entry(guid=did, rev=rev, body=updated)
+    r = swg_index_client.update_index_blank_entry(guid=did, rev=rev, body=updated)
     assert r.did == did
     assert r.rev != rev
 
-    r = swg_index_client.get_entry(did)
+    r = swg_index_client.get_index_entry(did)
     assert r.size == 10
     assert r.hashes.md5 == '8b9942cf415384b27cadf1f4d2d981f5'
 
@@ -253,18 +253,18 @@ def test_get_empty_acl_record(swg_index_client):
     Test that can get a list of empty acl given uploader
     """
     doc = get_doc()
-    r = swg_index_client.add_entry(doc)
+    r = swg_index_client.add_index_entry(doc)
 
     doc = {'uploader': 'uploader_123'}
-    r2 = swg_index_client.create_blank_entry(doc)
+    r2 = swg_index_client.create_index_blank_entry(doc)
 
     doc = {'uploader': 'uploader_123'}
-    r3 = swg_index_client.create_blank_entry(doc)
+    r3 = swg_index_client.create_index_blank_entry(doc)
 
-    r = swg_index_client.list_entries()
+    r = swg_index_client.list_index_entries()
     assert len(r.records) == 3
 
-    r = swg_index_client.list_entries(uploader='uploader_123', acl='null')
+    r = swg_index_client.list_index_entries(uploader='uploader_123', acl='null')
 
     assert len(r.records) == 2
     assert {r2.did, r3.did} == {r.records[0].did, r.records[1].did}
@@ -277,21 +277,21 @@ def test_get_empty_acl_record_after_fill_size_n_hash(swg_index_client):
     """
     # create the first blank record, update size, hashes and acl
     doc = {'uploader': 'uploader_123'}
-    r1 = swg_index_client.create_blank_entry(doc)
+    r1 = swg_index_client.create_index_blank_entry(doc)
     updated = {
         'size': 10,
         'hashes': {'md5': '8b9942cf415384b27cadf1f4d2d981f5'},
     }
     did1 = r1.did
-    r1 = swg_index_client.update_blank_entry(guid=r1.did, rev=r1.rev, body=updated)
-    r1 = swg_index_client.update_entry(guid=r1.did, rev=r1.rev, body={'acl': ['read']})
-    r1 = swg_index_client.get_entry(r1.did)
+    r1 = swg_index_client.update_index_blank_entry(guid=r1.did, rev=r1.rev, body=updated)
+    r1 = swg_index_client.update_index_entry(guid=r1.did, rev=r1.rev, body={'acl': ['read']})
+    r1 = swg_index_client.get_index_entry(r1.did)
     assert r1.acl == ['read']
     assert r1.did == did1
 
     # create the second blank record, only update size hashes and urls
     doc = {'uploader': 'uploader_123'}
-    r2 = swg_index_client.create_blank_entry(doc)
+    r2 = swg_index_client.create_index_blank_entry(doc)
     did2 = r2.did
     updated = {
         'size': 4,
@@ -301,7 +301,7 @@ def test_get_empty_acl_record_after_fill_size_n_hash(swg_index_client):
 
     # create the second blank record, only update size hashes and urls
     doc = {'uploader': 'uploader_123'}
-    r3 = swg_index_client.create_blank_entry(doc)
+    r3 = swg_index_client.create_index_blank_entry(doc)
     did3 = r3.did
     updated = {
         'size': 4,
@@ -309,34 +309,34 @@ def test_get_empty_acl_record_after_fill_size_n_hash(swg_index_client):
         'urls': ['s3://example/2'],
         'urls_metadata': {'s3://example/2': {}},
     }
-    swg_index_client.update_blank_entry(guid=r3.did, rev=r3.rev, body=updated)
+    swg_index_client.update_index_blank_entry(guid=r3.did, rev=r3.rev, body=updated)
 
-    r = swg_index_client.list_entries(uploader='uploader_123')
+    r = swg_index_client.list_index_entries(uploader='uploader_123')
     assert len(r.records) == 3
 
-    r = swg_index_client.list_entries(uploader='uploader_123', acl='read')
+    r = swg_index_client.list_index_entries(uploader='uploader_123', acl='read')
     assert len(r.records) == 1
     assert r.records[0].did == r1.did
 
 
-    r = swg_index_client.list_entries(uploader='uploader_123', acl='write')
+    r = swg_index_client.list_index_entries(uploader='uploader_123', acl='write')
     assert len(r.records) == 0
 
-    r = swg_index_client.list_entries(uploader='uploader_123', acl='null')
+    r = swg_index_client.list_index_entries(uploader='uploader_123', acl='null')
     assert len(r.records) == 2
     assert {r.records[0].did, r.records[1].did} == {did2, did3}
 
 def test_urls_metadata(swg_index_client):
     data = get_doc()
-    result = swg_index_client.add_entry(data)
+    result = swg_index_client.add_index_entry(data)
 
-    doc = swg_index_client.get_entry(result.did)
+    doc = swg_index_client.get_index_entry(result.did)
     assert doc.urls_metadata == data['urls_metadata']
 
     updated = {'urls_metadata': {data['urls'][0]: {'test': 'b'}}}
-    swg_index_client.update_entry(guid=doc.did, rev=doc.rev, body=updated)
+    swg_index_client.update_index_entry(guid=doc.did, rev=doc.rev, body=updated)
 
-    doc = swg_index_client.get_entry(result.did)
+    doc = swg_index_client.get_index_entry(result.did)
     assert doc.urls_metadata == updated['urls_metadata']
 
 
@@ -395,11 +395,11 @@ def test_urls_metadata_partial_match(swg_index_client, doc_urls, urls_meta,
         for url in url_group:
             data['urls_metadata'][url] = urls_meta[url]
 
-        record = swg_index_client.add_entry(data)
+        record = swg_index_client.add_index_entry(data)
         for url in url_group:
             url_doc_mapping[url] = record
 
-    docs = swg_index_client.list_entries(
+    docs = swg_index_client.list_index_entries(
         urls_metadata=json.dumps(params)
     )
 
@@ -409,7 +409,7 @@ def test_urls_metadata_partial_match(swg_index_client, doc_urls, urls_meta,
 
 def test_get_urls(swg_index_client, swg_global_client):
     data = get_doc()
-    result = swg_index_client.add_entry(data)
+    result = swg_index_client.add_index_entry(data)
 
     result = swg_global_client.list_urls(ids=result.did)
     url = data['urls'][0]
@@ -420,19 +420,19 @@ def test_get_urls(swg_index_client, swg_global_client):
 def test_index_create(swg_index_client):
     data = get_doc(baseid=str(uuid.uuid4()))
 
-    result = swg_index_client.add_entry(data)
+    result = swg_index_client.add_index_entry(data)
     assert result.did
     assert result.baseid == data['baseid']
-    r = swg_index_client.get_entry(result.did)
+    r = swg_index_client.get_index_entry(result.did)
     assert r.acl == []
 
 
 def test_index_get(swg_index_client):
     data = get_doc(baseid=str(uuid.uuid4()))
 
-    result = swg_index_client.add_entry(data)
-    r = swg_index_client.get_entry(result.did)
-    r2 = swg_index_client.get_entry(result.baseid)
+    result = swg_index_client.add_index_entry(data)
+    r = swg_index_client.get_index_entry(result.did)
+    r2 = swg_index_client.get_index_entry(result.baseid)
     assert r.did == result.did
     assert r2.did == result.did
 
@@ -440,20 +440,20 @@ def test_index_get(swg_index_client):
 def test_index_prepend_prefix(swg_index_client):
     data = get_doc()
 
-    result = swg_index_client.add_entry(data)
-    r = swg_index_client.get_entry(result.did)
+    result = swg_index_client.add_index_entry(data)
+    r = swg_index_client.get_index_entry(result.did)
     assert r.did == result.did
     assert r.did.startswith('testprefix:')
 
 
 def test_index_get_with_baseid(swg_index_client):
     data1 = get_doc(baseid=str(uuid.uuid4()))
-    swg_index_client.add_entry(data1)
+    swg_index_client.add_index_entry(data1)
 
     data2 = get_doc(baseid=data1['baseid'])
-    r2 = swg_index_client.add_entry(data2)
+    r2 = swg_index_client.add_index_entry(data2)
 
-    r = swg_index_client.get_entry(data1['baseid'])
+    r = swg_index_client.get_index_entry(data1['baseid'])
     assert r.did == r2.did
 
 
@@ -467,7 +467,7 @@ def test_delete_and_recreate(swg_index_client):
     new_data = get_doc(old_data['baseid'])
     new_data['hashes'] = {'md5': '11111111111111111111111111111111'}
 
-    old_result = swg_index_client.add_entry(old_data)
+    old_result = swg_index_client.add_index_entry(old_data)
     assert old_result.did
     assert old_result.baseid == old_data['baseid']
 
@@ -475,13 +475,13 @@ def test_delete_and_recreate(swg_index_client):
     new_data['did'] = old_result.did
 
     # delete the old doc
-    swg_index_client.delete_entry(old_result.did, old_result.rev)
+    swg_index_client.delete_index_entry(old_result.did, old_result.rev)
     with pytest.raises(ApiException):
         # make sure it's deleted
-        swg_index_client.get_entry(old_result.did)
+        swg_index_client.get_index_entry(old_result.did)
 
     # create new doc with the same baseid and did
-    new_result = swg_index_client.add_entry(new_data)
+    new_result = swg_index_client.add_index_entry(new_data)
 
     assert new_result.did
     # verify that they are the same
@@ -490,7 +490,7 @@ def test_delete_and_recreate(swg_index_client):
     assert new_result.baseid == old_result.baseid
 
     # verify that new data is in the new node
-    new_doc = swg_index_client.get_entry(new_result.did)
+    new_doc = swg_index_client.get_index_entry(new_result.did)
     assert new_data['baseid'] == new_doc.baseid
     assert new_data['urls'] == new_doc.urls
     assert new_data['hashes']['md5'] == new_doc.hashes.md5
@@ -503,7 +503,7 @@ def test_index_create_with_multiple_hashes(swg_index_client):
         'sha1': 'fdbbca63fbec1c2b0d4eb2494ce91520ec9f55f5'
     }
 
-    result = swg_index_client.add_entry(data)
+    result = swg_index_client.add_index_entry(data)
     assert result.did
 
 
@@ -511,7 +511,7 @@ def test_index_create_with_valid_did(swg_index_client):
     data = get_doc()
     data['did'] = '3d313755-cbb4-4b08-899d-7bbac1f6e67d'
 
-    result = swg_index_client.add_entry(data)
+    result = swg_index_client.add_index_entry(data)
     assert result.did == '3d313755-cbb4-4b08-899d-7bbac1f6e67d'
 
 
@@ -527,8 +527,8 @@ def test_index_create_with_acl(swg_index_client):
         },
     }
 
-    r = swg_index_client.add_entry(data)
-    result = swg_index_client.get_entry(r.did)
+    r = swg_index_client.add_index_entry(data)
+    result = swg_index_client.get_index_entry(r.did)
     assert result.acl == ['a', 'b']
 
 
@@ -538,7 +538,7 @@ def test_index_create_with_invalid_did(swg_index_client):
     data['did'] = '3d313755-cbb4-4b0fdfdfd8-899d-7bbac1f6e67dfdd'
 
     with pytest.raises(ApiException) as e:
-        swg_index_client.add_entry(data)
+        swg_index_client.add_index_entry(data)
         assert e.status == 400
 
 
@@ -546,7 +546,7 @@ def test_index_create_with_prefix(swg_index_client):
     data = get_doc()
     data['did'] = 'cdis:3d313755-cbb4-4b08-899d-7bbac1f6e67d'
 
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
     assert r.did == 'cdis:3d313755-cbb4-4b08-899d-7bbac1f6e67d'
 
 
@@ -554,10 +554,10 @@ def test_index_create_with_duplicate_did(swg_index_client):
     data = get_doc()
     data['did'] = '3d313755-cbb4-4b08-899d-7bbac1f6e67d'
 
-    swg_index_client.add_entry(data)
+    swg_index_client.add_index_entry(data)
 
     with pytest.raises(ApiException) as e:
-        swg_index_client.add_entry(data)
+        swg_index_client.add_index_entry(data)
         assert e.status == 400
 
 
@@ -565,8 +565,8 @@ def test_index_create_with_file_name(swg_index_client):
     data = get_doc()
     data['file_name'] = 'abc'
 
-    r = swg_index_client.add_entry(data)
-    r = swg_index_client.get_entry(r.did)
+    r = swg_index_client.add_index_entry(data)
+    r = swg_index_client.get_index_entry(r.did)
     assert r.file_name == 'abc'
 
 
@@ -574,8 +574,8 @@ def test_index_create_with_version(swg_index_client):
     data = get_doc()
     data['version'] = 'ver_123'
 
-    r = swg_index_client.add_entry(data)
-    r = swg_index_client.get_entry(r.did)
+    r = swg_index_client.add_index_entry(data)
+    r = swg_index_client.get_index_entry(r.did)
     assert r.version == data['version']
 
 def test_index_create_blank_record(swg_index_client):
@@ -584,9 +584,9 @@ def test_index_create_blank_record(swg_index_client):
         'baseid': 'baseid_123'
     }
 
-    r = swg_index_client.create_blank_entry(doc)
+    r = swg_index_client.create_index_blank_entry(doc)
     assert r.did
-    res = swg_index_client.get_entry(r.did)
+    res = swg_index_client.get_index_entry(r.did)
     assert res.acl==[]
     assert res.urls_metadata == {}
     assert res.size is None
@@ -596,15 +596,15 @@ def test_index_create_blank_record(swg_index_client):
 def test_index_create_with_uploader(swg_index_client):
     data = get_doc()
     data['uploader'] = 'uploader_123'
-    r = swg_index_client.add_entry(data)
-    r = swg_index_client.get_entry(r.did)
+    r = swg_index_client.add_index_entry(data)
+    r = swg_index_client.get_index_entry(r.did)
     assert r.uploader == data['uploader']
 
 
 def test_index_get_global_endpoint(swg_global_client, swg_index_client):
     data = get_doc()
 
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
     r = swg_global_client.get_entry(r.did)
 
     assert r.metadata == data['metadata']
@@ -620,10 +620,10 @@ def test_index_get_global_endpoint(swg_global_client, swg_index_client):
 def test_index_update(swg_index_client):
     data = get_doc()
 
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
     assert r.did
     assert r.rev
-    assert swg_index_client.get_entry(r.did).metadata == data['metadata']
+    assert swg_index_client.get_index_entry(r.did).metadata == data['metadata']
     dataNew = get_doc()
     dataNew['hashes']['md5'] = '8b9942cf415384b27cadf1f4d2d682e4'
     dataNew['size']  = 321
@@ -631,9 +631,9 @@ def test_index_update(swg_index_client):
     dataNew['metadata'] = {'test': 'abcd'}
     dataNew['version'] = 'ver123'
     dataNew['acl'] = ['a', 'b']
-    r2 = swg_index_client.update_entry(guid=r.did, rev=r.rev, body=dataNew)
+    r2 = swg_index_client.update_index_entry(guid=r.did, rev=r.rev, body=dataNew)
     assert r2.rev != r.rev
-    result = swg_index_client.get_entry(r.did)
+    result = swg_index_client.get_index_entry(r.did)
     assert result.metadata == dataNew['metadata']
     assert result.acl == dataNew['acl']
     assert result.hashes.md5 == dataNew['hashes']['md5']
@@ -641,7 +641,7 @@ def test_index_update(swg_index_client):
 
     data = get_doc()
     data['did'] = 'cdis:3d313755-cbb4-4b08-899d-7bbac1f6e67d'
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
     assert r.did
     assert r.rev
     dataNew = {
@@ -649,54 +649,54 @@ def test_index_update(swg_index_client):
         'file_name': 'test',
         'version': 'ver123',
         }
-    r2 = swg_index_client.update_entry(guid=r.did, rev=r.rev, body=dataNew)
+    r2 = swg_index_client.update_index_entry(guid=r.did, rev=r.rev, body=dataNew)
     assert r2.rev != r.rev
 
 
 def test_update_uploader_field(swg_index_client):
     data = get_doc()
     data['uploader'] = 'uploader_123'
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
     assert r.did
     assert r.rev
 
-    r = swg_index_client.get_entry(r.did)
+    r = swg_index_client.get_index_entry(r.did)
     assert r.uploader == 'uploader_123'
 
     updated = {'uploader': 'new_uploader'}
-    swg_index_client.update_entry(guid=r.did, rev=r.rev, body=updated)
+    swg_index_client.update_index_entry(guid=r.did, rev=r.rev, body=updated)
 
-    r = swg_index_client.get_entry(r.did)
+    r = swg_index_client.get_index_entry(r.did)
     assert r.uploader == 'new_uploader'
 
     updated = {'uploader': None}
-    swg_index_client.update_entry(guid=r.did, rev=r.rev, body=updated)
+    swg_index_client.update_index_entry(guid=r.did, rev=r.rev, body=updated)
 
-    r = swg_index_client.get_entry(r.did)
+    r = swg_index_client.get_index_entry(r.did)
     assert r.uploader is None
 
 
 def test_index_delete(swg_index_client):
     data = get_doc(has_metadata=False)
 
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
     assert r.did
     assert r.rev
 
-    r = swg_index_client.get_entry(r.did)
+    r = swg_index_client.get_index_entry(r.did)
     assert r.did
 
-    swg_index_client.delete_entry(r.did, rev=r.rev)
+    swg_index_client.delete_index_entry(r.did, rev=r.rev)
 
     with pytest.raises(ApiException) as e:
-        r = swg_index_client.get_entry(r.did)
+        r = swg_index_client.get_index_entry(r.did)
         assert e.status == 400
 
 
 def test_create_index_version(swg_index_client):
     data = get_doc(has_metadata=False)
 
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
     assert r.did
     assert r.rev
     assert r.baseid
@@ -713,41 +713,41 @@ def test_create_index_version(swg_index_client):
         },
     }
 
-    r2 = swg_index_client.add_new_version(guid=r.did, body=dataNew)
+    r2 = swg_index_client.add_index_new_version(guid=r.did, body=dataNew)
     assert r2.baseid == r.baseid
     assert r2.did == dataNew['did']
 
 
 def test_get_latest_version(swg_index_client):
     data = get_doc(has_metadata=False, version="1")
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
     assert r.did
 
     data = get_doc(has_metadata=False)
-    r2 = swg_index_client.add_new_version(guid=r.did, body=data)
-    r3 = swg_index_client.get_latest_version(r.did)
+    r2 = swg_index_client.add_index_new_version(guid=r.did, body=data)
+    r3 = swg_index_client.get_index_latest_version(r.did)
     assert r3.did == r2.did
 
-    r4 = swg_index_client.get_latest_version(r.baseid)
+    r4 = swg_index_client.get_index_latest_version(r.baseid)
     assert r4.did == r2.did
 
-    r5 = swg_index_client.get_latest_version(r.baseid, has_version=True)
+    r5 = swg_index_client.get_index_latest_version(r.baseid, has_version=True)
     assert r5.did == r.did
 
 
 def test_get_all_versions(swg_index_client):
     data = get_doc(has_metadata=False)
-    r = swg_index_client.add_entry(data)
+    r = swg_index_client.add_index_entry(data)
     assert r.did
-    swg_index_client.add_new_version(guid=r.did, body=data)
-    r3 = swg_index_client.get_all_versions(r.did)
+    swg_index_client.add_index_new_version(guid=r.did, body=data)
+    r3 = swg_index_client.get_index_all_versions(r.did)
     assert len(r3) == 2
-    r4 = swg_index_client.get_all_versions(r.baseid)
+    r4 = swg_index_client.get_index_all_versions(r.baseid)
     assert len(r4) == 2
 
 
 def test_alias_list(swg_alias_client):
-    assert swg_alias_client.list_entries().aliases == []
+    assert swg_alias_client.list_alias_entries().aliases == []
 
 
 def test_alias_create(swg_alias_client):
@@ -758,11 +758,11 @@ def test_alias_create(swg_alias_client):
         'keeper_authority': 'CRI', 'host_authorities': ['PDC'],
     }
     ark = 'ark:/31807/TEST-abc'
-    r = swg_alias_client.upsert_entry(aliasstring=ark, body=data)
+    r = swg_alias_client.upsert_alias_entry(aliasstring=ark, body=data)
     assert r.name == ark
 
-    assert len(swg_alias_client.list_entries().aliases) == 1
-    assert swg_alias_client.get_entry(r.name).name
+    assert len(swg_alias_client.list_alias_entries().aliases) == 1
+    assert swg_alias_client.get_alias_entry(r.name).name
 
 
 def test_alias_get_global_endpoint(swg_alias_client, swg_global_client):
@@ -774,7 +774,7 @@ def test_alias_get_global_endpoint(swg_alias_client, swg_global_client):
     }
     ark = 'ark:/31807/TEST-abc'
 
-    swg_alias_client.upsert_entry(aliasstring=ark, body=data)
+    swg_alias_client.upsert_alias_entry(aliasstring=ark, body=data)
 
     assert swg_global_client.get_entry(ark).size == 123
 
@@ -788,7 +788,7 @@ def test_alias_update(swg_alias_client):
     }
     ark = 'ark:/31807/TEST-abc'
 
-    r = swg_alias_client.upsert_entry(aliasstring=ark, body=data)
+    r = swg_alias_client.upsert_alias_entry(aliasstring=ark, body=data)
     assert r.rev
 
     dataNew = {
@@ -797,7 +797,7 @@ def test_alias_update(swg_alias_client):
         'release': 'private',
         'keeper_authority': 'CRI', 'host_authorities': ['PDC'],
     }
-    r2 = swg_alias_client.upsert_entry(aliasstring=ark, rev=r.rev, body=dataNew)
+    r2 = swg_alias_client.upsert_alias_entry(aliasstring=ark, rev=r.rev, body=dataNew)
     assert r2.rev != r.rev
 
 
@@ -810,12 +810,12 @@ def test_alias_delete(swg_alias_client):
     }
     ark = 'ark:/31807/TEST-abc'
 
-    r = swg_alias_client.upsert_entry(aliasstring=ark, body=data)
+    r = swg_alias_client.upsert_alias_entry(aliasstring=ark, body=data)
     assert r.rev
 
-    swg_alias_client.delete_entry(ark, rev=r.rev)
+    swg_alias_client.delete_alias_entry(ark, rev=r.rev)
 
-    assert len(swg_alias_client.list_entries().aliases) == 0
+    assert len(swg_alias_client.list_alias_entries().aliases) == 0
 
 
 @pytest.mark.parametrize('typ,h', [
@@ -891,7 +891,7 @@ def test_bad_hashes(client, user, typ, h):
 def test_dos_get(swg_index_client, swg_dos_client):
     data = get_doc(has_metadata=True, baseid=str(uuid.uuid4()))
 
-    result = swg_index_client.add_entry(data)
+    result = swg_index_client.add_index_entry(data)
     r = swg_dos_client.get_data_object(result.did)
     assert r.data_object.id == result.did
     assert r.data_object.size == "123"
@@ -907,7 +907,7 @@ def test_dos_get(swg_index_client, swg_dos_client):
 def test_dos_list(swg_index_client, swg_dos_client):
     data = get_doc(has_metadata=True, baseid=str(uuid.uuid4()))
 
-    result = swg_index_client.add_entry(data)
+    result = swg_index_client.add_index_entry(data)
     r = swg_dos_client.list_data_objects(page_size=100)
     assert len(r.data_objects) == 1
     assert r.data_objects[0].id == result.did
@@ -923,15 +923,15 @@ def test_update_without_changing_fields(swg_index_client):
     # setup test
     data = get_doc(has_metadata=True, baseid=str(uuid.uuid4()))
 
-    result = swg_index_client.add_entry(data)
-    first_doc = swg_index_client.get_entry(result.did)
+    result = swg_index_client.add_index_entry(data)
+    first_doc = swg_index_client.get_index_entry(result.did)
 
     # update
     updated = {'version': 'at least 2'}
-    swg_index_client.update_entry(guid=first_doc.did, rev=first_doc.rev, body=updated)
+    swg_index_client.update_index_entry(guid=first_doc.did, rev=first_doc.rev, body=updated)
 
     # Check if update successful.
-    second_doc = swg_index_client.get_entry(first_doc.did)
+    second_doc = swg_index_client.get_index_entry(first_doc.did)
     # Only `version` changed.
     assert first_doc.version != second_doc.version
 
@@ -944,10 +944,10 @@ def test_update_without_changing_fields(swg_index_client):
     # Change `version` to null.
     # update
     updated = {'version': None}
-    swg_index_client.update_entry(guid=second_doc.did, rev=second_doc.rev, body=updated)
+    swg_index_client.update_index_entry(guid=second_doc.did, rev=second_doc.rev, body=updated)
 
     # check if update successful
-    third_doc = swg_index_client.get_entry(result.did)
+    third_doc = swg_index_client.get_index_entry(result.did)
     # Only `version` changed.
     assert second_doc.version != third_doc.version
 
@@ -955,7 +955,7 @@ def test_update_without_changing_fields(swg_index_client):
 def test_bulk_get_documents(swg_index_client, swg_bulk_client):
     # just make a bunch of entries in indexd
     dids = [
-        swg_index_client.add_entry(get_doc(baseid=str(uuid.uuid4()))).did
+        swg_index_client.add_index_entry(get_doc(baseid=str(uuid.uuid4()))).did
         for _ in range(20)
     ]
 
@@ -990,7 +990,7 @@ def test_bulk_get_latest_version(swg_index_client, swg_bulk_client, add_null, sk
     total_files = 15
     # just make a bunch of entries in indexd
     dids = [
-        swg_index_client.add_entry(get_doc(baseid=str(uuid.uuid4()), version="1")).did
+        swg_index_client.add_index_entry(get_doc(baseid=str(uuid.uuid4()), version="1")).did
         for _ in range(total_files)
     ]
 
@@ -999,7 +999,8 @@ def test_bulk_get_latest_version(swg_index_client, swg_bulk_client, add_null, sk
     latest_dids_excluding_null = []
     for did in dids:
         if did in chosen_new_version_dids:
-            latest_dids_excluding_null.append(swg_index_client.add_new_version(guid=did, body=get_doc(version="2")).did)
+            latest_dids_excluding_null.append(swg_index_client.add_index_new_version(
+                guid=did, body=get_doc(version="2")).did)
         else:
             latest_dids_excluding_null.append(did)
     assert len(latest_dids_excluding_null) == len(dids)
@@ -1010,7 +1011,7 @@ def test_bulk_get_latest_version(swg_index_client, swg_bulk_client, add_null, sk
         chosen_null_version_dids = random.sample(latest_dids_excluding_null, k=total_files//3)
         for did in latest_dids_excluding_null:
             if did in chosen_null_version_dids:
-                latest_dids.append(swg_index_client.add_new_version(guid=did, body=get_doc()).did)
+                latest_dids.append(swg_index_client.add_index_new_version(guid=did, body=get_doc()).did)
             else:
                 latest_dids.append(did)
         assert len(latest_dids) == len(dids)
@@ -1034,18 +1035,18 @@ def test_special_case_metadata_get_and_set(swg_index_client):
     # release_number only, no extra metadata
     blob = get_doc(has_metadata=False)
     blob['metadata'] = {'release_number': '12.0'}
-    did = swg_index_client.add_entry(blob).did
+    did = swg_index_client.add_index_entry(blob).did
 
-    doc = swg_index_client.get_entry(did).to_dict()
+    doc = swg_index_client.get_index_entry(did).to_dict()
     assert 'release_number' in doc['metadata']
     assert doc['metadata']['release_number'] == '12.0'
 
     # Extra metadata with release_number
     blob = get_doc(has_metadata=True)
     blob['metadata']['release_number'] = '12.0'
-    did = swg_index_client.add_entry(blob).did
+    did = swg_index_client.add_index_entry(blob).did
 
-    doc = swg_index_client.get_entry(did).to_dict()
+    doc = swg_index_client.get_index_entry(did).to_dict()
     assert 'release_number' in doc['metadata']
     assert doc['metadata']['release_number'] == '12.0'
 
@@ -1055,23 +1056,23 @@ def test_special_case_metadata_get_latest(swg_index_client):
 
     blob = get_doc(has_metadata=False)
     blob['metadata'] = {'release_number': '12.0'}
-    did = swg_index_client.add_entry(blob).did
+    did = swg_index_client.add_index_entry(blob).did
     blob['did'] = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
     blob['metadata'] = {'release_number': '13.0'}
-    new_did = swg_index_client.add_new_version(guid=did, body=blob).did
+    new_did = swg_index_client.add_index_new_version(guid=did, body=blob).did
 
-    doc = swg_index_client.get_latest_version(new_did).to_dict()
+    doc = swg_index_client.get_index_latest_version(new_did).to_dict()
     assert 'release_number' in doc['metadata']
     assert doc['metadata']['release_number'] == '13.0'
 
     # Extra metadata with release_number
     blob = get_doc(has_metadata=True)
     blob['metadata']['release_number'] = '12.0'
-    did = swg_index_client.add_entry(blob).did
+    did = swg_index_client.add_index_entry(blob).did
     blob['did'] = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
     blob['metadata']['release_number'] = '13.0'
-    new_did = swg_index_client.add_new_version(guid=did, body=blob).did
+    new_did = swg_index_client.add_index_new_version(guid=did, body=blob).did
 
-    doc = swg_index_client.get_latest_version(new_did).to_dict()
+    doc = swg_index_client.get_index_latest_version(new_did).to_dict()
     assert 'release_number' in doc['metadata']
     assert doc['metadata']['release_number'] == '13.0'
