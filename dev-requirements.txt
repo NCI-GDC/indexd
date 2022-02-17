@@ -67,7 +67,7 @@ future==0.18.2
     # via
     #   -c requirements.txt
     #   detect-secrets
-futures==3.3.0
+futures==3.3.0 ; python_version == "2.7"
     # via pre-commit
 identify==1.4.24
     # via pre-commit
