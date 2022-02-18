@@ -427,7 +427,7 @@ def test_driver_get_latest_version_not_deleted(index_driver, database_conn):
             VALUES (?,?,?,?,?,?,?,?)
         """, (did, baseid, rev, form, size, created_date, updated_date, index_metadata)))
 
-    record = index_driver.get_latest_version(did, not_deleted=True)
+    record = index_driver.get_latest_version(did)
 
     assert record["baseid"] == baseid, "record baseid does not match"
     assert record["did"] != did, "record did matches deleted record"
@@ -530,7 +530,7 @@ def test_driver_get_all_version_not_deleted(index_driver, database_conn):
             VALUES (?,?,?,?,?,?,?,?)
         """, (did, baseid, rev, form, size, created_date, updated_date, index_metadata)))
 
-    records = index_driver.get_all_versions(did, not_deleted=True)
+    records = index_driver.get_all_versions(did)
     assert len(records) == len(non_deleted_dids), "the number of records does not match"
     assert all([doc["baseid"] == baseid for doc in records.values()]), "record baseid does not match"
     assert set(doc["did"] for doc in records.values()) == set(non_deleted_dids), "record did does not match"

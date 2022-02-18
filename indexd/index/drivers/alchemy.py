@@ -972,7 +972,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             return record.did, record.baseid, record.rev
 
-    def get_all_versions(self, did, not_deleted=None):
+    def get_all_versions(self, did, not_deleted=True):
         """
         Get all record versions given did
         Args:
@@ -1011,7 +1011,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
         return ret
 
-    def get_latest_version(self, did, has_version=None, not_deleted=None):
+    def get_latest_version(self, did, has_version=None, not_deleted=True):
         """
         Get the latest record version given did
         Args:
