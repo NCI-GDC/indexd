@@ -795,3 +795,48 @@ def test_driver_delete_fails_with_invalid_rev(index_driver, database_conn):
 
     with pytest.raises(RevisionMismatch):
         index_driver.delete(did, 'some_revision')
+
+
+def test_driver_bulk_get_latest_versions_not_deleted(index_driver, database_conn):
+    """
+    Tests bulk retrieval of the latest record version not flagged as deleted for each document in a list of dids
+    """
+    # generate baseids
+    baseids = {}
+    for _ in range(5):
+        baseids[str(uuid.uuid4())] = {}
+
+    # create set of deleted and non-deleted documents for each baseid
+    for baseid in baseids.keys():
+        is_first_record = True
+        for _ in range(10):
+
+            did = str(uuid.uuid4())
+            rev = str(uuid.uuid4())[:8]
+            size = 512
+            form = "object"
+            created_date = datetime.now()
+            updated_date = datetime.now()
+
+            if is_first_record:
+                is_first_record = False
+                index_metadata = None
+                baseids[baseid]["non_deleted_did"] = did
+            else:
+                index_metadata = json.dumps({"deleted": "true"})
+                baseids[baseid]["deleted_did"] = did
+
+            database_conn.execute(make_sql_statement("""
+                INSERT INTO index_record(did, baseid, rev, form, size, created_date, updated_date, index_metadata) 
+                VALUES (?,?,?,?,?,?,?,?)
+            """, (did, baseid, rev, form, size, created_date, updated_date, index_metadata)))
+
+    non_deleted_dids = [baseids[baseid]["non_deleted_did"] for baseid in baseids.keys()]
+    deleted_dids = [baseids[baseid]["deleted_did"] for baseid in baseids.keys()]
+
+    # get latest non-deleted records from the list of deleted dids
+    records = index_driver.bulk_get_latest_versions(deleted_dids)
+    assert len(records) == len(non_deleted_dids), "the number of records does not match"
+    assert set(record["baseid"] for record in records) == set(baseids.keys()), "one ore more baseid does not match"
+    assert set(record["did"] for record in records) == set(non_deleted_dids), "one or more non-deleted record missing"
+    assert all(record["did"] not in deleted_dids for record in records), "one or more deleted record returned"

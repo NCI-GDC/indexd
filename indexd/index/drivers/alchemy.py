@@ -1046,9 +1046,15 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             return record.to_document_dict()
 
-    def bulk_get_latest_versions(self, dids, skip_null=False):
+    def bulk_get_latest_versions(self, dids, skip_null=False, skip_deleted=True):
         """
-        Get latest version given list of did
+        Get latest version given list of dids
+        Args:
+            dids (list): document ids (UUID) of existing records
+            skip_null (bool): if True, exclude records without a version
+            skip_deleted (bool): if True, exclude records marked as deleted in index_metadata
+        Returns:
+            list: record versions
         """
         with self.session as session:
             # get the baseid from given dids to filter the maxdate subquery
@@ -1061,6 +1067,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             if skip_null:
                 max_date_subq = max_date_subq.filter(IndexRecord.version.isnot(None))
+            if skip_deleted:
+                max_date_subq = max_date_subq.filter(
+                    (func.lower(IndexRecord.index_metadata['deleted'].astext) == 'true').isnot(True))
 
             max_date_subq = max_date_subq.subquery()
 
