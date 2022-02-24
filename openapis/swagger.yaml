@@ -812,6 +812,11 @@ paths:
         description: filter by latest doc that has version value populated
         schema:
           type: boolean
+      - name: skip_deleted
+        in: query
+        description: filter by latest doc not marked as deleted
+        schema:
+          type: boolean
       requestBody:
         description: List of dids to retrieve
         content:
