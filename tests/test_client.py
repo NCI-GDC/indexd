@@ -734,6 +734,15 @@ def test_get_latest_version(swg_index_client):
     r5 = swg_index_client.get_index_latest_version(r.baseid, has_version=True)
     assert r5.did == r.did
 
+    # deleted documents are filtered out by default, but they can be included if not_deleted flag is set to false
+    data = get_doc(has_metadata=False)
+    data["metadata"] = {"deleted": "True"}
+    r6 = swg_index_client.add_index_new_version(guid=r.did, body=data)
+    r7 = swg_index_client.get_index_latest_version(r.baseid)
+    assert r7.did == r2.did
+    r8 = swg_index_client.get_index_latest_version(r.baseid, not_deleted=False)
+    assert r8.did == r6.did
+
 
 def test_get_all_versions(swg_index_client):
     data = get_doc(has_metadata=False)
@@ -744,6 +753,15 @@ def test_get_all_versions(swg_index_client):
     assert len(r3) == 2
     r4 = swg_index_client.get_index_all_versions(r.baseid)
     assert len(r4) == 2
+
+    # deleted documents are filtered out by default, but they can be included if not_deleted flag is set to false
+    data = get_doc(has_metadata=False)
+    data["metadata"] = {"deleted": "True"}
+    swg_index_client.add_index_new_version(guid=r.did, body=data)
+    r5 = swg_index_client.get_index_all_versions(r.did)
+    assert len(r5) == 2
+    r6 = swg_index_client.get_index_all_versions(r.did, not_deleted=False)
+    assert len(r6) == 3
 
 
 def test_alias_list(swg_alias_client):
