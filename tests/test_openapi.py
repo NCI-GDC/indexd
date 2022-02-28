@@ -9,11 +9,11 @@ import openapis
 
 
 def test_valid_openapi():
-    filename = pkg_resources.resource_filename(openapis.__name__, 'swagger.yaml')
+    filename = pkg_resources.resource_filename(openapis.__name__, "swagger.yaml")
     spec, url = specs_readers.read_from_filename(filename)
 
     if not isinstance(spec, dict):
-        raise specs_exceptions.OpenAPIValidationError('root node is not a mapping')
+        raise specs_exceptions.OpenAPIValidationError("root node is not a mapping")
     # ensure the spec is valid JSON
     spec = json.loads(json.dumps(spec))
 

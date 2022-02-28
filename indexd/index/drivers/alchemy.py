@@ -992,21 +992,20 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             except NoResultFound:
                 record = session.query(IndexRecord).filter_by(baseid=did).first()
                 if not record:
-                    raise NoRecordFound('no record found')
+                    raise NoRecordFound("no record found")
                 else:
                     baseid = record.baseid
             except MultipleResultsFound:
-                raise MultipleRecordsFound('multiple records found')
+                raise MultipleRecordsFound("multiple records found")
 
             query = session.query(IndexRecord)
             query = query.filter(IndexRecord.baseid == baseid)
             if not_deleted:
-                query = query.filter((func.lower(IndexRecord.index_metadata['deleted'].astext) == 'true').isnot(True))
+                query = query.filter((func.lower(IndexRecord.index_metadata["deleted"].astext) == "true").isnot(True))
 
             records = query.all()
 
             for idx, record in enumerate(records):
-
                 ret[idx] = record.to_document_dict()
 
         return ret
@@ -1031,18 +1030,17 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             except NoResultFound:
                 baseid = did
             except MultipleResultsFound:
-                raise MultipleRecordsFound('multiple records found')
+                raise MultipleRecordsFound("multiple records found")
 
             query = session.query(IndexRecord)
-            query = query.filter(IndexRecord.baseid == baseid) \
-                .order_by(IndexRecord.created_date.desc())
+            query = query.filter(IndexRecord.baseid == baseid).order_by(IndexRecord.created_date.desc())
             if has_version:
                 query = query.filter(IndexRecord.version.isnot(None))
             if not_deleted:
-                query = query.filter((func.lower(IndexRecord.index_metadata['deleted'].astext) == 'true').isnot(True))
+                query = query.filter((func.lower(IndexRecord.index_metadata["deleted"].astext) == "true").isnot(True))
             record = query.first()
             if not record:
-                raise NoRecordFound('no record found')
+                raise NoRecordFound("no record found")
 
             return record.to_document_dict()
 
@@ -1061,7 +1059,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             subq = session.query(IndexRecord.baseid).filter(IndexRecord.did.in_(dids))
 
             # get max date for each baseid
-            max_date_subq = session.query(IndexRecord.baseid, func.max(IndexRecord.created_date).label('max_date')) \
+            max_date_subq = session.query(IndexRecord.baseid, func.max(IndexRecord.created_date).label("max_date")) \
                 .filter(IndexRecord.baseid.in_(subq)) \
                 .group_by(IndexRecord.baseid)
 
@@ -1069,7 +1067,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 max_date_subq = max_date_subq.filter(IndexRecord.version.isnot(None))
             if skip_deleted:
                 max_date_subq = max_date_subq.filter(
-                    (func.lower(IndexRecord.index_metadata['deleted'].astext) == 'true').isnot(True))
+                    (func.lower(IndexRecord.index_metadata["deleted"].astext) == "true").isnot(True))
 
             max_date_subq = max_date_subq.subquery()
 
