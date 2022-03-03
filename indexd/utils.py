@@ -28,7 +28,7 @@ def hint_match(record, hints):
 
 
 def try_drop_test_data(
-        database='indexd_test', root_user='postgres', host='localhost'):
+        database='indexd_test', root_user='postgres', host='postgres'):
 
     # Using an engine that connects to the `postgres` database allows us to
     # create a new database.
@@ -43,7 +43,7 @@ def try_drop_test_data(
 
 def setup_database(
         user='test', password='test', database='indexd_test',
-        root_user='postgres', host='localhost', no_drop=False, no_user=False):
+        root_user='postgres', host='postgres', no_drop=False, no_user=False):
     """Setup the user and database"""
 
     if not no_drop:
