@@ -61,29 +61,6 @@ tox:
     xpack_security_enabled: "false"
     discovery_type: "single-node"
 
-test:
-  image: docker.osdc.io/ncigdc/python38-builder-jdk11:1.4.0
-  tags:
-    - dind
-  services:
-    - name: docker.osdc.io/postgres:13
-      alias: postgres
-    - name: docker.osdc.io/ncigdc/elasticsearch-docker:7.7.1
-      alias: elasticsearch
-  script:
-    - !reference [.load_github_key, script]
-    - python setup.py test
-    - pip install tox flake8  # you can also use tox
-    - tox -e py36,flake8
-  variables:
-    POSTGRES_DB: $POSTGRES_DB
-    POSTGRES_USER: $POSTGRES_USER
-    POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-    POSTGRES_HOST_AUTH_METHOD: trust
-    ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-    xpack_security_enabled: "false"
-    discovery_type: "single-node"
-
 run:
   script:
     - !reference [.load_github_key, script]
@@ -94,14 +71,3 @@ run:
   artifacts:
     paths:
       - dist/*.whl
-
-pages:
-  script:
-    - pip install sphinx sphinx-rtd-theme
-    - cd doc ; make html
-    - mv build/html/ ../public/
-  artifacts:
-    paths:
-      - public
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
