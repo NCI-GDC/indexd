@@ -4,8 +4,8 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
 include:
-  - project: nci-gdc/gitlab-ci-library
-    ref: main
+  - project: nci-gdc/gitlab-templates
+    ref: master
     file:
       - /templates/deployments/environments/.gitlab-ci-template.yml
       - /templates/docker/ssh/.gitlab-ci.template.yml
