@@ -854,11 +854,18 @@ paths:
           type: string
       - name: versioned
         in: query
-        description: if true search for documents with a version set, else search
-          documents without version
+        description: if true search for documents with a version set, if false search
+          documents without version, else search both versioned and unversioned 
+          documents
         schema:
           type: boolean
-          default: false
+      - name: not_deleted
+        in: query
+        description: if true search documents not flagged as deleted, else search all
+          documents regardless of deleted status
+        schema:
+          type: boolean
+          default: true
       - name: limit
         in: query
         description: maximum rows to return
@@ -907,11 +914,18 @@ paths:
           type: string
       - name: versioned
         in: query
-        description: if true search for documents with a version set, else search
-          documents without version
+        description: if true search for documents with a version set, if false search
+          documents without version, else search both versioned and unversioned 
+          documents
         schema:
           type: boolean
-          default: false
+      - name: not_deleted
+        in: query
+        description: if true search documents not flagged as deleted, else search all
+          documents regardless of deleted status
+        schema:
+          type: boolean
+          default: true
       - name: limit
         in: query
         description: maximum rows to return
