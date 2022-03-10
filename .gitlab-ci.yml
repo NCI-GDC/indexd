@@ -51,7 +51,8 @@ tox-py27:
       alias: elasticsearch
   script:
     - !reference [.load_github_key, script]
-    - apt update && apt install openjdk-11-jdk -y
+    - mkdir -p /usr/share/man/man1
+    - apt update && apt install openjdk-11-jdk -y --no-install-recommends
     - pip install tox
     - tox
   variables:
