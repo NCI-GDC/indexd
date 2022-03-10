@@ -7,34 +7,13 @@ include:
   - project: nci-gdc/gitlab-templates
     ref: master
     file:
-      - /templates/deployments/environments/.gitlab-ci-template.yml
-      - /templates/docker/ssh/.gitlab-ci.template.yml
-  - template: Security/Dependency-Scanning.gitlab-ci.yml
-  - template: Security/License-Scanning.gitlab-ci.yml
-  - template: Security/SAST.gitlab-ci.yml
-  - template: Security/Secret-Detection.gitlab-ci.yml
+      - templates/docker/ssh/.gitlab-ci.template.yml
+      - templates/builds/python/cache/.gitlab-ci.template.yml
+      - templates/deployments/environments/.gitlab-ci-template.yml
 
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/python/tags/
 image: docker.osdc.io/ncigdc/python38-builder-jdk11:1.4.0
-
-# Change pip's cache directory to be inside the project directory since we can
-# only cache local items.
-variables:
-  PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
-  DOCKER_HOST: tcp://docker:2375/
-  DOCKER_DRIVER: overlay2
-  SECURE_ANALYZERS_PREFIX: "docker.osdc.io/security-products"
-
-# Pip's cache doesn't store the python packages
-# https://pip.pypa.io/en/stable/reference/pip_install/#caching
-#
-# If you want to also cache the installed packages, you have to install
-# them in a virtualenv and cache it as well.
-cache:
-  paths:
-    - .cache/pip
-    - venv/
 
 before_script:
   - python --version  # For debugging
@@ -42,7 +21,7 @@ before_script:
   - virtualenv venv
   - source venv/bin/activate
 
-tox:
+tox-py38:
   tags:
     - dind
   image: docker.osdc.io/ncigdc/python38-builder-jdk11:1.4.0
@@ -53,6 +32,26 @@ tox:
       alias: elasticsearch
   script:
     - !reference [.load_github_key, script]
+    - pip install tox
+    - tox
+  variables:
+    POSTGRES_HOST_AUTH_METHOD: trust
+    ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    xpack_security_enabled: "false"
+    discovery_type: "single-node"
+
+tox-py27:
+  tags:
+    - dind
+  image: docker.osdc.io/ncigdc/python27-builder:1.4.0
+  services:
+    - name: docker.osdc.io/postgres:13
+      alias: postgres
+    - name: docker.osdc.io/ncigdc/elasticsearch-docker:7.7.1
+      alias: elasticsearch
+  script:
+    - !reference [.load_github_key, script]
+    - apt update && apt install openjdk-11-jdk -y
     - pip install tox
     - tox
   variables:
