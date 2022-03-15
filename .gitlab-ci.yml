@@ -32,6 +32,7 @@ workflow:
 stages:
   - test
   - build
+  - deploy
 
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/python/tags/
