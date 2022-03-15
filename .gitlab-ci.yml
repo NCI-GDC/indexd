@@ -59,7 +59,7 @@ tox-py38:
     - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:chore_add-python3.9_and_3.10-16
       alias: elasticsearch
   script:
-    - !reference[.load_github_key, script]
+    - !reference [.load_github_key, script]
     - pip install tox
     - tox
   variables:
