@@ -10,6 +10,28 @@ include:
       - templates/docker/ssh/.gitlab-ci.template.yml
       - templates/builds/python/cache/.gitlab-ci.template.yml
       - templates/deployments/environments/.gitlab-ci-template.yml
+  - template: Code-Quality.gitlab-ci.yml
+
+code_quality:
+  variables:
+    CODE_QUALITY_IMAGE: "docker.osdc.io/codequality:0.85.26"
+
+variables:
+  RELEASE_REGISTRY: "dev-containers.osdc.io"
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      variables:
+        RELEASE_REGISTRY: "containers.osdc.io"  # Override globally-defined RELEASE_REGISTRY
+    - if: $CI_COMMIT_REF_NAME =~ /master/
+      variables:
+        RELEASE_REGISTRY: "containers.osdc.io"
+    - when: always
+
+stages:
+  - test
+  - build
 
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/python/tags/
@@ -22,6 +44,7 @@ before_script:
   - source venv/bin/activate
 
 tox-py38:
+  stage: test
   tags:
     - dind
   image: docker.osdc.io/ncigdc/python38-builder-jdk11:1.4.0
@@ -31,7 +54,7 @@ tox-py38:
     - name: docker.osdc.io/ncigdc/elasticsearch-docker:7.7.1
       alias: elasticsearch
   script:
-    - !reference [.load_github_key, script]
+    - !reference[.load_github_key, script]
     - pip install tox
     - tox
   variables:
@@ -39,8 +62,14 @@ tox-py38:
     ES_JAVA_OPTS: "-Xms512m -Xmx512m"
     xpack_security_enabled: "false"
     discovery_type: "single-node"
+  artifacts:
+    when: always
+    reports:
+      cobertura: coverage.xml
+      junit: test-reports/results.xml
 
 tox-py27:
+  stage: test
   tags:
     - dind
   image: docker.osdc.io/ncigdc/python27-builder:1.4.0
@@ -60,8 +89,15 @@ tox-py27:
     ES_JAVA_OPTS: "-Xms512m -Xmx512m"
     xpack_security_enabled: "false"
     discovery_type: "single-node"
+  artifacts:
+    when: always
+    reports:
+      cobertura: coverage.xml
+      junit: test-reports/results.xml
+
 
 run:
+  stage: build
   script:
     - !reference [.load_github_key, script]
     - python setup.py bdist_wheel
@@ -71,3 +107,16 @@ run:
   artifacts:
     paths:
       - dist/*.whl
+
+docker_build:
+  stage: build
+  tags:
+    - dind
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      when: always
+  script:
+    - docker build -t $RELEASE_REGISTRY/indexd:$CI_COMMIT_REF_NAME .
+    - docker push $RELEASE_REGISTRY/indexd:$CI_COMMIT_REF_NAME
