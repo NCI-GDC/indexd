@@ -419,7 +419,7 @@ paths:
         description: filter by latest doc that has version value populated
         schema:
           type: boolean
-      - name: not_deleted
+      - name: exclude_deleted
         in: query
         description: filter by latest doc not marked as deleted
         schema:
@@ -448,7 +448,7 @@ paths:
         required: true
         schema:
           type: string
-      - name: not_deleted
+      - name: exclude_deleted
         in: query
         description: filter by docs not marked as deleted
         schema:
@@ -812,7 +812,7 @@ paths:
         description: filter by latest doc that has version value populated
         schema:
           type: boolean
-      - name: skip_deleted
+      - name: exclude_deleted
         in: query
         description: filter by latest doc not marked as deleted
         schema:
@@ -859,13 +859,13 @@ paths:
           documents
         schema:
           type: boolean
-      - name: not_deleted
+      - name: exclude_deleted
         in: query
         description: if true search documents not flagged as deleted, else search all
           documents regardless of deleted status
         schema:
           type: boolean
-          default: true
+          default: false
       - name: limit
         in: query
         description: maximum rows to return
@@ -919,13 +919,13 @@ paths:
           documents
         schema:
           type: boolean
-      - name: not_deleted
+      - name: exclude_deleted
         in: query
         description: if true search documents not flagged as deleted, else search all
           documents regardless of deleted status
         schema:
           type: boolean
-          default: true
+          default: false
       - name: limit
         in: query
         description: maximum rows to return

@@ -16,7 +16,7 @@ def query():
         exclude (str): only include documents (did) with urls that does not match this pattern
         include (str): only include documents (did) with a url matching this pattern
         versioned (str): return only records with version number
-        not_deleted (str): return only records not marked as deleted
+        exclude_deleted (str): return only records not marked as deleted
         fields (str): comma separated list of fields to return, if not specified return all fields
         limit (str): max results to return
         offset (str): where to start the next query from
@@ -32,8 +32,8 @@ def query():
     args_dict = flask.request.args.to_dict()
     if "versioned" in args_dict.keys():
         args_dict["versioned"] = args_dict["versioned"].lower() in ["true", "t", "yes", "y"]
-    if "not_deleted" in args_dict.keys():
-        args_dict["not_deleted"] = args_dict["not_deleted"].lower() not in ["false", "f", "no", "n"]
+    if "exclude_deleted" in args_dict.keys():
+        args_dict["exclude_deleted"] = args_dict["exclude_deleted"].lower() in ["true", "t", "yes", "y"]
 
     record_list = blueprint.driver.query_urls(**args_dict)
     return flask.Response(json.dumps(record_list, indent=2, separators=(', ', ': ')), 200, mimetype="application/json")
@@ -48,7 +48,7 @@ def query_metadata():
         url (str): full url or pattern for limit to
         fields (str): comma separated list of fields to return, if not specified return all fields
         versioned (str): filter only records with a version number
-        not_deleted (str): return only records not marked as deleted
+        exclude_deleted (str): return only records not marked as deleted
         limit (str): max results to return
         offset (str): where to start the next query from
     Returns:
@@ -63,8 +63,8 @@ def query_metadata():
     args_dict = flask.request.args.to_dict()
     if "versioned" in args_dict.keys():
         args_dict["versioned"] = args_dict["versioned"].lower() in ["true", "t", "yes", "y"]
-    if "not_deleted" in args_dict.keys():
-        args_dict["not_deleted"] = args_dict["not_deleted"].lower() not in ["false", "f", "no", "n"]
+    if "exclude_deleted" in args_dict.keys():
+        args_dict["exclude_deleted"] = args_dict["exclude_deleted"].lower() in ["true", "t", "yes", "y"]
 
     record_list = blueprint.driver.query_metadata_by_key(**args_dict)
     return flask.Response(json.dumps(record_list, indent=2, separators=(', ', ': ')), 200, mimetype="application/json")

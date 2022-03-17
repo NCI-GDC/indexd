@@ -23,7 +23,7 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
         """
         self.driver = alchemy_driver
 
-    def query_urls(self, exclude=None, include=None, versioned=None, not_deleted=True, offset=0, limit=1000,
+    def query_urls(self, exclude=None, include=None, versioned=None, exclude_deleted=False, offset=0, limit=1000,
                    fields="did,urls", **kwargs):
         """
         Get a list of document fields matching the search parameters
@@ -32,7 +32,7 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
             exclude (str): If defined, no URL in a document may contain this string to be included in search.
             versioned (bool): If None (default), search documents regardless of whether they are versioned or not. If
                 True, filter only for versioned documents. If False, filter only for un-versioned documents.
-            not_deleted (bool): If True (default), exclude deleted documents from search. If False, include deleted
+            exclude_deleted (bool): If True, exclude deleted documents from search. If False, include deleted
                 and not deleted documents in search.
             offset (int): Defines a position offset, the first n results to skip
             limit (int): Defines the number of results to return
@@ -53,7 +53,7 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
             )
 
             # handle filters for versioned and/or not_deleted flags
-            query = self._filter_indexrecord(query, versioned, not_deleted)
+            query = self._filter_indexrecord(query, versioned, exclude_deleted)
 
             query = query.group_by(IndexRecordUrlMetadataJsonb.did)
 
@@ -69,7 +69,7 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
             record_list = query.order_by(IndexRecordUrlMetadataJsonb.did.asc()).offset(offset).limit(limit).all()
         return self._format_response(fields, record_list)
 
-    def query_metadata_by_key(self, key, value, url=None, versioned=None, not_deleted=True, offset=0,
+    def query_metadata_by_key(self, key, value, url=None, versioned=None, exclude_deleted=False, offset=0,
                               limit=1000, fields="did,urls,rev", **kwargs):
         """
         Get a list of document fields matching the search parameters
@@ -79,7 +79,7 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
             url (str): full url or pattern for limit to
             versioned (bool): If None (default), search documents regardless of whether they are versioned or not. If
                 True, filter only for versioned documents. If False, filter only for un-versioned documents.
-            not_deleted (bool): If True (default), exclude deleted documents from search. If False, include deleted
+            exclude_deleted (bool): If True, exclude deleted documents from search. If False, include deleted
                 and not deleted documents in search.
             offset (int): Defines a position offset, the first n results to skip
             limit (int): Defines the number of results to return
@@ -108,7 +108,7 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
                     IndexRecordUrlMetadataJsonb.urls_metadata[key].astext == value)
 
             # handle filters for versioned and/or not_deleted flags
-            query = self._filter_indexrecord(query, versioned, not_deleted)
+            query = self._filter_indexrecord(query, versioned, exclude_deleted)
 
             # add url filter
             if url:
@@ -119,13 +119,13 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
         return self._format_response(fields, record_list)
 
     @staticmethod
-    def _filter_indexrecord(query, versioned, not_deleted):
-        """ Handles outer join to IndexRecord for versioned and not_deleted filters if filter flags exist """
-        if versioned is not None or not_deleted:
+    def _filter_indexrecord(query, versioned, exclude_deleted):
+        """ Handles outer join to IndexRecord for versioned and exclude_deleted filters if filter flags exist """
+        if versioned is not None or exclude_deleted:
             query = query.outerjoin(IndexRecord)
 
             # handle not deleted filter
-            if not_deleted:
+            if exclude_deleted:
                 query = query.filter(
                     (func.lower(IndexRecord.index_metadata["deleted"].astext) == "true").isnot(True)
                 )
