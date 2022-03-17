@@ -13,6 +13,7 @@ include:
   - template: Code-Quality.gitlab-ci.yml
 
 code_quality:
+  services: # Shut off Docker-in-Docker
   allow_failure: true
   tags:
     - cq-sans-dind
