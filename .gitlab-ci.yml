@@ -56,6 +56,8 @@ tox-py38:
     - source venv/bin/activate
     - pip install tox
     - tox
+  variables:
+    POSTGRES_HOST_AUTH_METHOD: trust
   artifacts:
     when: always
     reports:
@@ -82,6 +84,8 @@ tox-py27:
     - source venv/bin/activate
     - pip install tox
     - tox
+  variables:
+    POSTGRES_HOST_AUTH_METHOD: trust
   artifacts:
     when: always
     reports:
