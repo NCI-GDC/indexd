@@ -13,10 +13,9 @@ include:
   - template: Code-Quality.gitlab-ci.yml
 
 code_quality:
-  image: docker:20.10.12
   allow_failure: true
   tags:
-    - dind
+    - cq-sans-dind
   variables:
     CODE_QUALITY_IMAGE: "docker.osdc.io/codequality:0.85.26"
 
