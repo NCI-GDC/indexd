@@ -1038,7 +1038,7 @@ def test_bulk_get_latest_version(
     3. N/3 docs have version [1,2,X] or [1,X] and be flagged as deleted
     """
 
-    assert target_flag in ["skip_null", "exclude_deleted"], f"invalid value for target_flag: {target_flag}"
+    assert target_flag in ["skip_null", "exclude_deleted"]
 
     total_files = 15
     # just make a bunch of entries in indexd
