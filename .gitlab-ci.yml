@@ -7,36 +7,7 @@ include:
   - project: nci-gdc/gitlab-templates
     ref: master
     file:
-      - templates/docker/ssh/.gitlab-ci.template.yml
-      - templates/builds/python/cache/.gitlab-ci.template.yml
-      - templates/deployments/environments/.gitlab-ci-template.yml
-  - template: Code-Quality.gitlab-ci.yml
-
-code_quality:
-  services: # Shut off Docker-in-Docker
-  allow_failure: true
-  tags:
-    - cq-sans-dind
-  variables:
-    CODE_QUALITY_IMAGE: "docker.osdc.io/gitlab-org/ci-cd/codequality:0.85.26"
-
-variables:
-  RELEASE_REGISTRY: "dev-containers.osdc.io"
-
-workflow:
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-      variables:
-        RELEASE_REGISTRY: "containers.osdc.io"  # Override globally-defined RELEASE_REGISTRY
-    - if: $CI_COMMIT_REF_NAME =~ /master/
-      variables:
-        RELEASE_REGISTRY: "containers.osdc.io"
-    - when: always
-
-stages:
-  - test
-  - build
-  - deploy
+      - templates/python/full.yml
 
 tox-py38:
   stage: test
@@ -91,29 +62,3 @@ tox-py27:
     reports:
       cobertura: coverage.xml
       junit: test-reports/results.xml
-
-
-run:
-  stage: build
-  script:
-    - !reference [.load_github_key, script]
-    - python setup.py bdist_wheel
-    # an alternative approach is to install and run:
-    - pip install dist/*
-    # run the command here
-  artifacts:
-    paths:
-      - dist/*.whl
-
-docker_build:
-  stage: build
-  tags:
-    - dind
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      when: always
-  script:
-    - docker build -t $RELEASE_REGISTRY/indexd:$CI_COMMIT_REF_NAME .
-    - docker push $RELEASE_REGISTRY/indexd:$CI_COMMIT_REF_NAME
