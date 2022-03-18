@@ -18,7 +18,7 @@ code_quality:
   tags:
     - cq-sans-dind
   variables:
-    CODE_QUALITY_IMAGE: "docker.osdc.io/codequality:0.85.26"
+    CODE_QUALITY_IMAGE: "docker.osdc.io/gitlab-org/ci-cd/codequality:0.85.26"
 
 variables:
   RELEASE_REGISTRY: "dev-containers.osdc.io"
