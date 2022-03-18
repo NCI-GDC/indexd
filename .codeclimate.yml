@@ -1,0 +1,28 @@
+---
+engines:
+  pylint:
+    enabled: true
+  bandit:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - python
+  fixme:
+    enabled: true
+  markdownlint:
+    enabled: true
+  pep8:
+    enabled: true
+  radon:
+    enabled: true
+ratings:
+  paths:
+    - "**.inc"
+    - "**.module"
+    - "**.py"
+exclude_paths:
+  - dist/
+  - tests/
+  - build/
