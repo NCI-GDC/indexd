@@ -7,7 +7,8 @@ include:
   - project: nci-gdc/gitlab-templates
     ref: master
     file:
-      - templates/python/full.yml
+      - templates/global/full.yaml
+      - templates/python/full.yaml
 
 tox-py38:
   stage: test
