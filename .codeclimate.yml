@@ -1,5 +1,8 @@
 ---
+version: "2"
 engines:
+  sonar-python:
+    enabled: true
   pylint:
     enabled: true
   bandit:
