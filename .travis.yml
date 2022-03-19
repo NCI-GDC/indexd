@@ -6,6 +6,8 @@ python:
 
 addons:
   postgresql: "13"
+  hosts:
+    - postgres
   apt:
     sources:
       - sourceline: deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main 13
