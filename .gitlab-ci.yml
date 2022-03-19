@@ -22,10 +22,7 @@ tox-py38:
       alias: elasticsearch
   script:
     - !reference [.load_github_key, script]
-    - python --version  # For debugging
-    - pip install virtualenv
-    - virtualenv venv
-    - source venv/bin/activate
+    - !reference [.python_venv, script]
     - pip install tox
     - tox
   variables:
@@ -50,10 +47,7 @@ tox-py27:
     - !reference [.load_github_key, script]
     - mkdir -p /usr/share/man/man1
     - apt update && apt install openjdk-11-jdk -y --no-install-recommends
-    - python --version  # For debugging
-    - pip install virtualenv
-    - virtualenv venv
-    - source venv/bin/activate
+    - !reference [.python_venv, script]
     - pip install tox
     - tox
   variables:
