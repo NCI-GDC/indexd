@@ -16,9 +16,9 @@ tox-py38:
     - dind
   image: docker.osdc.io/ncigdc/python38-builder-jdk11:1.4.0
   services:
-    - name: docker.osdc.io/ncigdc/ci-postgres-13:chore_add-python3.9_and_3.10-16
+    - name: docker.osdc.io/ncigdc/ci-postgres-13:chore_add-python3.9_and_3.10-19
       alias: postgres
-    - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:chore_add-python3.9_and_3.10-16
+    - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:chore_add-python3.9_and_3.10-19
       alias: elasticsearch
   script:
     - !reference [.load_github_key, script]
@@ -39,9 +39,9 @@ tox-py27:
     - dind
   image: docker.osdc.io/ncigdc/python27-builder:1.4.0
   services:
-    - name: docker.osdc.io/postgres:13
+    - name: docker.osdc.io/ncigdc/ci-postgres-13:chore_add-python3.9_and_3.10-19
       alias: postgres
-    - name: docker.osdc.io/ncigdc/elasticsearch-docker:7.7.1
+    - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:chore_add-python3.9_and_3.10-19
       alias: elasticsearch
   script:
     - !reference [.load_github_key, script]
