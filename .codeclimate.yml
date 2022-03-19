@@ -1,6 +1,6 @@
 ---
 version: "2"
-engines:
+plugins:
   sonar-python:
     enabled: true
   pylint:
@@ -25,7 +25,7 @@ ratings:
     - "**.inc"
     - "**.module"
     - "**.py"
-exclude_paths:
+exclude_patterns:
   - dist/
   - tests/
   - build/
