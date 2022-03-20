@@ -4,6 +4,7 @@ setup(
     name="indexd",
     use_scm_version={
         "local_scheme": "dirty-tag",
+        "version_scheme": "release-branch-semver",
         "write_to": "indexd/_version.py",
     },
     setup_requires=["setuptools_scm<6"],
