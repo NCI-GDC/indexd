@@ -24,6 +24,7 @@ tox-py38:
     - !reference [ .load_github_key, script ]
     - !reference [ .python_venv, script ]
     - pip install tox
+    - tox --showconfig
     - tox
     - ls -lsha /mnt/ramdisk
   variables:
@@ -50,7 +51,9 @@ tox-py27:
     - apt update && apt install openjdk-11-jdk -y --no-install-recommends
     - !reference [ .python_venv, script ]
     - pip install tox
+    - tox --showconfig
     - tox
+    - ls -lsha /mnt/ramdisk
   variables:
     PYTEST_TMPDIR: /mnt/ramdisk
   artifacts:
