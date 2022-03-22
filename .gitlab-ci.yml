@@ -21,12 +21,11 @@ tox-py38:
     - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:master-32
       alias: elasticsearch
   script:
-    - !reference [.load_github_key, script]
-    - !reference [.python_venv, script]
-    - ls /mnt
-    - ls /
+    - !reference [ .load_github_key, script ]
+    - !reference [ .python_venv, script ]
     - pip install tox
     - tox
+    - ls -lsha /mnt/ramdisk
   variables:
     PYTEST_TMPDIR: /mnt/ramdisk
   artifacts:
@@ -46,12 +45,10 @@ tox-py27:
     - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:master-32
       alias: elasticsearch
   script:
-    - !reference [.load_github_key, script]
+    - !reference [ .load_github_key, script ]
     - mkdir -p /usr/share/man/man1
     - apt update && apt install openjdk-11-jdk -y --no-install-recommends
-    - !reference [.python_venv, script]
-    - ls /mnt
-    - ls /
+    - !reference [ .python_venv, script ]
     - pip install tox
     - tox
   variables:
