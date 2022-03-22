@@ -23,6 +23,8 @@ tox-py38:
   script:
     - !reference [.load_github_key, script]
     - !reference [.python_venv, script]
+    - ls /mnt
+    - ls /
     - pip install tox
     - tox
   variables:
@@ -48,6 +50,8 @@ tox-py27:
     - mkdir -p /usr/share/man/man1
     - apt update && apt install openjdk-11-jdk -y --no-install-recommends
     - !reference [.python_venv, script]
+    - ls /mnt
+    - ls /
     - pip install tox
     - tox
   variables:
