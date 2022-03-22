@@ -14,11 +14,11 @@ tox-py38:
   stage: test
   tags:
     - dind
-  image: docker.osdc.io/ncigdc/python38-builder-jdk11:1.4.0
+  image: docker.osdc.io/ncigdc/python38-builder-jdk11:master-32
   services:
-    - name: docker.osdc.io/ncigdc/ci-postgres-13:chore_add-python3.9_and_3.10-19
+    - name: docker.osdc.io/ncigdc/ci-postgres-13:master-32
       alias: postgres
-    - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:chore_add-python3.9_and_3.10-19
+    - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:master-32
       alias: elasticsearch
   script:
     - !reference [.load_github_key, script]
@@ -26,7 +26,7 @@ tox-py38:
     - pip install tox
     - tox
   variables:
-    POSTGRES_HOST_AUTH_METHOD: trust
+    PYTEST_TMPDIR: /mnt/ramdisk
   artifacts:
     when: always
     reports:
@@ -39,9 +39,9 @@ tox-py27:
     - dind
   image: docker.osdc.io/ncigdc/python27-builder:1.4.0
   services:
-    - name: docker.osdc.io/ncigdc/ci-postgres-13:chore_add-python3.9_and_3.10-19
+    - name: docker.osdc.io/ncigdc/ci-postgres-13:master-32
       alias: postgres
-    - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:chore_add-python3.9_and_3.10-19
+    - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:master-32
       alias: elasticsearch
   script:
     - !reference [.load_github_key, script]
@@ -51,7 +51,7 @@ tox-py27:
     - pip install tox
     - tox
   variables:
-    POSTGRES_HOST_AUTH_METHOD: trust
+    PYTEST_TMPDIR: /mnt/ramdisk
   artifacts:
     when: always
     reports:

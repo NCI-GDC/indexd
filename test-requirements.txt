@@ -1,5 +1,6 @@
 mock
 pytest~=3.10.1
+pytest-xdist~=1.27.0
 pytest-flask~=0.15.0
 pytest-cov
 PyYAML
