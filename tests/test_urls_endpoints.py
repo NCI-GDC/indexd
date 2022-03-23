@@ -52,7 +52,7 @@ def test_query_urls(swg_index_client, swg_query_client, test_data):
     Args:
         swg_index_client (swagger_client.api.indexurls_api.IndexApi): index api client
         swg_query_client (swagger_client.api.indexurls_api.IndexurlsApi): urls api client
-        test_data (tuple[int, int, int, int]: test data counts
+        test_data (tuple[int, int, int, int]): test data counts
     """
     url_x_count, versioned_count, unversioned_count, deleted_count = test_data
     # test get all

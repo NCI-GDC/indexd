@@ -52,7 +52,7 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
                 q_func["string_agg"](IndexRecordUrlMetadataJsonb.url, ","),
             )
 
-            # handle filters for versioned and/or not_deleted flags
+            # handle filters for versioned and/or exclude_deleted flags
             query = self._filter_indexrecord(query, versioned, exclude_deleted)
 
             query = query.group_by(IndexRecordUrlMetadataJsonb.did)
@@ -107,7 +107,7 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
                     IndexRecord.did == IndexRecordUrlMetadataJsonb.did,
                     IndexRecordUrlMetadataJsonb.urls_metadata[key].astext == value)
 
-            # handle filters for versioned and/or not_deleted flags
+            # handle filters for versioned and/or exclude_deleted flags
             query = self._filter_indexrecord(query, versioned, exclude_deleted)
 
             # add url filter
