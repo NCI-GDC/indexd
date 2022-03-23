@@ -14,3 +14,4 @@ openapi-spec-validator~=0.3.3
 pre-commit==1.21.0
 detect-secrets==0.13.0
 cfgv==2.0.1
+funcsigs==1.0.2
