@@ -6,7 +6,8 @@ import flask
 import pytest
 from sqlalchemy import create_engine
 
-import swagger_client
+from swagger_client import openapi_client
+from openapi_client.apis import AliasApi, BulkApi, DOSApi, GlobalApi, IndexApi, QueryApi
 from indexd import app_init, get_app
 from indexd.alias.drivers.alchemy import (
     Base as alias_base,
@@ -207,7 +208,7 @@ def user(auth_driver):
 
 @pytest.fixture
 def swg_config(indexd_server, index_driver, alias_driver, indexd_admin_user):
-    config = swagger_client.Configuration()
+    config = openapi_client.Configuration()
     config.host = indexd_server.baseurl
     config.username = indexd_admin_user[0]
     config.password = indexd_admin_user[1]
@@ -216,7 +217,7 @@ def swg_config(indexd_server, index_driver, alias_driver, indexd_admin_user):
 
 @pytest.fixture
 def swg_config_no_migrate(indexd_server_no_migrate, create_indexd_tables_no_migrate):
-    config = swagger_client.Configuration()
+    config = openapi_client.Configuration()
     config.host = 'http://localhost:8001'
     config.username = 'admin'
     config.password = 'admin'
@@ -225,62 +226,68 @@ def swg_config_no_migrate(indexd_server_no_migrate, create_indexd_tables_no_migr
 
 @pytest.fixture
 def swg_index_client(swg_config):
-    return swagger_client.IndexApi(swagger_client.ApiClient(swg_config))
+    return IndexApi(openapi_client.ApiClient(swg_config))
+    # return swagger_client.IndexApi(swagger_client.ApiClient(swg_config))
 
 
 @pytest.fixture
 def swg_index_client_no_migrate(swg_config_no_migrate):
-    return swagger_client.IndexApi(swagger_client.ApiClient(swg_config_no_migrate))
+    return IndexApi(openapi_client.ApiClient(swg_config_no_migrate))
+    # return swagger_client.IndexApi(swagger_client.ApiClient(swg_config_no_migrate))
 
 
 @pytest.fixture
 def swg_global_client(swg_config):
-    return swagger_client.GlobalApi(swagger_client.ApiClient(swg_config))
+    return GlobalApi(openapi_client.ApiClient(swg_config))
+    # return swagger_client.GlobalApi(swagger_client.ApiClient(swg_config))
 
 
 @pytest.fixture
 def swg_global_client_no_migrate(swg_config_no_migrate):
-    return swagger_client.GlobalApi(swagger_client.ApiClient(swg_config_no_migrate))
+    return GlobalApi(openapi_client.ApiClient(swg_config_no_migrate))
+    # return swagger_client.GlobalApi(swagger_client.ApiClient(swg_config_no_migrate))
 
 
 @pytest.fixture
 def swg_alias_client(swg_config):
-    return swagger_client.AliasApi(swagger_client.ApiClient(swg_config))
+    return AliasApi(openapi_client.ApiClient(swg_config))
+    # return swagger_client.AliasApi(swagger_client.ApiClient(swg_config))
 
 
 @pytest.fixture
 def swg_alias_client_no_migrate(swg_config_no_migrate):
-    return swagger_client.AliasApi(swagger_client.ApiClient(swg_config_no_migrate))
+    return AliasApi(openapi_client.ApiClient(swg_config_no_migrate))
+    # return swagger_client.AliasApi(swagger_client.ApiClient(swg_config_no_migrate))
 
 
 @pytest.fixture
 def swg_dos_client(swg_config):
-    return swagger_client.DOSApi(swagger_client.ApiClient(swg_config))
+    return DOSApi(openapi_client.ApiClient(swg_config))
 
 
 @pytest.fixture
 def swg_dos_client_no_migrate(swg_config_no_migrate):
-    return swagger_client.DOSApi(swagger_client.ApiClient(swg_config_no_migrate))
+    return DOSApi(openapi_client.ApiClient(swg_config_no_migrate))
 
 
 @pytest.fixture
 def swg_query_client(swg_config):
-    return swagger_client.QueryApi(swagger_client.ApiClient(swg_config))
+    return QueryApi(openapi_client.ApiClient(swg_config))
 
 
 @pytest.fixture
 def swg_query_client_no_migrate(swg_config_no_migrate):
-    return swagger_client.QueryApi(swagger_client.ApiClient(swg_config_no_migrate))
+    return QueryApi(openapi_client.ApiClient(swg_config_no_migrate))
 
 
 @pytest.fixture
 def swg_bulk_client(swg_config):
-    return swagger_client.BulkApi(swagger_client.ApiClient(swg_config))
+    return BulkApi(openapi_client.ApiClient(swg_config))
 
 
 @pytest.fixture
 def swg_bulk_client_no_migrate(swg_config_no_migrate):
-    return swagger_client.BulkApi(swagger_client.ApiClient(swg_config_no_migrate))
+    return BulkApi(openapi_client.ApiClient(swg_config_no_migrate))
 
 
 @pytest.fixture

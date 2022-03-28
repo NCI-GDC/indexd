@@ -4,7 +4,7 @@ import random
 import pytest
 
 from indexd.index.blueprint import ACCEPTABLE_HASHES
-from swagger_client.rest import ApiException
+from swagger_client.openapi_client.rest import ApiException
 from tests.util import assert_blank
 import uuid
 

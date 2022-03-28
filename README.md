@@ -125,11 +125,11 @@ data as well as the type.
 
 ## Testing
 - Follow [installation](#installation)
-- Install [swagger-codegen](https://swagger.io/swagger-codegen/)
+- Install [openapi-generator](https://github.com/OpenAPITools/openapi-generator)
 - Run:
 ```
 pip install -r dev-requirements.txt -r requirements.txt
-swagger-codegen generate -i openapis/swagger.yaml -l python -o swagger_client
+openapi-generator generate -i ./openapis/swagger.yaml -g python -o ./swagger_client
 cd swagger_client; python setup.py develop; cd -
 py.test -v tests/
 
