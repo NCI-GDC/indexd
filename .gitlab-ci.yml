@@ -10,32 +10,7 @@ include:
       - templates/global/full.yaml
       - templates/python/full.yaml
 
-tox-py38:
-  stage: test
-  tags:
-    - dind
-  image: docker.osdc.io/ncigdc/python38-builder-jdk11:master-32
-  services:
-    - name: docker.osdc.io/ncigdc/ci-postgres-13:master-32
-      alias: postgres
-    - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:master-32
-      alias: elasticsearch
-  script:
-    - !reference [ .load_github_key, script ]
-    - !reference [ .python_venv, script ]
-    - pip install tox
-    - tox
-  artifacts:
-    when: always
-    reports:
-      cobertura: coverage.xml
-      junit: test-reports/results.xml
-
-tox-py27:
-  stage: test
-  tags:
-    - dind
-  image: docker.osdc.io/ncigdc/python27-builder:1.4.0
+.tox_config: &tox_configuration
   services:
     - name: docker.osdc.io/ncigdc/ci-postgres-13:master-32
       alias: postgres
@@ -48,8 +23,8 @@ tox-py27:
     - !reference [ .python_venv, script ]
     - pip install tox
     - tox
-  artifacts:
-    when: always
-    reports:
-      cobertura: coverage.xml
-      junit: test-reports/results.xml
+
+.python_versions:
+  parallel:
+    matrix:
+      - REPO_PY_VERSION: [python27, python38]
