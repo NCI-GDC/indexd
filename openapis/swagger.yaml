@@ -956,7 +956,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/URLsOutput'
+                $ref: '#/components/schemas/URLsMetadataOutput'
         400:
           description: invalid request parameters
           content: {}
@@ -1444,6 +1444,15 @@ components:
             type: array
             items:
               type: string
+    URLsMetadataOutput:
+        allOf:
+         - $ref: '#/components/schemas/URLsOutput'
+         - type: array
+         - items:
+            type: object
+            properties:
+             rev:
+                type: string
     SystemMetadata:
       type: object
       description: |-
