@@ -880,7 +880,7 @@ paths:
           default: 0
       - name: fields
         in: query
-        description: Comma separated list (defaults to did,urls) of fields to return
+        description: Comma separated list (defaults to did,urls) of fields to return. Valid fields are did and urls.
         schema:
           type: string
           default: urls,did
@@ -946,7 +946,7 @@ paths:
           default: 0
       - name: fields
         in: query
-        description: Comma separated list (defaults to did,urls,rev) of fields to return
+        description: Comma separated list (defaults to did,urls,rev) of fields to return. Valid fields are did, urls and rev.
         schema:
           type: string
           default: urls,did,rev
