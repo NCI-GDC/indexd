@@ -64,12 +64,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OutputInfo'
+              examples:
+                OutputInfo:
+                  $ref: '#/components/examples/OutputInfo'
         400:
           description: Invalid status value
           content: {}
         404:
           description: Record not found
-          content: {}
+          content:
+            application/json:
+              example: { "error": "no record found" }
   /urls:
     get:
       tags:
@@ -785,9 +790,12 @@ paths:
       requestBody:
         description: List of dids to retrieve
         content:
-          '*/*':
+          'application/json':
             schema:
               $ref: '#/components/schemas/BulkInputInfo'
+            examples:
+              BulkInputInfo:
+                $ref: '#/components/examples/BulkInputInfo'
         required: true
       responses:
         200:
@@ -820,9 +828,12 @@ paths:
       requestBody:
         description: List of dids to retrieve
         content:
-          '*/*':
+          'application/json':
             schema:
               $ref: '#/components/schemas/BulkInputInfo'
+            examples:
+              BulkInputInfo:
+                $ref: '#/components/examples/BulkInputInfo'
         required: true
       responses:
         200:
@@ -1013,14 +1024,9 @@ components:
         hashes:
           $ref: '#/components/schemas/HashInfo'
     BulkInputInfo:
-      required:
-      - ids
-      type: object
-      properties:
-        ids:
-          type: array
-          items:
-            type: string
+      type: array
+      items:
+        type: string
     InputInfo:
       required:
       - form
@@ -1571,3 +1577,58 @@ components:
     basic_auth:
       type: http
       scheme: basic
+  examples:
+    BulkInputInfo:
+      summary: Example IDs for bulk search
+      value:
+        - 00000073-27e1-4dcd-bfdc-e458c31feec2
+        - 0000034c-d70d-42b2-b515-36a70e5c74f7
+    OutputInfo:
+      summary: Example output of an indexd record
+      value:
+        {
+          "acl": [
+              "open"
+          ],
+          "baseid": "626bd20c-940f-4126-818f-f5bfb178c362",
+          "created_date": "2018-08-06T04:30:16.248625",
+          "did": "0000047f-772f-4241-980d-1f667686fe60",
+          "file_name": "e6bb1330-c761-43a5-9d17-16da727232f1.FPKM.txt.gz",
+          "form": "object",
+          "hashes": {
+            "md5": "3f1bdb20a6b344a6fbb00676a5f67150"
+          },
+          "metadata": {
+            "release_number": "12.0"
+          },
+          "rev": "f90dadb5",
+          "size": 496848,
+          "updated_date": "2018-08-06T04:30:16.248634",
+          "uploader": null,
+          "urls": [
+              "ds3://blackpearl-primary.service.consul/gdc_backup/0000047f-772f-4241-980d-1f667686fe60",
+              "s3://cleversafe.service.consul/ceph-relocated/e6bb1330-c761-43a5-9d17-16da727232f1/e6bb1330-c761-43a5-9d17-16da727232f1.FPKM.txt.gz",
+              "s3://s3-external-1.amazonaws.com/gdcarchive/0000047f-772f-4241-980d-1f667686fe60/e6bb1330-c761-43a5-9d17-16da727232f1.FPKM.txt.gz",
+              "s3://s3-external-1.amazonaws.com/gdcbackup/0000047f-772f-4241-980d-1f667686fe60"
+          ],
+          "urls_metadata": {
+            "ds3://blackpearl-primary.service.consul/gdc_backup/0000047f-772f-4241-980d-1f667686fe60": {
+              "state": "backuped",
+              "type": "primary_backup"
+            },
+            "s3://cleversafe.service.consul/ceph-relocated/e6bb1330-c761-43a5-9d17-16da727232f1/e6bb1330-c761-43a5-9d17-16da727232f1.FPKM.txt.gz": {
+              "state": "validated",
+              "type": "cleversafe"
+            },
+            "s3://s3-external-1.amazonaws.com/gdcarchive/0000047f-772f-4241-980d-1f667686fe60/e6bb1330-c761-43a5-9d17-16da727232f1.FPKM.txt.gz": {
+              "state": "validated",
+              "type": "aws_archive"
+            },
+            "s3://s3-external-1.amazonaws.com/gdcbackup/0000047f-772f-4241-980d-1f667686fe60": {
+              "md5": "3f1bdb20a6b344a6fbb00676a5f67150",
+              "state": "validated",
+              "type": "aws_s3_rr"
+            }
+          },
+          "version": "1"
+        }
