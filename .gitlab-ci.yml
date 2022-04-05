@@ -16,13 +16,10 @@ include:
       alias: postgres
     - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:master-32
       alias: elasticsearch
-  script:
-    - !reference [ .load_github_key, script ]
-    - mkdir -p /usr/share/man/man1
-    - apt update && apt install openjdk-11-jdk -y --no-install-recommends
-    - !reference [ .python_venv, script ]
-    - pip install tox
-    - tox
+
+.tox-script-before: &tox-script-before
+  - mkdir -p /usr/share/man/man1
+  - apt update && apt install openjdk-11-jdk -y --no-install-recommends
 
 .python_versions:
   parallel:
