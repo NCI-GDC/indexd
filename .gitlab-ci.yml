@@ -10,16 +10,17 @@ include:
       - templates/global/full.yaml
       - templates/python/full.yaml
 
-.tox_config: &tox_configuration
+.tox_services:
   services:
     - name: docker.osdc.io/ncigdc/ci-postgres-13:master-32
       alias: postgres
     - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:master-32
       alias: elasticsearch
 
-.tox-script-before: &tox-script-before
-  - mkdir -p /usr/share/man/man1
-  - apt update && apt install openjdk-11-jdk -y --no-install-recommends
+.tox_script-before:
+  script:
+    - mkdir -p /usr/share/man/man1
+    - apt update && apt install openjdk-11-jdk -y --no-install-recommends
 
 .python_versions:
   parallel:
