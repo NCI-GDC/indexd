@@ -17,7 +17,7 @@ include:
     - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:master-32
       alias: elasticsearch
 
-.tox_script-before:
+.tox_script_before:
   script:
     - mkdir -p /usr/share/man/man1
     - apt update && apt install openjdk-11-jdk -y --no-install-recommends
