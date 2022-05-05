@@ -825,13 +825,13 @@ paths:
               $ref: '#/components/schemas/BulkInputInfo'
         required: true
       responses:
-        200:
+        '200':
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkOutputInfo'
-        400:
+        '400':
           description: Invalid status value
           content: {}
       x-codegen-request-body-name: body
@@ -885,13 +885,13 @@ paths:
           type: string
           default: urls,did
       responses:
-        200:
+        '200':
           description: successful
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/URLsOutput'
-        400:
+        '400':
           description: invalid request parameters
           content: {}
   /_query/urls/metadata/q:
