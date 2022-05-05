@@ -823,11 +823,11 @@ paths:
           description: pointer position to start search
           required: false
       responses:
-        200:
+        '200':
           description: successful
           schema:
             $ref: '#/definitions/URLsOutput'
-        400:
+        '400':
           description: invalid request parameters
   '/_query/urls/metadata/q':
     get:
@@ -872,11 +872,11 @@ paths:
           description: pointer position to start search
           required: false
       responses:
-       200:
+       '200':
          description: successful
          schema:
            $ref: '#/definitions/URLsOutput'
-       400:
+       '400':
          description: invalid request parameters
 
 securityDefinitions:
