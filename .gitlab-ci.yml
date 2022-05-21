@@ -12,9 +12,9 @@ include:
 
 .tox_services:
   services:
-    - name: docker.osdc.io/ncigdc/ci-postgres-13:master-32
+    - name: docker.osdc.io/ncigdc/ci-postgres-13:2.0.0
       alias: postgres
-    - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:master-32
+    - name: docker.osdc.io/ncigdc/ci-elasticsearch-7:2.0.0
       alias: elasticsearch
 
 tox:
@@ -25,4 +25,4 @@ tox:
 .python_versions:
   parallel:
     matrix:
-      - REPO_PY_VERSION: [python27, python38]
+      - REPO_PY_VERSION: [python27, python3.8]
