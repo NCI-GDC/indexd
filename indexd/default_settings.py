@@ -12,7 +12,7 @@ SQLALCHEMY_VERBOSE = (
     os.getenv('INDEXD_VERBOSE', '').lower() in ['1', 'yes', 'true']
 )
 PG_HOST = os.getenv("PG_INDEXD_HOST", "localhost")
-PG_URL = 'postgresql://test:test@{PG_HOST}/indexd_test'.format(PG_HOST)
+PG_URL = 'postgresql://test:test@{}/indexd_test'.format(PG_HOST)
 
 CONFIG['INDEX'] = {
     'driver': SQLAlchemyIndexDriver(
