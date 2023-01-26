@@ -27,11 +27,5 @@ setup(
         "future~=0.18",
         "Werkzeug~=0.16",
         "ddtrace~=0.59.1",
-        # pinned to make ddtrace install in python2.7
-        "packaging~=20.9",
-        "pyparsing~=2.4.7",
-        "tenacity~=7.0.0",
-        "typing~=3.7.4.3",
-        "futures==3.1.1",
     ],
 )
