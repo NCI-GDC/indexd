@@ -26,6 +26,6 @@ setup(
         "dosclient @ git+https://github.com/uc-cdis/dosclient.git@1.0.0#egg=dosclient",
         "future~=0.18",
         "Werkzeug~=0.16",
-        "ddtrace~=0.59.1",
+        "ddtrace~=1.6.0",
     ],
 )

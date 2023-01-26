@@ -4,10 +4,15 @@
 #
 #    pip-compile
 #
-attrs==19.3.0
+attrs==22.2.0
     # via
+    #   cattrs
     #   ddtrace
     #   jsonschema
+bytecode==0.14.0
+    # via ddtrace
+cattrs==22.2.0
+    # via ddtrace
 cdislogging==1.0.0
     # via indexd (setup.py)
 certifi==2020.6.20
@@ -16,12 +21,18 @@ chardet==3.0.4
     # via requests
 click==7.1.2
     # via flask
-ddtrace==0.59.1
+ddsketch==2.0.4
+    # via ddtrace
+ddtrace==1.6.6
     # via indexd (setup.py)
 doiclient @ git+https://github.com/uc-cdis/doiclient.git@1.0.0
     # via indexd (setup.py)
 dosclient @ git+https://github.com/uc-cdis/dosclient.git@1.0.0
     # via indexd (setup.py)
+envier==0.4.0
+    # via ddtrace
+exceptiongroup==1.1.0
+    # via cattrs
 flask==1.1.2
     # via indexd (setup.py)
 future==0.18.2
@@ -33,13 +44,17 @@ itsdangerous==1.1.0
 jinja2==2.11.2
     # via flask
 jsonschema==3.2.0
-    # via indexd (setup.py)
+    # via
+    #   ddtrace
+    #   indexd (setup.py)
 markupsafe==1.1.1
     # via jinja2
 packaging==20.9
     # via ddtrace
 protobuf==3.17.3
-    # via ddtrace
+    # via
+    #   ddsketch
+    #   ddtrace
 psycopg2==2.8.5
     # via indexd (setup.py)
 pyparsing==2.4.7
@@ -52,6 +67,7 @@ requests==2.24.0
     #   dosclient
 six==1.15.0
     # via
+    #   ddsketch
     #   ddtrace
     #   jsonschema
     #   protobuf
@@ -66,12 +82,18 @@ sqlalchemy-utils==0.36.3
     # via indexd (setup.py)
 tenacity==7.0.0
     # via ddtrace
+typing-extensions==4.4.0
+    # via
+    #   bytecode
+    #   ddtrace
 urllib3==1.25.9
     # via requests
 werkzeug==0.16.1
     # via
     #   flask
     #   indexd (setup.py)
+xmltodict==0.13.0
+    # via ddtrace
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

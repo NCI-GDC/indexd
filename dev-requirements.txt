@@ -6,7 +6,7 @@
 #
 atomicwrites==1.4.0
     # via pytest
-attrs==19.3.0
+attrs==22.2.0
     # via
     #   -c requirements.txt
     #   jsonschema
