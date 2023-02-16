@@ -32,13 +32,9 @@ def try_drop_test_data(
 
     # Using an engine that connects to the `postgres` database allows us to
     # create a new database.
-    engine = create_engine("postgresql://{user}@{host}/{name}".format(
-        user=root_user, host=host, name=database))
-
-    if sqlalchemy_utils.database_exists(engine.url):
-        sqlalchemy_utils.drop_database(engine.url)
-
-    engine.dispose()
+    url = "postgresql://{user}@{host}/{name}".format(user=root_user, host=host, name=database)
+    if sqlalchemy_utils.database_exists(url):
+        sqlalchemy_utils.drop_database(url)
 
 
 def setup_database(
@@ -51,11 +47,11 @@ def setup_database(
 
     # Create an engine connecting to the `postgres` database allows us to
     # create a new database from there.
-    engine = create_engine("postgresql://{user}@{host}/{name}".format(
-        user=root_user, host=host, name=database))
-    if not sqlalchemy_utils.database_exists(engine.url):
-        sqlalchemy_utils.create_database(engine.url)
+    url = "postgresql://{user}@{host}/{name}".format(user=root_user, host=host, name=database)
+    if not sqlalchemy_utils.database_exists(url):
+        sqlalchemy_utils.create_database(url)
 
+    engine = create_engine(url)
     conn = engine.connect()
 
     if not no_user:
