@@ -4,9 +4,9 @@ import threading
 import flask
 import pytest
 import requests
-import swagger_client
 from sqlalchemy import create_engine
 
+import swagger_client
 from indexd import app_init, get_app
 from indexd.alias.drivers.alchemy import Base as alias_base
 from indexd.alias.drivers.alchemy import SQLAlchemyAliasDriver
@@ -248,16 +248,6 @@ def swg_alias_client(swg_config):
 @pytest.fixture
 def swg_alias_client_no_migrate(swg_config_no_migrate):
     return swagger_client.AliasApi(swagger_client.ApiClient(swg_config_no_migrate))
-
-
-@pytest.fixture
-def swg_dos_client(swg_config):
-    return swagger_client.DOSApi(swagger_client.ApiClient(swg_config))
-
-
-@pytest.fixture
-def swg_dos_client_no_migrate(swg_config_no_migrate):
-    return swagger_client.DOSApi(swagger_client.ApiClient(swg_config_no_migrate))
 
 
 @pytest.fixture
