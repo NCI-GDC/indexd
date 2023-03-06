@@ -10,7 +10,6 @@ import swagger_client
 from indexd import app_init, get_app
 from indexd.alias.drivers.alchemy import Base as alias_base
 from indexd.alias.drivers.alchemy import SQLAlchemyAliasDriver
-from indexd.auth.drivers.alchemy import Base as auth_base
 from indexd.auth.drivers.alchemy import SQLAlchemyAuthDriver
 from indexd.index.drivers.alchemy import Base as index_base
 from indexd.index.drivers.alchemy import SQLAlchemyIndexDriver
