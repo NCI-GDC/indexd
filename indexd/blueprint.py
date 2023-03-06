@@ -9,7 +9,6 @@ blueprint = flask.Blueprint("cross", __name__)
 blueprint.config = dict()
 blueprint.index_driver = None
 blueprint.alias_driver = None
-blueprint.dist = []
 
 
 @blueprint.route("/alias/<path:alias>", methods=["GET"])
@@ -89,5 +88,3 @@ def get_config(setup_state):
     alias_config = setup_state.app.config["ALIAS"]
     blueprint.index_driver = index_config["driver"]
     blueprint.alias_driver = alias_config["driver"]
-    if "DIST" in setup_state.app.config:
-        blueprint.dist = setup_state.app.config["DIST"]
