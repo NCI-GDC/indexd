@@ -1,15 +1,8 @@
-import re
-
 import flask
-import jsonschema
-import requests
-from doiclient.client import DOIClient
-from dosclient.client import DOSClient
 
 from indexd.alias.errors import NoRecordFound as AliasNoRecordFound
 from indexd.errors import AuthError, UserError
 from indexd.index.errors import NoRecordFound as IndexNoRecordFound
-from indexd.utils import handle_error, hint_match
 
 blueprint = flask.Blueprint("cross", __name__)
 
@@ -65,48 +58,9 @@ def get_record(record):
             try:
                 ret = blueprint.alias_driver.get(record)
             except AliasNoRecordFound:
-                if not blueprint.dist or "no_dist" in flask.request.args:
-                    raise
-                ret = dist_get_record(record)
+                raise IndexNoRecordFound("no record found")
 
     return flask.jsonify(ret), 200
-
-
-def dist_get_record(record):
-
-    # Sort the list of distributed ID services
-    # Ones with which the request matches a hint will be first
-    # Followed by those that don't match the hint
-    sorted_dist = sorted(
-        blueprint.dist, key=lambda k: hint_match(record, k["hints"]), reverse=True
-    )
-
-    for indexd in sorted_dist:
-        try:
-            if indexd["type"] == "doi":
-                fetcher_client = DOIClient(baseurl=indexd["host"])
-                res = fetcher_client.get(record)
-            elif indexd["type"] == "dos":
-                fetcher_client = DOSClient(baseurl=indexd["host"])
-                res = fetcher_client.get(record)
-            else:
-                res = requests.get(
-                    indexd["host"] + "/" + record, params={"no_dist": ""}
-                )
-                handle_error(res)
-        except:
-            # a lot of things can go wrong with the get, but in general we don't care here.
-            continue
-
-        if res:
-            json = res.to_json()
-            json["from_index_service"] = {
-                "host": indexd["host"],
-                "name": indexd["name"],
-            }
-            return json
-
-    raise IndexNoRecordFound("no record found")
 
 
 @blueprint.errorhandler(UserError)
