@@ -21,8 +21,6 @@ setup(
         "sqlalchemy-utils",
         "psycopg2",
         "cdislogging",
-        "future",
-        "Werkzeug",
         "ddtrace",
     ],
 )

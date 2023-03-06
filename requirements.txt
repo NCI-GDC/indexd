@@ -27,8 +27,6 @@ exceptiongroup==1.1.0
     # via cattrs
 flask==1.1.2
     # via indexd (setup.py)
-future==0.18.2
-    # via indexd (setup.py)
 itsdangerous==1.1.0
     # via flask
 jinja2==2.11.2
@@ -73,9 +71,7 @@ typing-extensions==4.4.0
     #   bytecode
     #   ddtrace
 werkzeug==0.16.1
-    # via
-    #   flask
-    #   indexd (setup.py)
+    # via flask
 xmltodict==0.13.0
     # via ddtrace
 
