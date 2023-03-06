@@ -34,6 +34,15 @@ CONFIG["ALIAS"] = {
     ),
 }
 
+CONFIG["DIST"] = [
+    {
+        "name": "Other IndexD",
+        "host": "https://indexd.example.io/index/",
+        "hints": [".*ROCKS.*"],
+        "type": "indexd",
+    },
+]
+
 AUTH = SQLAlchemyAuthDriver(PG_URL)
 
 settings = {"config": CONFIG, "auth": AUTH}
