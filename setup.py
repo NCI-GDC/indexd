@@ -15,7 +15,7 @@ setup(
     },
     scripts=["bin/index_admin.py", "bin/indexd", "bin/migrate_index.py"],
     install_requires=[
-        "flask~=1.1",
+        "flask",
         "jsonschema",
         "sqlalchemy<1.4",
         "sqlalchemy-utils",
