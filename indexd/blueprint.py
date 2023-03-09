@@ -1,14 +1,22 @@
+import re
+
 import flask
+import jsonschema
+import requests
+from doiclient.client import DOIClient
+from dosclient.client import DOSClient
 
 from indexd.alias.errors import NoRecordFound as AliasNoRecordFound
 from indexd.errors import AuthError, UserError
 from indexd.index.errors import NoRecordFound as IndexNoRecordFound
+from indexd.utils import handle_error, hint_match
 
 blueprint = flask.Blueprint("cross", __name__)
 
 blueprint.config = dict()
 blueprint.index_driver = None
 blueprint.alias_driver = None
+blueprint.dist = []
 
 
 @blueprint.route("/alias/<path:alias>", methods=["GET"])
@@ -57,9 +65,39 @@ def get_record(record):
             try:
                 ret = blueprint.alias_driver.get(record)
             except AliasNoRecordFound:
-                raise IndexNoRecordFound("no record found")
+                if not blueprint.dist or "no_dist" in flask.request.args:
+                    raise IndexNoRecordFound("no record found")
+                ret = dist_get_record(record)
 
     return flask.jsonify(ret), 200
+
+
+def dist_get_record(record):
+
+    # Sort the list of distributed ID services
+    # Ones with which the request matches a hint will be first
+    # Followed by those that don't match the hint
+    sorted_dist = sorted(
+        blueprint.dist, key=lambda k: hint_match(record, k["hints"]), reverse=True
+    )
+
+    for indexd in sorted_dist:
+        try:
+            res = requests.get(indexd["host"] + "/" + record, params={"no_dist": ""})
+            handle_error(res)
+        except:
+            # a lot of things can go wrong with the get, but in general we don't care here.
+            continue
+
+        if res:
+            json = res.to_json()
+            json["from_index_service"] = {
+                "host": indexd["host"],
+                "name": indexd["name"],
+            }
+            return json
+
+    raise IndexNoRecordFound("no record found")
 
 
 @blueprint.errorhandler(UserError)
@@ -88,3 +126,5 @@ def get_config(setup_state):
     alias_config = setup_state.app.config["ALIAS"]
     blueprint.index_driver = index_config["driver"]
     blueprint.alias_driver = alias_config["driver"]
+    if "DIST" in setup_state.app.config:
+        blueprint.dist = setup_state.app.config["DIST"]
