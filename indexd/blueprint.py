@@ -51,9 +51,10 @@ def get_alias(alias):
 
 
 @blueprint.route("/<path:record>", methods=["GET"])
-def get_record(record):
+def get_record(record: str):
     """
     Returns a record from the local ids, alias, or global resolvers.
+
     """
 
     try:
@@ -66,13 +67,13 @@ def get_record(record):
                 ret = blueprint.alias_driver.get(record)
             except AliasNoRecordFound:
                 if not blueprint.dist or "no_dist" in flask.request.args:
-                    raise IndexNoRecordFound("no record found")
+                    raise IndexNoRecordFound(f"no record found for {record}")
                 ret = dist_get_record(record)
 
     return flask.jsonify(ret), 200
 
 
-def dist_get_record(record):
+def dist_get_record(record: str):
 
     # Sort the list of distributed ID services
     # Ones with which the request matches a hint will be first
@@ -97,7 +98,7 @@ def dist_get_record(record):
             }
             return json
 
-    raise IndexNoRecordFound("no record found")
+    raise IndexNoRecordFound(f"no record found for {record}")
 
 
 @blueprint.errorhandler(UserError)
