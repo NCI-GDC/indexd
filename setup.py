@@ -15,12 +15,12 @@ setup(
     },
     scripts=["bin/index_admin.py", "bin/indexd", "bin/migrate_index.py"],
     install_requires=[
-        "flask",
-        "jsonschema",
+        "flask>=1.1",
+        "jsonschema>3",
         "sqlalchemy<1.4",
-        "sqlalchemy-utils",
-        "psycopg2",
-        "cdislogging",
-        "ddtrace",
+        "sqlalchemy-utils>=0.32",
+        "psycopg2>=2.7",
+        "cdislogging>=1.0",
+        "ddtrace>=1.6.0",
     ],
 )
