@@ -5,9 +5,9 @@ import threading
 import flask
 import pytest
 import requests
-import swagger_client
 from sqlalchemy import create_engine
 
+import swagger_client
 from indexd import app_init, get_app
 from indexd import utils as indexd_utils
 from indexd.alias.drivers.alchemy import Base as alias_base
@@ -147,7 +147,7 @@ def indexd_server():
     app.config["DIST"].append(
         {
             "name": "test",
-            "host": f"http://localhost:{INDEXD_TEST_PORT}",
+            "host": f"http://localhost:{INDEXD_TEST_PORT}/index/",
             "hints": [".*test.*"],
             "type": "indexd",
         }
