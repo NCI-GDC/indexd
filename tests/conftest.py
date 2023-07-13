@@ -1,12 +1,13 @@
 import base64
+import os
 import threading
 
 import flask
 import pytest
 import requests
-import swagger_client
 from sqlalchemy import create_engine
 
+import swagger_client
 from indexd import app_init, get_app
 from indexd import utils as indexd_utils
 from indexd.alias.drivers.alchemy import Base as alias_base
@@ -19,6 +20,8 @@ PG_URL = (
     f"postgresql://{indexd_utils.IndexdConfig['user']}:{indexd_utils.IndexdConfig['password']}@"
     f"{indexd_utils.IndexdConfig['host']}/{indexd_utils.IndexdConfig['database']}"
 )
+
+INDEXD_TEST_PORT = os.getenv("TEST_INDEXD_PORT", 8001)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -141,8 +144,16 @@ def indexd_server():
     Runs once per test session.
     """
     app = get_app()
+    app.config["DIST"].append(
+        {
+            "name": "test",
+            "host": f"http://localhost:{INDEXD_TEST_PORT}",
+            "hints": [".*test.*"],
+            "type": "indexd",
+        }
+    )
     hostname = "localhost"
-    port = 8001
+    port = INDEXD_TEST_PORT
     debug = False
     t = threading.Thread(
         target=app.run, kwargs={"host": hostname, "port": port, "debug": debug}
