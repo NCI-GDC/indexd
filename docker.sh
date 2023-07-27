@@ -23,12 +23,12 @@ GIT_BRANCH=${GIT_BRANCH/\//_}
 VERSION=$(cat VERSION.txt)
 echo "$VERSION"
 
-BUILD_COMMAND=(build \
+docker build \
   --label org.opencontainers.image.version="${VERSION}" \
   --label org.opencontainers.image.created="$(date -Iseconds)" \
   --label org.opencontainers.image.revision="${CI_COMMIT_SHORT_SHA}" \
   --label org.opencontainers.ref.name="indexd:${GIT_BRANCH}" \
-  --ssh default -t "$IMAGE_NAME:$GIT_BRANCH")
+  --ssh default -t "$IMAGE_NAME:$GIT_BRANCH"
 
 if [ "$PARAM" = "push" ]; then
   docker push "$IMAGE_NAME:$GIT_BRANCH"
