@@ -2,11 +2,12 @@
 dist: focal
 language: python
 
+python:
+  - '3.8'
+
 jobs:
   include:
     - stage: test
-      python:
-        - '3.8'
       addons:
         postgresql: '13'
         apt:
@@ -32,20 +33,14 @@ jobs:
       # Pin a specific version of pytest outside of the tox virtualenvs so it has
       # required dependencies in order for tox to start for Python 2.
       install:
-        - pip install tox-travis tox==3.23.0 pytest==3.10.1 setuptools_scm
-        - python -m setuptools_scm > VERSION.txt
-        - cat VERSION.txt
+        - pip install tox-travis tox==3.23.0 pytest==3.10.1
       script: tox
 
-      workspaces:
-        create:
-          name: version
-          paths:
-            - VERSION.txt
     - stage: deploy
-      workspaces:
-        use: version
       script:
+        - pip install setuptools_scm
+        - python -m setuptools_scm > VERSION.txt
+        - cat VERSION.txt
         - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
         - bash docker.sh
 
