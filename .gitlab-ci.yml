@@ -65,6 +65,22 @@ release:
   before_script:
     - git fetch --unshallow
 
+get_version:
+  stage: test
+  tags:
+    - dind
+  image: ${BASE_CONTAINER_REGISTRY}/python3.6-builder:${BASE_CONTAINER_VERSION}
+  before_script:
+    - git fetch --unshallow
+  script:
+    - pip install setuptools_scm
+    - python -m setuptools_scm > VERSION
+    - cat VERSION
+  artifacts:
+    paths:
+      - VERSION
+    expire_in: 1 week
+
 Docker build:
   stage: release
   before_script:
@@ -74,15 +90,15 @@ Docker build:
   script:
     - !reference [.load_github_key, script]
     - /bin/bash docker.sh
-  only:
+  except:
     - tags
   tags:
     - dind
+  dependencies:
+    - get_version
 
 Docker build git tag:
   stage: release
-  variables:
-    CI_COMMIT_TAG: 2.13.0
   before_script:
     - apk add bash git
     - git fetch --unshallow
@@ -94,7 +110,7 @@ Docker build git tag:
     - docker pull $DOCKER_RELEASE_REGISTRY/ncigdc/$CI_PROJECT_NAME:${CLEAN_BRANCH_NAME}
     - docker tag $DOCKER_RELEASE_REGISTRY/ncigdc/$CI_PROJECT_NAME:${CLEAN_BRANCH_NAME} $DOCKER_RELEASE_REGISTRY/ncigdc/$CI_PROJECT_NAME:${CI_COMMIT_TAG}
     - docker push $DOCKER_RELEASE_REGISTRY/ncigdc/$CI_PROJECT_NAME:${CI_COMMIT_TAG}
-  except:
+  only:
     - tags
   tags:
     - dind
