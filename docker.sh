@@ -20,7 +20,7 @@ fi
 # replace slashes with underscore
 GIT_BRANCH=${GIT_BRANCH/\//_}
 
-VERSION=$(cat VERSION)
+VERSION=$(cat VERSION.txt)
 echo "$VERSION"
 
 BUILD_COMMAND=(build \
