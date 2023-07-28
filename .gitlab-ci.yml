@@ -63,7 +63,7 @@ tox:
 
 release:
   before_script:
-    - git fetch --unshallow
+    - git fetch --unshallow || true
 
 get_version:
   stage: test
@@ -71,7 +71,7 @@ get_version:
     - dind
   image: ${BASE_CONTAINER_REGISTRY}/python3.8-builder:${BASE_CONTAINER_VERSION}
   before_script:
-    - git fetch --unshallow
+    - git fetch --unshallow || true
   script:
     - pip install importlib-metadata
     - pip install --no-deps .
@@ -104,7 +104,7 @@ Docker build git tag:
   stage: release
   before_script:
     - apk add bash git
-    - git fetch --unshallow
+    - git fetch --unshallow || true
   services:
     - docker:$DOCKER_VERSION-dind
   script:
