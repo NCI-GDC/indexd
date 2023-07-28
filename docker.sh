@@ -30,7 +30,7 @@ BUILD_COMMAND=(build \
   --label org.opencontainers.ref.name="indexd:${GIT_BRANCH}" \
   --ssh default -t "$IMAGE_NAME:$GIT_BRANCH")
 
-echo $BUILD_COMMAND
+echo "${BUILD_COMMAND[@]}"
 
 docker "${BUILD_COMMAND[@]}" .
 
