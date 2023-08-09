@@ -514,7 +514,7 @@ def version():
 
     base = {
         "version": get_version(),
-        "commit": "depreciated",
+        "commit": "deprecated",
     }
 
     return flask.jsonify(base), 200
