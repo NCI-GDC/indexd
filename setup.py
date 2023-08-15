@@ -1,7 +1,18 @@
+from pathlib import Path
+
 from setuptools import find_packages, setup
+
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="indexd",
+    description="Data indexing and tracking service.",
+    author="NCI GDC",
+    author_email="gdc_dev_questions-aaaaae2lhsbell56tlvh3upgoq@cdis.slack.com",
+    url="https://github.com/NCI-GDC/indexd",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=find_packages(),
     package_data={
         "index": [
