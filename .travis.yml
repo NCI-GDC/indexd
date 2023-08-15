@@ -36,16 +36,28 @@ jobs:
         - pip install tox-travis tox==3.23.0 pytest==3.10.1
       script: tox
 
+    - stage: build
+      install:
+        - pip install tox-travis
+      script: tox -e publish
+      workspaces:
+        create:
+          name: whl
+          paths:
+            - dist/*.whl
+
     - stage: deploy
       script:
         - pip install importlib-metadata
-        - pip install --no-deps .
+        - pip install --no-deps dist/*.whl
         - >
           python -c "from importlib_metadata import version; print(version('indexd'))"
           > VERSION.txt
         - cat VERSION.txt
         - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
         - bash docker.sh
+      workspaces:
+        use: whl
 
 env:
   global:
