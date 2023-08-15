@@ -9,9 +9,9 @@ COPY requirements.txt /indexd/
 WORKDIR /indexd
 RUN pip3 install --no-deps -r requirements.txt
 
-# Now install the code for indexd itself.
-COPY . /indexd
-RUN pip3 install --no-deps .
+# Now install indexd, should be built in release step
+COPY dist/*.whl /indexd
+RUN pip3 install --no-deps *.whl
 
 
 FROM ${registry}/ncigdc/python38-httpd:${base_version}
