@@ -64,21 +64,8 @@ tox:
 release:
   before_script:
     - git fetch --unshallow || true
-
-get_version:
-  stage: test
-  tags:
-    - dind
-  image: ${BASE_CONTAINER_REGISTRY}/python3.8-builder:${BASE_CONTAINER_VERSION}
-  before_script:
-    - git fetch --unshallow || true
-  script:
-    - pip install importlib-metadata
-    - pip install --no-deps .
-    - >
-      python -c "from importlib_metadata import version; print(version('indexd'))"
-      > VERSION.txt
-    - cat VERSION.txt
+  after_script:
+    - python setup.py --version > VERSION.txt
   artifacts:
     paths:
       - VERSION.txt
@@ -99,7 +86,6 @@ Docker build:
   tags:
     - dind
   dependencies:
-    - get_version
     - release
 
 Docker build git tag:
