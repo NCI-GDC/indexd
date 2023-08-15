@@ -91,6 +91,7 @@ Docker build:
   services:
     - docker:$DOCKER_VERSION-dind
   script:
+    - ls
     - !reference [.load_github_key, script]
     - /bin/bash docker.sh
   except:
@@ -99,6 +100,7 @@ Docker build:
     - dind
   dependencies:
     - get_version
+    - release
 
 Docker build git tag:
   stage: release
