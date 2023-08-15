@@ -5,9 +5,9 @@ import re
 import flask
 
 try:
-    from importlib_metadata import version
+    import importlib_metadata
 except ImportError:
-    from importlib.metadata import version
+    import importlib.metadata as importlib_metadata
 import jsonschema
 
 from indexd.auth import authorize
@@ -517,7 +517,7 @@ def version():
     """
 
     base = {
-        "version": version("indexd"),
+        "version": importlib_metadata.version("indexd"),
         "commit": "deprecated",
     }
 
