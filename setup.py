@@ -32,7 +32,6 @@ setup(
     install_requires=[
         "flask>=1.1",
         "jsonschema>3",
-        "setuptools_scm",
         "sqlalchemy<1.4",
         "sqlalchemy-utils>=0.32",
         "psycopg2>=2.7",
@@ -40,5 +39,6 @@ setup(
         "requests",
         "ddtrace",
         "dataclasses; python_version < '3.7'",
+        "importlib-metadata; python_version < '3.8'",
     ],
 )
