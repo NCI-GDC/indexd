@@ -17,6 +17,10 @@ include:
     matrix:
       - DEPLOY_SERVICE_LIST: [ indexd ]
 
+pre-commit:
+  variables:
+    PRE_COMMIT_VERSION: 3.4.0
+
 tox:
   parallel:
     matrix:
