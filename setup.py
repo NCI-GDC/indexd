@@ -13,6 +13,15 @@ setup(
     url="https://github.com/NCI-GDC/indexd",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    classifiers=[
+        "Framework :: Flask",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    ],
+    python_requires=">=3.7",
     packages=find_packages(),
     package_data={
         "index": [
