@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [tool.isort]
 extend_skip = [".md", ".json"]
 known_first_party = ["indexd"]
+known_third_party = ["swagger_client"]
 py_version = 37
 skip = [".gitignore", ".dockerignore"]
 

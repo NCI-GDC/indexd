@@ -26,7 +26,6 @@ repos:
       - id: isort
         name: isort (python)
         args: [--profile, black]
-        exclude: tests/integration/conftest.py|tests/integration/test_client.py
       - id: isort
         name: isort (cython)
         types: [cython]
