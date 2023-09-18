@@ -36,6 +36,7 @@ setup(
             "pytest-flask",
             "PyYAML",
             "openapi-spec-validator",
+            "jsonschema-spec>=0.1.6",  # used by openapi-spec-validator and have bug in 0.1.4
         ],
     },
     install_requires=[
