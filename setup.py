@@ -38,7 +38,6 @@ setup(
         "cdislogging>=1.0",
         "requests",
         "ddtrace",
-        "dataclasses; python_version < '3.7'",
         "importlib-metadata; python_version < '3.8'",
     ],
 )
