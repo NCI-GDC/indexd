@@ -26,6 +26,7 @@ repos:
       - id: isort
         name: isort (python)
         args: [--profile, black]
+        exclude: tests/integration/conftest.py|tests/integration/test_client.py
       - id: isort
         name: isort (cython)
         types: [cython]
@@ -45,7 +46,7 @@ repos:
     hooks:
       - id: toml-sort
         args: [--in-place]
-  - repo: git@github.com:Yelp/detect-secrets
+  - repo: https://github.com/Yelp/detect-secrets
     rev: v1.4.0
     hooks:
       - id: detect-secrets
