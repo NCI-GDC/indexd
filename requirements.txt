@@ -23,7 +23,7 @@ click==8.1.7
     # via flask
 ddsketch==2.0.4
     # via ddtrace
-ddtrace==1.18.5
+# ddtrace==1.18.5
     # via indexd (setup.py)
 deprecated==1.2.14
     # via opentelemetry-api
