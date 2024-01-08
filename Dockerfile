@@ -4,6 +4,7 @@ ARG registry=quay.io
 FROM ${registry}/ncigdc/python38-builder:${base_version} as build
 ARG NAME=indexd
 ARG PIP_INDEX_URL
+ENV PIP_INDEX_URL=$PIP_INDEX_URL
 
 WORKDIR /${NAME}
 
