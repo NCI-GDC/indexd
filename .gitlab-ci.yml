@@ -48,6 +48,8 @@ tox:
     - java -version
     - pip install 'tox < 4'
     - tox -e py
+  except:
+    - tags
 
 release:
   variables:
