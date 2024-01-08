@@ -18,7 +18,9 @@ else
 fi
 
 # setup active branch name, default to using git if build is happening on local
-if [ ${GITLAB_CI+x} ]; then
+if [ ${TRAVIS_BRANCH+x} ]; then
+  GIT_BRANCH=$TRAVIS_BRANCH;
+elif [ ${GITLAB_CI+x} ]; then
   GIT_BRANCH=${CI_COMMIT_REF_NAME};
 else
   GIT_BRANCH=$(git symbolic-ref --short -q HEAD);
