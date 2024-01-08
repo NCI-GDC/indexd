@@ -52,7 +52,6 @@ echo "$COMMIT" > DOCKER_TAG.txt
 
 docker "${BUILD_COMMAND[@]}" . --progress=plain
 
-
 if [ "$PARAM" = "push" ]; then
   docker image ls "$IMAGE_NAME"
   docker push -a "$IMAGE_NAME"
