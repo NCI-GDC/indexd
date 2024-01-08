@@ -41,7 +41,6 @@ BUILD_COMMAND=(build \
   --build-arg BASE_VERSION="${BASE_CONTAINER_VERSION:=1.2.0}" \
   --build-arg PIP_INDEX_URL \
   --build-arg REQUIREMENTS_GDC_LIBRARIES_FILE \
-  --ssh default \
   -t "$IMAGE_NAME:$GIT_BRANCH" \
   -t "$IMAGE_NAME:$COMMIT"
 )
