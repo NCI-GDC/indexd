@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euox pipefail
 
-export DOCKER_BUILDKIT=1
-
 NAME="indexd"
 PARAM=${1:-DO_NOT_PUSH};
 
