@@ -50,10 +50,7 @@ BUILD_COMMAND=(build \
 
 echo "$COMMIT" > DOCKER_TAG.txt
 
-touch "${REQUIREMENTS_GDC_LIBRARIES_FILE}"
-cat "${REQUIREMENTS_GDC_LIBRARIES_FILE}"
 docker "${BUILD_COMMAND[@]}" . --progress=plain
-rm "${REQUIREMENTS_GDC_LIBRARIES_FILE}"
 
 
 if [ "$PARAM" = "push" ]; then
