@@ -45,7 +45,7 @@ jobs:
           > VERSION.txt
         - cat VERSION.txt
         - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
-        - bash docker.sh
+        - bash docker.sh push
 
 env:
   global:
