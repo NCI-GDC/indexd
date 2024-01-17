@@ -47,7 +47,7 @@ setup(
         "psycopg2>=2.7",
         "cdislogging>=1.0",
         "requests",
-        "ddtrace",
+        # "ddtrace",
         "importlib-metadata; python_version < '3.8'",
         "typing-extensions<=4.6.0; python_version < '3.8'",  # solve deps problem for python 3.7
     ],
