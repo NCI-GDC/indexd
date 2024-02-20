@@ -1,6 +1,6 @@
 ARG base_version=2.3.3
 ARG registry=quay.io
-ARG NAME=index
+ARG NAME=indexd
 
 FROM ${registry}/ncigdc/python3.8-builder:${base_version} as build
 ARG NAME
