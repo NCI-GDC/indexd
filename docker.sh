@@ -4,8 +4,6 @@ set -euox pipefail
 NAME="indexd"
 PARAM=${1:-DO_NOT_PUSH};
 
-BASE_CONTAINER_VERSION=1.2.0  # upgrade later
-
 IMAGE_NAME="${DOCKER_RELEASE_REGISTRY:=quay.io}/ncigdc/${NAME}"
 REGISTRY="${BASE_CONTAINER_REGISTRY:=quay.io}"
 
@@ -37,7 +35,7 @@ BUILD_COMMAND=(build \
   --label org.opencontainers.image.revision="${COMMIT}" \
   --label org.opencontainers.image.ref.name="${NAME}:${GIT_BRANCH}" \
   --build-arg REGISTRY="${REGISTRY%\/ncigdc}" \
-  --build-arg BASE_VERSION="${BASE_CONTAINER_VERSION:=1.2.0}" \
+  --build-arg BASE_VERSION="${BASE_CONTAINER_VERSION:=2.3.3}" \
   --build-arg PIP_INDEX_URL \
   --build-arg REQUIREMENTS_GDC_LIBRARIES_FILE \
   -t "$IMAGE_NAME:$GIT_BRANCH" \
