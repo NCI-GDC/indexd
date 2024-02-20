@@ -29,7 +29,7 @@ tox:
     POSTGRES_HOST_AUTH_METHOD: trust
   script:
     - mkdir -p /usr/share/man/man1
-    - apt update && apt -y install openjdk-8-jdk-headless
+    - dnf -y install java-11-amazon-corretto-headless
     - java -version
     - pip install 'tox < 4'
     - tox -e py
