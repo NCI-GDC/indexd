@@ -33,10 +33,9 @@ COMMIT=$(git rev-parse HEAD)
 echo "COMMIT=\"${COMMIT}\"" > indexd/index/version_data.py
 
 BUILD_COMMAND=(build \
-  --label org.opencontainers.image.version="${VERSION}" \
   --label org.opencontainers.image.created="$(date -Iseconds)" \
   --label org.opencontainers.image.revision="${COMMIT}" \
-  --label org.opencontainers.ref.name="${NAME}:${GIT_BRANCH}" \
+  --label org.opencontainers.image.ref.name="${NAME}:${GIT_BRANCH}" \
   --build-arg REGISTRY="${REGISTRY%\/ncigdc}" \
   --build-arg BASE_VERSION="${BASE_CONTAINER_VERSION:=1.2.0}" \
   --build-arg PIP_INDEX_URL \
