@@ -1,4 +1,4 @@
-ARG BASE_VERSION=2.3.3
+ARG BASE_VERSION=3.0.1-rc3
 ARG REGISTRY=quay.io
 ARG NAME=indexd
 
@@ -33,14 +33,10 @@ RUN mkdir -p /var/www/${NAME}/ \
   && a2dissite 000-default
 
 COPY wsgi.py /var/www/${NAME}/
-COPY bin/indexd /var/www/${NAME}/
+COPY bin/${NAME} /var/www/${NAME}/
 COPY --from=build /venv/lib/python3.8/site-packages /venv/lib/python3.8/site-packages
 
 # Make indexd CLI utilities available for, e.g., DB schema migration.
 COPY --from=build /venv/bin/*${NAME}* /venv/bin
-
-RUN ln -sf /dev/stdout /var/log/apache2/access.log \
-  && ln -sf /dev/stdout /var/log/apache2/other_vhosts_access.log\
-  && ln -sf /dev/stderr /var/log/apache2/error.log
 
 WORKDIR /var/www/${NAME}
