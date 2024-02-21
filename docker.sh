@@ -34,6 +34,7 @@ BUILD_COMMAND=(build \
   --label org.opencontainers.image.created="$(date -Iseconds)" \
   --label org.opencontainers.image.revision="${COMMIT}" \
   --label org.opencontainers.image.ref.name="${NAME}:${GIT_BRANCH}" \
+  --label org.opencontainers.ref.name="${NAME}:${GIT_BRANCH}" \
   --build-arg REGISTRY="${REGISTRY%\/ncigdc}" \
   --build-arg BASE_VERSION="${BASE_CONTAINER_VERSION:=3.0.1-rc3}" \
   --build-arg PIP_INDEX_URL \
