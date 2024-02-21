@@ -27,6 +27,7 @@ LABEL org.opencontainers.image.title=${NAME} \
       org.opencontainers.image.source="https://github.com/NCI-GDC/${NAME}" \
       org.opencontainers.image.vendor="NCI GDC"
 
+RUN dnf install -y libpq-15.0
 
 RUN mkdir -p /var/www/${NAME}/ \
   && chmod 777 /var/www/${NAME}
