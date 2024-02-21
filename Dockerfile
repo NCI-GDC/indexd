@@ -29,8 +29,7 @@ LABEL org.opencontainers.image.title=${NAME} \
 
 
 RUN mkdir -p /var/www/${NAME}/ \
-  && chmod 777 /var/www/${NAME} \
-  && a2dissite 000-default
+  && chmod 777 /var/www/${NAME}
 
 COPY wsgi.py /var/www/${NAME}/
 COPY bin/${NAME} /var/www/${NAME}/
