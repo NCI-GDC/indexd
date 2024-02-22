@@ -36,7 +36,7 @@ BUILD_COMMAND=(build \
   --label org.opencontainers.image.ref.name="${NAME}:${GIT_BRANCH}" \
   --label org.opencontainers.ref.name="${NAME}:${GIT_BRANCH}" \
   --build-arg REGISTRY="${REGISTRY%\/ncigdc}" \
-  --build-arg BASE_VERSION="${BASE_CONTAINER_VERSION:=3.0.1-rc3}" \
+  --build-arg BASE_VERSION="${BASE_CONTAINER_VERSION:=3.0.1}" \
   --build-arg PIP_INDEX_URL \
   --build-arg REQUIREMENTS_GDC_LIBRARIES_FILE \
   -t "$IMAGE_NAME:$GIT_BRANCH" \

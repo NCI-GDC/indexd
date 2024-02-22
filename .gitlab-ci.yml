@@ -1,16 +1,13 @@
 ---
 include:
   - project: nci-gdc/gitlab-templates
-    ref: 0.7.0
+    ref: 0.7.1
     file:
       - templates/global/full.yaml
       - templates/python/full.yaml
       - templates/common/python.yaml
       - templates/common/docker.yaml
       - templates/deployments/salt-service.yaml
-
-variables:
-  BASE_CONTAINER_VERSION: 3.0.1-rc3
 
 tox:
   parallel:
