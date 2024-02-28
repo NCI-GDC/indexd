@@ -40,14 +40,17 @@ BUILD_COMMAND=(build \
   --build-arg PIP_INDEX_URL \
   --build-arg REQUIREMENTS_GDC_LIBRARIES_FILE \
   -t "$IMAGE_NAME:$GIT_BRANCH" \
-  -t "$IMAGE_NAME:$COMMIT"
+  -t "$IMAGE_NAME:$COMMIT" \
+  -t "$IMAGE_NAME:${COMMIT:0:8}" \
+  -t "$IMAGE_NAME:$GIT_BRANCH-${COMMIT:0:8}"
 )
 
 echo "$COMMIT" > DOCKER_TAG.txt
 
 docker "${BUILD_COMMAND[@]}" . --progress=plain
 
+docker image ls "$IMAGE_NAME"
+
 if [ "$PARAM" = "push" ]; then
-  docker image ls "$IMAGE_NAME"
   docker push -a "$IMAGE_NAME"
 fi
