@@ -34,7 +34,7 @@ RUN mkdir -p /var/www/${NAME}/ \
 
 COPY wsgi.py /var/www/${NAME}/
 COPY bin/${NAME} /var/www/${NAME}/
-COPY --from=build /venv/lib/python3.8/site-packages /venv/lib/python3.8/site-packages
+COPY --from=build /venv/lib/python3.7/site-packages /venv/lib/python3.7/site-packages
 
 # Make indexd CLI utilities available for, e.g., DB schema migration.
 COPY --from=build /venv/bin/indexd /venv/bin
