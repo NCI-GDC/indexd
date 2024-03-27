@@ -2,7 +2,7 @@ ARG BASE_VERSION=3.0.1
 ARG REGISTRY=quay.io
 ARG NAME=indexd
 
-FROM ${REGISTRY}/ncigdc/python3.8-builder:${BASE_VERSION} as build
+FROM ${REGISTRY}/ncigdc/python3.7-builder:${BASE_VERSION} as build
 ARG NAME
 ARG PIP_INDEX_URL
 ENV PIP_INDEX_URL=$PIP_INDEX_URL
@@ -19,7 +19,7 @@ COPY . .
 RUN pip3 install --no-deps .
 
 
-FROM ${REGISTRY}/ncigdc/python3.8-httpd:${BASE_VERSION}
+FROM ${REGISTRY}/ncigdc/python3.7-httpd:${BASE_VERSION}
 ARG NAME
 
 LABEL org.opencontainers.image.title=${NAME} \
