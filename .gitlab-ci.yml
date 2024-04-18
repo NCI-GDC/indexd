@@ -1,15 +1,12 @@
 ---
 include:
   - project: nci-gdc/gitlab-templates
-    ref: 0.7.1
+    ref: 0.7.8
     file:
       - templates/global/full.yaml
       - templates/python/full.yaml
       - templates/common/python.yaml
       - templates/common/docker.yaml
-  - project: nci-gdc/gitlab-templates
-    ref: 0.7.8
-    file:
       - templates/deployments/salt-service.yaml
 
 pre-commit:
