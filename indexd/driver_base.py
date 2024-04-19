@@ -1,8 +1,10 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy_utils import create_database, database_exists
+from typing import cast
 
-Base = declarative_base()
+import sqlalchemy
+import sqlalchemy_utils
+from sqlalchemy import engine, orm
+
+Base = orm.declarative_base()
 
 
 class SQLAlchemyDriverBase:
@@ -14,10 +16,9 @@ class SQLAlchemyDriverBase:
         """
         Initialize the SQLAlchemy database driver.
         """
-        engine = create_engine(conn, **config)
-        if not database_exists(engine.url):
-            create_database(engine.url)
-        self.engine = engine
+        self.engine = cast(engine.Engine, sqlalchemy.create_engine(conn, **config))
+        if not sqlalchemy_utils.database_exists(self.engine.url):
+            sqlalchemy_utils.create_database(self.engine.url)
 
     def dispose(self):
         self.engine.dispose()

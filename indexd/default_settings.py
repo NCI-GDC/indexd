@@ -13,7 +13,7 @@ PG_HOST = os.getenv("PG_INDEXD_HOST", "localhost")
 PG_USER = os.getenv("PG_INDEXD_USER", "test")
 PG_PASS = os.getenv("PG_INDEXD_PASS", "test")
 PG_DBNAME = os.getenv("PG_INDEXD_DBNAME", "indexd_test")
-PG_URL = f"postgresql://{PG_USER}:{PG_PASS}@{PG_HOST}/{PG_DBNAME}"
+PG_URL = f"postgresql+psycopg2://{PG_USER}:{PG_PASS}@{PG_HOST}/{PG_DBNAME}"
 
 CONFIG["INDEX"] = {
     "driver": SQLAlchemyIndexDriver(

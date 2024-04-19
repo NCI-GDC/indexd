@@ -3,7 +3,7 @@ import uuid
 from contextlib import contextmanager
 
 from cdislogging import get_logger
-from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String, and_
+from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String, and_, orm
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
@@ -14,7 +14,7 @@ from indexd.alias.errors import MultipleRecordsFound, NoRecordFound, RevisionMis
 from indexd.index.errors import UnhealthyCheck
 from indexd.utils import init_schema_version, is_empty_database, migrate_database
 
-Base = declarative_base()
+Base = orm.declarative_base()
 
 
 class AliasSchemaVersion(Base):

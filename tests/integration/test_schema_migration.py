@@ -1,11 +1,12 @@
 import uuid
+from typing import cast
 
-from sqlalchemy import create_engine
+import sqlalchemy
+from sqlalchemy import create_engine, engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import database_exists, drop_database
 
 from indexd import utils as indexd_utils
-from indexd.alias.drivers.alchemy import AliasSchemaVersion
 from indexd.index.drivers.alchemy import (
     CURRENT_SCHEMA_VERSION,
     SCHEMA_MIGRATION_FUNCTIONS,
@@ -21,7 +22,7 @@ from tests.integration.util import make_sql_statement
 
 Base = declarative_base()
 
-TEST_DB = f"postgresql://{indexd_utils.IndexdConfig['root_auth']}@{indexd_utils.IndexdConfig['host']}/test_migration_db"
+TEST_DB = f"postgresql+psycopg2://{indexd_utils.IndexdConfig['root_auth']}@{indexd_utils.IndexdConfig['host']}/test_migration_db"
 
 INDEX_TABLES = {
     "index_record": [
@@ -45,32 +46,15 @@ INDEX_TABLES = {
 }
 
 
-def update_version_table_for_testing(conn, table, val):
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS {table} (version INT)
-        """.format(
-            table=table
+def update_version_table_for_testing(engine: engine.Engine, table, val):
+    with engine.connect() as conn:
+        conn.execute(
+            sqlalchemy.text(f"CREATE TABLE IF NOT EXISTS {table} (version INT)")
         )
-    )
-    conn.execute(
-        """
-            DELETE FROM {table}
-        """.format(
-            table=table
+        conn.execute(sqlalchemy.text(f"DELETE FROM {table}"))
+        conn.execute(
+            make_sql_statement(f"INSERT INTO {table} (version) VALUES (?)", (val,))
         )
-    )
-    conn.execute(
-        make_sql_statement(
-            """
-            INSERT INTO {table} (version) VALUES (?)
-        """.format(
-                table=table
-            ),
-            (val,),
-        )
-    )
-    conn.commit()
 
 
 def test_migrate_7(
@@ -348,99 +332,10 @@ def test_migrate_12(
         assert row.urls_metadata == None
 
 
-def test_migrate_index(index_driver_no_migrate, database_conn):
-    def test_migrate_index_internal(monkeypatch):
-        called = []
-
-        def mock_migrate(**kwargs):
-            called.append(True)
-
-        monkeypatch.setattr("indexd.index.drivers.alchemy.CURRENT_SCHEMA_VERSION", 2)
-        monkeypatch.setattr("indexd.utils.check_engine_for_migrate", lambda _: True)
-
-        monkeypatch.setattr(
-            "indexd.index.drivers.alchemy.SCHEMA_MIGRATION_FUNCTIONS",
-            [mock_migrate, mock_migrate],
-        )
-
-        update_version_table_for_testing(database_conn, "index_schema_version", 0)
-
-        assert len(called) == 2
-        with index_driver_no_migrate.session as s:
-            v = s.query(IndexSchemaVersion).first()
-            assert v.version == 2
-            s.delete(v)
-
-    return test_migrate_index_internal
-
-
-def test_migrate_index_only_diff(index_driver_no_migrate, database_conn):
-    def test_migrate_index_only_diff_internal(monkeypatch):
-        called = []
-
-        def mock_migrate(**kwargs):
-            called.append(True)
-
-        called_2 = []
-
-        def mock_migrate_2(**kwargs):
-            called_2.append(True)
-
-        monkeypatch.setattr("indexd.utils.check_engine_for_migrate", lambda _: True)
-        monkeypatch.setattr("indexd.index.drivers.alchemy.CURRENT_SCHEMA_VERSION", 1)
-        monkeypatch.setattr(
-            "indexd.index.drivers.alchemy.SCHEMA_MIGRATION_FUNCTIONS",
-            [mock_migrate, mock_migrate_2],
-        )
-
-        update_version_table_for_testing(database_conn, "index_schema_version", 0)
-
-        assert len(called) == 1
-        assert len(called_2) == 0
-
-        called = []
-        called_2 = []
-        monkeypatch.setattr("indexd.index.drivers.alchemy.CURRENT_SCHEMA_VERSION", 2)
-
-        update_version_table_for_testing(database_conn, "index_schema_version", 1)
-        assert len(called) == 0
-        assert len(called_2) == 1
-
-        with index_driver_no_migrate.session as s:
-            v = s.query(IndexSchemaVersion).first()
-            assert v.version == 2
-
-    return test_migrate_index_only_diff_internal
-
-
-def test_migrate_alias(alias_driver, database_conn):
-    def test_migrate_alias_internal(monkeypatch):
-        called = []
-
-        def mock_migrate(**kwargs):
-            called.append(True)
-
-        monkeypatch.setattr("indexd.alias.drivers.alchemy.CURRENT_SCHEMA_VERSION", 1)
-        monkeypatch.setattr(
-            "indexd.alias.drivers.alchemy.SCHEMA_MIGRATION_FUNCTIONS", [mock_migrate]
-        )
-
-        monkeypatch.setattr("indexd.utils.check_engine_for_migrate", lambda _: True)
-
-        update_version_table_for_testing(database_conn, "alias_schema_version", 0)
-
-        assert len(called) == 1
-        with alias_driver.session as s:
-            v = s.query(AliasSchemaVersion).first()
-            assert v.version == 1
-
-    return test_migrate_alias_internal
-
-
 def test_migrate_index_versioning(monkeypatch, index_driver_no_migrate, database_conn):
-    engine = create_engine(TEST_DB)
-    if database_exists(engine.url):
-        drop_database(engine.url)
+    test_engin = cast(engine.Engine, create_engine(TEST_DB))
+    if database_exists(test_engin.url):
+        drop_database(test_engin.url)
 
     driver = SQLAlchemyIndexTestDriver(TEST_DB)
     monkeypatch.setattr("indexd.index.drivers.alchemy.CURRENT_SCHEMA_VERSION", 2)
@@ -451,23 +346,22 @@ def test_migrate_index_versioning(monkeypatch, index_driver_no_migrate, database
 
     monkeypatch.setattr("indexd.utils.check_engine_for_migrate", lambda _: True)
 
-    conn = driver.engine.connect()
-    for _ in range(10):
-        did = str(uuid.uuid4())
-        rev = str(uuid.uuid4())[:8]
-        size = 512
-        form = "object"
-        conn.execute(
-            """
-            INSERT INTO index_record(did, rev, form, size)
-            VALUES ('{}','{}','{}',{})
-        """.format(
-                did, rev, form, size
+    with test_engin.begin() as conn:
+        for _ in range(10):
+            did = str(uuid.uuid4())
+            rev = str(uuid.uuid4())[:8]
+            size = 512
+            form = "object"
+            conn.execute(
+                """
+                INSERT INTO index_record(did, rev, form, size)
+                VALUES ('{}','{}','{}',{})
+            """.format(
+                    did, rev, form, size
+                )
             )
-        )
-    conn.execute("commit")
-    conn.close()
-    engine.dispose()
+        conn.execute("commit")
+    test_engin.dispose()
 
     # TODO: unify this in similar databases.
     driver = SQLAlchemyIndexDriver(TEST_DB)
@@ -482,31 +376,30 @@ def test_migrate_index_versioning(monkeypatch, index_driver_no_migrate, database
     for table in INDEX_TABLES:
         assert table in tables, f"{table} not created"
 
-    conn = driver.engine.connect()
-    for table, schema in INDEX_TABLES.items():
-        cols = conn.execute(
-            "\
-            SELECT column_name, data_type \
-            FROM information_schema.columns \
-            WHERE table_schema = 'public' AND table_name = '{table}'".format(
-                table=table
+    with driver.engine.connect() as conn:
+        for table, schema in INDEX_TABLES.items():
+            cols = conn.execute(
+                "\
+                SELECT column_name, data_type \
+                FROM information_schema.columns \
+                WHERE table_schema = 'public' AND table_name = '{table}'".format(
+                    table=table
+                )
             )
-        )
-        assert schema == [i for i in cols]
+            assert schema == [i for i in cols]
 
-    vids = conn.execute("SELECT baseid FROM index_record").fetchall()
+        vids = conn.execute("SELECT baseid FROM index_record").fetchall()
 
-    for baseid in vids:
-        c = conn.execute(
-            "\
-            SELECT COUNT(*) AS number_rows \
-            FROM index_record \
-            WHERE baseid = '{}'".format(
-                baseid[0]
-            )
-        ).fetchone()[0]
-        assert c == 1
-    conn.close()
+        for baseid in vids:
+            c = conn.execute(
+                "\
+                SELECT COUNT(*) AS number_rows \
+                FROM index_record \
+                WHERE baseid = '{}'".format(
+                    baseid[0]
+                )
+            ).fetchone()[0]
+            assert c == 1
 
 
 def test_schema_version():

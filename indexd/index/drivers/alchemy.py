@@ -17,12 +17,11 @@ from sqlalchemy import (
     func,
     not_,
     or_,
+    orm,
     select,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.exc import IntegrityError, ProgrammingError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import joinedload, relationship, sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from indexd.errors import UserError
@@ -36,7 +35,7 @@ from indexd.index.errors import (
 )
 from indexd.utils import init_schema_version, is_empty_database, migrate_database
 
-Base = declarative_base()
+Base = orm.declarative_base()
 
 
 class BaseVersion(Base):
@@ -84,25 +83,25 @@ class IndexRecord(Base):
     uploader = Column(String, index=True)
     index_metadata = Column(JSONB)
 
-    urls_metadata = relationship(
+    urls_metadata = orm.relationship(
         "IndexRecordUrlMetadataJsonb",
         backref="index_record",
         cascade="all, delete-orphan",
     )
 
-    acl = relationship(
+    acl = orm.relationship(
         "IndexRecordACE",
         backref="index_record",
         cascade="all, delete-orphan",
     )
 
-    hashes = relationship(
+    hashes = orm.relationship(
         "IndexRecordHash",
         backref="index_record",
         cascade="all, delete-orphan",
     )
 
-    aliases = relationship(
+    aliases = orm.relationship(
         "IndexRecordAlias",
         backref="index_record",
         cascade="all, delete-orphan",
@@ -303,7 +302,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
         self.config = index_config or {}
 
         Base.metadata.bind = self.engine
-        self.Session = sessionmaker(bind=self.engine)
+        self.Session = orm.sessionmaker(bind=self.engine)
 
         is_empty_db = is_empty_database(driver=self)
         Base.metadata.create_all()
@@ -370,10 +369,10 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             # Enable joinedload on all relationships so that we won't have to
             # do a bunch of selects when we assemble our response.
-            query = query.options(joinedload(IndexRecord.urls_metadata))
-            query = query.options(joinedload(IndexRecord.acl))
-            query = query.options(joinedload(IndexRecord.hashes))
-            query = query.options(joinedload(IndexRecord.aliases))
+            query = query.options(orm.joinedload(IndexRecord.urls_metadata))
+            query = query.options(orm.joinedload(IndexRecord.acl))
+            query = query.options(orm.joinedload(IndexRecord.hashes))
+            query = query.options(orm.joinedload(IndexRecord.aliases))
 
             if start is not None:
                 query = query.filter(IndexRecord.did > start)
@@ -411,7 +410,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                             IndexRecordHash.hash_value == v,
                         )
                     )
-                    query = query.filter(IndexRecord.did.in_(sub.subquery()))
+                    query = query.filter(IndexRecord.did.in_(sub))
 
             if release_number:
                 query = query.filter(IndexRecord.release_number == release_number)
@@ -572,7 +571,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                                     IndexRecordUrlMetadataJsonb.state == u_state,
                                 )
                             )
-                            query = query.filter(~IndexRecord.did.in_(sub.subquery()))
+                            query = query.filter(~IndexRecord.did.in_(sub))
 
                     for k, v in url_dict.items():
                         if not v:
@@ -625,9 +624,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                     )
 
                     # Filter anything that does not match.
-                    query = query.filter(
-                        IndexRecordUrlMetadataJsonb.did.in_(sub.subquery())
-                    )
+                    query = query.filter(IndexRecordUrlMetadataJsonb.did.in_(sub))
             if ids:
                 query = query.filter(IndexRecordUrlMetadataJsonb.did.in_(ids))
             # Remove duplicates.
@@ -1138,7 +1135,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             max_date_subq = max_date_subq.subquery()
 
-            # get the index record with thhe latest create date for each baseid
+            # get the index record with the latest create date for each baseid
             query = session.query(IndexRecord).join(
                 max_date_subq,
                 and_(
