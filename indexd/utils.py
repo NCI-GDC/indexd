@@ -3,9 +3,9 @@ import os
 import re
 from typing import Optional
 
+import sqlalchemy
 import sqlalchemy_utils
 from sqlalchemy import create_engine
-from sqlalchemy.engine.reflection import Inspector
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +68,7 @@ def try_drop_test_data(
         return
 
     engine = create_engine(
-        "postgresql://{user}@{host}/{name}".format(
+        "postgresql+psycopg2://{user}@{host}/{name}".format(
             user=root_auth, host=host, name=database
         )
     )
@@ -110,7 +110,7 @@ def setup_database(
 
     # Create an engine connecting to the `postgres` database allows us to
     # create a new database from there.
-    engine = create_engine(f"postgresql://{auth}@{host}/{database}")
+    engine = create_engine(f"postgresql+psycopg2://{auth}@{host}/{database}")
     if not sqlalchemy_utils.database_exists(engine.url):
         sqlalchemy_utils.create_database(engine.url)
 
@@ -217,6 +217,7 @@ def is_empty_database(driver):
     Returns:
         Boolean
     """
-    table_list = Inspector.from_engine(driver.engine).get_table_names()
+    inspect = sqlalchemy.inspect(driver.engine)
+    table_list = inspect.get_table_names() if inspect else ()
 
     return len(table_list) == 0

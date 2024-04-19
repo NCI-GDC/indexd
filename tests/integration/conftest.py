@@ -6,7 +6,7 @@ import flask
 import pytest
 import requests
 import swagger_client
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, engine
 
 from indexd import app_init, get_app
 from indexd import utils as indexd_utils
@@ -17,7 +17,7 @@ from indexd.index.drivers.alchemy import Base as index_base
 from indexd.index.drivers.alchemy import SQLAlchemyIndexDriver
 
 PG_URL = (
-    f"postgresql://{indexd_utils.IndexdConfig['user']}:{indexd_utils.IndexdConfig['password']}@"
+    f"postgresql+psycopg2://{indexd_utils.IndexdConfig['user']}:{indexd_utils.IndexdConfig['password']}@"
     f"{indexd_utils.IndexdConfig['host']}/{indexd_utils.IndexdConfig['database']}"
 )
 
@@ -291,7 +291,7 @@ def database_engine():
 
 
 @pytest.fixture
-def database_conn(database_engine):
+def database_conn(database_engine: engine.Engine) -> engine.Connection:
     conn = database_engine.connect()
     yield conn
     conn.close()

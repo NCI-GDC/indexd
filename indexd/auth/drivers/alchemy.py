@@ -1,16 +1,14 @@
 import hashlib
 from contextlib import contextmanager
 
-from sqlalchemy import Column, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, String, orm
 from sqlalchemy.orm.exc import NoResultFound
 
 from indexd.auth.driver import AuthDriverABC
 from indexd.auth.errors import AuthError
 from indexd.index.errors import UnhealthyCheck
 
-Base = declarative_base()
+Base = orm.declarative_base()
 
 
 class AuthRecord(Base):
@@ -36,7 +34,7 @@ class SQLAlchemyAuthDriver(AuthDriverABC):
         super().__init__(conn, **config)
         Base.metadata.bind = self.engine
         Base.metadata.create_all()
-        self.Session = sessionmaker(bind=self.engine)
+        self.Session = orm.sessionmaker(bind=self.engine)
 
     @property
     @contextmanager
