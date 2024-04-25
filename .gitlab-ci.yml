@@ -1,7 +1,7 @@
 ---
 include:
   - project: nci-gdc/gitlab-templates
-    ref: master
+    ref: feat/dev-2667-python-docker-services
     file:
       - templates/artifacts/python-service.yaml
 
