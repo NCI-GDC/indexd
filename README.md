@@ -103,8 +103,8 @@ java \
 docker build --build-arg https_proxy=http://cloud-proxy:3128 --build-arg http_proxy=http://cloud-proxy:3128 -t indexd .
 
 docker run -d --name=indexd -p 80:80 indexd
-docker exec indexd python /indexd/bin/index_admin.py create --username $username --password $password
-docker exec indexd python /indexd/bin/index_admin.py delete --username $username
+docker exec indexd python /indexd/scripts/index_admin.py create --username $username --password $password
+docker exec indexd python /indexd/scripts/index_admin.py delete --username $username
 ```
 To run docker with an alternative settings file:
 ```

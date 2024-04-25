@@ -92,9 +92,7 @@ def test_index_list_with_params_negate(swg_index_client):
     data["urls"] = sorted(data["urls_metadata"].keys())
     r_3 = swg_index_client.add_index_entry(data)
 
-    data["urls_metadata"] = {
-        "s3://endpointurl/bucket_2/key_2": {"no_state": "uploaded"}
-    }
+    data["urls_metadata"] = {"s3://endpointurl/bucket_2/key_2": {"no_state": "uploaded"}}
     data["urls"] = sorted(data["urls_metadata"].keys())
     r_4 = swg_index_client.add_index_entry(data)
 
@@ -284,12 +282,8 @@ def test_get_empty_acl_record_after_fill_size_n_hash(swg_index_client):
         "hashes": {"md5": "8b9942cf415384b27cadf1f4d2d981f5"},
     }
     did1 = r1.did
-    r1 = swg_index_client.update_index_blank_entry(
-        guid=r1.did, rev=r1.rev, body=updated
-    )
-    r1 = swg_index_client.update_index_entry(
-        guid=r1.did, rev=r1.rev, body={"acl": ["read"]}
-    )
+    r1 = swg_index_client.update_index_blank_entry(guid=r1.did, rev=r1.rev, body=updated)
+    r1 = swg_index_client.update_index_entry(guid=r1.did, rev=r1.rev, body={"acl": ["read"]})
     r1 = swg_index_client.get_index_entry(r1.did)
     assert r1.acl == ["read"]
     assert r1.did == did1
@@ -390,9 +384,7 @@ def test_urls_metadata(swg_index_client):
         ),
     ],
 )
-def test_urls_metadata_partial_match(
-    swg_index_client, doc_urls, urls_meta, params, expected
-):
+def test_urls_metadata_partial_match(swg_index_client, doc_urls, urls_meta, params, expected):
     url_doc_mapping = {}
     for url_group in doc_urls:
         data = get_doc()
@@ -942,9 +934,7 @@ def test_update_without_changing_fields(swg_index_client):
 
     # update
     updated = {"version": "at least 2"}
-    swg_index_client.update_index_entry(
-        guid=first_doc.did, rev=first_doc.rev, body=updated
-    )
+    swg_index_client.update_index_entry(guid=first_doc.did, rev=first_doc.rev, body=updated)
 
     # Check if update successful.
     second_doc = swg_index_client.get_index_entry(first_doc.did)
@@ -960,9 +950,7 @@ def test_update_without_changing_fields(swg_index_client):
     # Change `version` to null.
     # update
     updated = {"version": None}
-    swg_index_client.update_index_entry(
-        guid=second_doc.did, rev=second_doc.rev, body=updated
-    )
+    swg_index_client.update_index_entry(guid=second_doc.did, rev=second_doc.rev, body=updated)
 
     # check if update successful
     third_doc = swg_index_client.get_index_entry(result.did)
@@ -973,8 +961,7 @@ def test_update_without_changing_fields(swg_index_client):
 def test_bulk_get_documents(swg_index_client, swg_bulk_client):
     # just make a bunch of entries in indexd
     dids = [
-        swg_index_client.add_index_entry(get_doc(baseid=str(uuid.uuid4()))).did
-        for _ in range(20)
+        swg_index_client.add_index_entry(get_doc(baseid=str(uuid.uuid4()))).did for _ in range(20)
     ]
 
     # do a bulk query for them all
@@ -1025,9 +1012,7 @@ def test_bulk_get_latest_version(
     total_files = 15
     # just make a bunch of entries in indexd
     dids = [
-        swg_index_client.add_index_entry(
-            get_doc(baseid=str(uuid.uuid4()), version="1")
-        ).did
+        swg_index_client.add_index_entry(get_doc(baseid=str(uuid.uuid4()), version="1")).did
         for _ in range(total_files)
     ]
 
@@ -1037,9 +1022,7 @@ def test_bulk_get_latest_version(
     for did in dids:
         if did in chosen:
             latest_dids_excluding_target.append(
-                swg_index_client.add_index_new_version(
-                    guid=did, body=get_doc(version="2")
-                ).did
+                swg_index_client.add_index_new_version(guid=did, body=get_doc(version="2")).did
             )
         else:
             latest_dids_excluding_target.append(did)
@@ -1053,16 +1036,12 @@ def test_bulk_get_latest_version(
             if did in chosen:
                 if target_flag == "skip_null":
                     latest_dids.append(
-                        swg_index_client.add_index_new_version(
-                            guid=did, body=get_doc()
-                        ).did
+                        swg_index_client.add_index_new_version(guid=did, body=get_doc()).did
                     )
                 elif target_flag == "exclude_deleted":
                     data = get_doc(version="X", has_metadata=False)
                     data["metadata"] = {"deleted": "True"}
-                    new_doc = swg_index_client.add_index_new_version(
-                        guid=did, body=data
-                    )
+                    new_doc = swg_index_client.add_index_new_version(guid=did, body=data)
                     latest_dids.append(new_doc.did)
             else:
                 latest_dids.append(did)

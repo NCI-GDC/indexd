@@ -325,9 +325,7 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
 
 
 def migrate_1(session, **kwargs):
-    session.execute(
-        f"ALTER TABLE {AliasRecord.__tablename__} ALTER COLUMN size TYPE bigint"
-    )
+    session.execute(f"ALTER TABLE {AliasRecord.__tablename__} ALTER COLUMN size TYPE bigint")
 
 
 # ordered schema migration functions that the index should correspond to

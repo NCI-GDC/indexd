@@ -1,4 +1,5 @@
 """Bulk operations for indexd"""
+
 import json
 
 import flask

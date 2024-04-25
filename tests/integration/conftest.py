@@ -155,9 +155,7 @@ def indexd_server():
     hostname = "localhost"
     port = INDEXD_TEST_PORT
     debug = False
-    t = threading.Thread(
-        target=app.run, kwargs={"host": hostname, "port": port, "debug": debug}
-    )
+    t = threading.Thread(target=app.run, kwargs={"host": hostname, "port": port, "debug": debug})
     t.setDaemon(True)
     t.start()
     wait_for_indexd_alive(port)

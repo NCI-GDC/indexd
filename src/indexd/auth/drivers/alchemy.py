@@ -65,11 +65,7 @@ class SQLAlchemyAuthDriver(AuthDriverABC):
     def add(self, username, password):
         password = self.digest(password)
         with self.session as session:
-            if (
-                session.query(AuthRecord)
-                .filter(AuthRecord.username == username)
-                .first()
-            ):
+            if session.query(AuthRecord).filter(AuthRecord.username == username).first():
                 raise AuthError(f"User {username} already exists")
 
             new_record = AuthRecord(username=username, password=password)
@@ -77,11 +73,7 @@ class SQLAlchemyAuthDriver(AuthDriverABC):
 
     def delete(self, username):
         with self.session as session:
-            user = (
-                session.query(AuthRecord)
-                .filter(AuthRecord.username == username)
-                .first()
-            )
+            user = session.query(AuthRecord).filter(AuthRecord.username == username).first()
             if not user:
                 raise AuthError(f"User {username} doesn't exist")
             session.delete(user)

@@ -68,9 +68,7 @@ def try_drop_test_data(
         return
 
     engine = create_engine(
-        "postgresql://{user}@{host}/{name}".format(
-            user=root_auth, host=host, name=database
-        )
+        "postgresql://{user}@{host}/{name}".format(user=root_auth, host=host, name=database)
     )
 
     if sqlalchemy_utils.database_exists(engine.url):
@@ -123,9 +121,8 @@ def setup_database(
             )
             conn.execute(user_stmt)
 
-            perm_stmt = (
-                "GRANT ALL PRIVILEGES ON DATABASE {database} to {password}"
-                "".format(database=database, password=password)
+            perm_stmt = "GRANT ALL PRIVILEGES ON DATABASE {database} to {password}" "".format(
+                database=database, password=password
             )
             conn.execute(perm_stmt)
             conn.execute("commit")
@@ -188,9 +185,7 @@ def migrate_database(driver, migrate_functions, current_schema_version, model):
 
     if not check_engine_for_migrate(driver.engine) and need_migrate:
         logger.error(
-            "Engine {} does not support alter, skip migration".format(
-                driver.engine.dialect.name
-            )
+            "Engine {} does not support alter, skip migration".format(driver.engine.dialect.name)
         )
         return
     for f in migrate_functions[db_schema_version:current_schema_version]:
