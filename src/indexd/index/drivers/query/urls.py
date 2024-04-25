@@ -67,25 +67,21 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
             if include and exclude:
                 query = query.having(
                     and_(
-                        ~q_func["string_agg"](
-                            IndexRecordUrlMetadataJsonb.url, ","
-                        ).contains(exclude),
-                        q_func["string_agg"](
-                            IndexRecordUrlMetadataJsonb.url, ","
-                        ).contains(include),
+                        ~q_func["string_agg"](IndexRecordUrlMetadataJsonb.url, ",").contains(
+                            exclude
+                        ),
+                        q_func["string_agg"](IndexRecordUrlMetadataJsonb.url, ",").contains(
+                            include
+                        ),
                     )
                 )
             elif include:
                 query = query.having(
-                    q_func["string_agg"](IndexRecordUrlMetadataJsonb.url, ",").contains(
-                        include
-                    )
+                    q_func["string_agg"](IndexRecordUrlMetadataJsonb.url, ",").contains(include)
                 )
             elif exclude:
                 query = query.having(
-                    ~q_func["string_agg"](
-                        IndexRecordUrlMetadataJsonb.url, ","
-                    ).contains(exclude)
+                    ~q_func["string_agg"](IndexRecordUrlMetadataJsonb.url, ",").contains(exclude)
                 )
             # [("did", "urls")]
             record_list = (
@@ -174,10 +170,9 @@ class AlchemyURLsQueryDriver(URLsQueryDriver):
             # handle not deleted filter
             if exclude_deleted:
                 query = query.filter(
-                    (
-                        func.lower(IndexRecord.index_metadata["deleted"].astext)
-                        == "true"
-                    ).isnot(True)
+                    (func.lower(IndexRecord.index_metadata["deleted"].astext) == "true").isnot(
+                        True
+                    )
                 )
 
             # handle version filter if not None

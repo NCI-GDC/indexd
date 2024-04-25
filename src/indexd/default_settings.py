@@ -29,9 +29,7 @@ CONFIG["INDEX"] = {
 }
 
 CONFIG["ALIAS"] = {
-    "driver": SQLAlchemyAliasDriver(
-        PG_URL, auto_migrate=AUTO_MIGRATE, echo=SQLALCHEMY_VERBOSE
-    ),
+    "driver": SQLAlchemyAliasDriver(PG_URL, auto_migrate=AUTO_MIGRATE, echo=SQLALCHEMY_VERBOSE),
 }
 
 CONFIG["DIST"] = [

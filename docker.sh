@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/scripts/bash
 set -euox pipefail
 
 NAME="indexd"

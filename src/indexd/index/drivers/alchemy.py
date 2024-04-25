@@ -211,9 +211,7 @@ class IndexRecordUrlMetadata(Base):
     did = Column(String, index=True, primary_key=True)
     value = Column(String)
     __table_args__ = (
-        ForeignKeyConstraint(
-            ["did", "url"], ["index_record_url.did", "index_record_url.url"]
-        ),
+        ForeignKeyConstraint(["did", "url"], ["index_record_url.did", "index_record_url.url"]),
         Index("index_record_url_metadata_idx", "did"),
     )
 
@@ -292,9 +290,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
     SQLAlchemy implementation of index driver.
     """
 
-    def __init__(
-        self, conn, logger=None, auto_migrate=True, index_config=None, **config
-    ):
+    def __init__(self, conn, logger=None, auto_migrate=True, index_config=None, **config):
         """
         Initialize the SQLAlchemy database driver.
         """
@@ -425,9 +421,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 for url_key, url_dict in urls_metadata.items():
                     u_type, u_state, url_dict = separate_urls_metadata(url_dict)
 
-                    query = query.filter(
-                        IndexRecordUrlMetadataJsonb.url.contains(url_key)
-                    )
+                    query = query.filter(IndexRecordUrlMetadataJsonb.url.contains(url_key))
                     for k, v in url_dict.items():
                         query = query.filter(
                             IndexRecordUrlMetadataJsonb.urls_metadata[k].astext == v
@@ -435,9 +429,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                     if u_type:
                         query = query.filter(IndexRecordUrlMetadataJsonb.type == u_type)
                     if u_state:
-                        query = query.filter(
-                            IndexRecordUrlMetadataJsonb.state == u_state
-                        )
+                        query = query.filter(IndexRecordUrlMetadataJsonb.state == u_state)
 
             if negate_params:
                 query = self._negate_filter(session, query, **negate_params)
@@ -514,17 +506,13 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 if not v:
                     query = query.filter(not_(IndexRecord.index_metadata.has_key(k)))
                 else:
-                    query = query.filter(
-                        not_(IndexRecord.index_metadata[k].astext == v)
-                    )
+                    query = query.filter(not_(IndexRecord.index_metadata[k].astext == v))
 
         if urls_metadata is not None and urls_metadata:
             query = query.join(IndexRecord.urls_metadata)
             for url_key, url_dict in urls_metadata.items():
                 if not url_dict:
-                    query = query.filter(
-                        ~IndexRecordUrlMetadataJsonb.url.contains(url_key)
-                    )
+                    query = query.filter(~IndexRecordUrlMetadataJsonb.url.contains(url_key))
                 else:
                     # Filter first on the fields separated out from the
                     # metadata jsonb blob.
@@ -535,9 +523,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                                 ~IndexRecord.urls_metadata.any(
                                     and_(
                                         IndexRecordUrlMetadataJsonb.type == "",
-                                        IndexRecordUrlMetadataJsonb.url.contains(
-                                            url_key
-                                        ),
+                                        IndexRecordUrlMetadataJsonb.url.contains(url_key),
                                     )
                                 )
                             )
@@ -558,9 +544,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                                 ~IndexRecord.urls_metadata.any(
                                     and_(
                                         IndexRecordUrlMetadataJsonb.state == "",
-                                        IndexRecordUrlMetadataJsonb.url.contains(
-                                            url_key
-                                        ),
+                                        IndexRecordUrlMetadataJsonb.url.contains(url_key),
                                     )
                                 )
                             )
@@ -579,12 +563,8 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                             query = query.filter(
                                 ~IndexRecord.urls_metadata.any(
                                     and_(
-                                        IndexRecordUrlMetadataJsonb.urls_metadata.has_key(
-                                            k
-                                        ),
-                                        IndexRecordUrlMetadataJsonb.url.contains(
-                                            url_key
-                                        ),
+                                        IndexRecordUrlMetadataJsonb.urls_metadata.has_key(k),
+                                        IndexRecordUrlMetadataJsonb.url.contains(url_key),
                                     )
                                 )
                             )
@@ -593,8 +573,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                             sub = sub.filter(
                                 and_(
                                     IndexRecordUrlMetadataJsonb.url.contains(url_key),
-                                    IndexRecordUrlMetadataJsonb.urls_metadata[k].astext
-                                    == v,
+                                    IndexRecordUrlMetadataJsonb.urls_metadata[k].astext == v,
                                 )
                             )
                             query = query.filter(~IndexRecord.did.in_(sub.subquery()))
@@ -625,9 +604,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                     )
 
                     # Filter anything that does not match.
-                    query = query.filter(
-                        IndexRecordUrlMetadataJsonb.did.in_(sub.subquery())
-                    )
+                    query = query.filter(IndexRecordUrlMetadataJsonb.did.in_(sub.subquery()))
             if ids:
                 query = query.filter(IndexRecordUrlMetadataJsonb.did.in_(ids))
             # Remove duplicates.
@@ -638,10 +615,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             query = query.limit(limit)
 
             urls_metadata = extract_urls_metadata(query)
-            return [
-                {"url": url, "metadata": metadata}
-                for url, metadata in urls_metadata.items()
-            ]
+            return [{"url": url, "metadata": metadata} for url, metadata in urls_metadata.items()]
 
     def add(
         self,
@@ -818,9 +792,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
         with self.session as session:
             try:
                 record = (
-                    session.query(IndexRecord)
-                    .filter(IndexRecord.aliases.any(name=alias))
-                    .one()
+                    session.query(IndexRecord).filter(IndexRecord.aliases.any(name=alias)).one()
                 )
             except NoResultFound:
                 raise NoRecordFound("no record found")
@@ -843,9 +815,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
         """
         with self.session as session:
             query = session.query(IndexRecord)
-            query = query.filter(
-                or_(IndexRecord.did == did, IndexRecord.baseid == did)
-            ).order_by(IndexRecord.created_date.desc())
+            query = query.filter(or_(IndexRecord.did == did, IndexRecord.baseid == did)).order_by(
+                IndexRecord.created_date.desc()
+            )
 
             record = query.first()
             if record is None:
@@ -879,14 +851,11 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                     session.delete(ace)
 
                 record.acl = [
-                    IndexRecordACE(did=record.did, ace=ace)
-                    for ace in changing_fields["acl"]
+                    IndexRecordACE(did=record.did, ace=ace) for ace in changing_fields["acl"]
                 ]
 
             if "metadata" in changing_fields:
-                record.release_number = changing_fields["metadata"].pop(
-                    "release_number", None
-                )
+                record.release_number = changing_fields["metadata"].pop("release_number", None)
                 record.index_metadata = changing_fields["metadata"]
 
             if "hashes" in changing_fields:
@@ -894,9 +863,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                     session.delete(hash_doc)
 
                 record.hashes = [
-                    IndexRecordHash(
-                        did=record.did, hash_type=hash_type, hash_value=hash_value
-                    )
+                    IndexRecordHash(did=record.did, hash_type=hash_type, hash_value=hash_value)
                     for hash_type, hash_value in changing_fields["hashes"].items()
                 ]
 
@@ -1048,10 +1015,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             query = query.filter(IndexRecord.baseid == baseid)
             if exclude_deleted:
                 query = query.filter(
-                    (
-                        func.lower(IndexRecord.index_metadata["deleted"].astext)
-                        == "true"
-                    ).isnot(True)
+                    (func.lower(IndexRecord.index_metadata["deleted"].astext) == "true").isnot(
+                        True
+                    )
                 )
 
             records = query.all()
@@ -1091,10 +1057,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 query = query.filter(IndexRecord.version.isnot(None))
             if exclude_deleted:
                 query = query.filter(
-                    (
-                        func.lower(IndexRecord.index_metadata["deleted"].astext)
-                        == "true"
-                    ).isnot(True)
+                    (func.lower(IndexRecord.index_metadata["deleted"].astext) == "true").isnot(
+                        True
+                    )
                 )
             record = query.first()
             if not record:
@@ -1130,10 +1095,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 max_date_subq = max_date_subq.filter(IndexRecord.version.isnot(None))
             if exclude_deleted:
                 max_date_subq = max_date_subq.filter(
-                    (
-                        func.lower(IndexRecord.index_metadata["deleted"].astext)
-                        == "true"
-                    ).isnot(True)
+                    (func.lower(IndexRecord.index_metadata["deleted"].astext) == "true").isnot(
+                        True
+                    )
                 )
 
             max_date_subq = max_date_subq.subquery()
@@ -1194,9 +1158,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
         Number of unique records stored by backend.
         """
         with self.session as session:
-            return session.execute(
-                select([func.count()]).select_from(IndexRecord)
-            ).scalar()
+            return session.execute(select([func.count()]).select_from(IndexRecord)).scalar()
 
 
 def extract_urls_metadata(urls_metadata_results):
@@ -1277,17 +1239,13 @@ def migrate_2(session, **kwargs):
 def migrate_3(session, **kwargs):
     session.execute("ALTER TABLE index_record ADD COLUMN file_name VARCHAR")
 
-    session.execute(
-        "CREATE INDEX index_record__file_name_idx ON index_record ( file_name )"
-    )
+    session.execute("CREATE INDEX index_record__file_name_idx ON index_record ( file_name )")
 
 
 def migrate_4(session, **kwargs):
     session.execute("ALTER TABLE index_record ADD COLUMN version VARCHAR")
 
-    session.execute(
-        "CREATE INDEX index_record__version_idx ON index_record ( version )"
-    )
+    session.execute("CREATE INDEX index_record__version_idx ON index_record ( version )")
 
 
 def migrate_5(session, **kwargs):
@@ -1302,15 +1260,11 @@ def migrate_5(session, **kwargs):
     )
 
     session.execute(
-        "CREATE INDEX {tb}_idx ON {tb} ( did )".format(
-            tb=IndexRecordMetadata.__tablename__
-        )
+        "CREATE INDEX {tb}_idx ON {tb} ( did )".format(tb=IndexRecordMetadata.__tablename__)
     )
 
     session.execute(
-        "CREATE INDEX {tb}_idx ON {tb} ( did )".format(
-            tb=IndexRecordUrlMetadata.__tablename__
-        )
+        "CREATE INDEX {tb}_idx ON {tb} ( did )".format(tb=IndexRecordUrlMetadata.__tablename__)
     )
 
 
@@ -1319,9 +1273,7 @@ def migrate_6(session, **kwargs):
 
 
 def migrate_7(session, **kwargs):
-    existing_acls = (
-        session.query(IndexRecordMetadata).filter_by(key="acls").yield_per(1000)
-    )
+    existing_acls = session.query(IndexRecordMetadata).filter_by(key="acls").yield_per(1000)
     for metadata in existing_acls:
         acl = metadata.value.split(",")
         for ace in acl:
@@ -1354,9 +1306,7 @@ def migrate_9(session, **kwargs):
 def migrate_10(session, **kwargs):
     session.execute("ALTER TABLE index_record ADD COLUMN uploader VARCHAR")
 
-    session.execute(
-        "CREATE INDEX index_record__uploader_idx ON index_record ( uploader )"
-    )
+    session.execute("CREATE INDEX index_record__uploader_idx ON index_record ( uploader )")
 
 
 def migrate_11(session, **kwargs):
@@ -1366,9 +1316,7 @@ def migrate_11(session, **kwargs):
     session.execute(
         "ALTER TABLE index_record_metadata DROP CONSTRAINT index_record_metadata_did_fkey"
     )
-    session.execute(
-        "ALTER TABLE index_record_url DROP CONSTRAINT index_record_url_did_fkey"
-    )
+    session.execute("ALTER TABLE index_record_url DROP CONSTRAINT index_record_url_did_fkey")
 
 
 def migrate_12(session, **kwargs):

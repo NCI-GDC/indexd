@@ -42,9 +42,7 @@ def test_driver_auth_rejects_bad_creds(auth_driver, database_conn):
     """
 
     database_conn.execute(
-        make_sql_statement(
-            """INSERT INTO auth_record VALUES (?,?)""", (USERNAME, DIGESTED)
-        )
+        make_sql_statement("""INSERT INTO auth_record VALUES (?,?)""", (USERNAME, DIGESTED))
     )
 
     with pytest.raises(AuthError):
@@ -61,9 +59,7 @@ def test_driver_auth_returns_user_context(auth_driver, database_conn):
     """
 
     database_conn.execute(
-        make_sql_statement(
-            """INSERT INTO auth_record VALUES (?,?)""", (USERNAME, DIGESTED)
-        )
+        make_sql_statement("""INSERT INTO auth_record VALUES (?,?)""", (USERNAME, DIGESTED))
     )
 
     user = auth_driver.auth(USERNAME, PASSWORD)

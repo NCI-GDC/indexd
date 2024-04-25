@@ -393,12 +393,8 @@ def test_driver_get_record(index_driver, database_conn):
     assert record["rev"] == rev, "record revision does not match"
     assert record["size"] == size, "record size does not match"
     assert record["form"] == form, "record form does not match"
-    assert (
-        record["created_date"] == created_date.isoformat()
-    ), "created date does not match"
-    assert (
-        record["updated_date"] == updated_date.isoformat()
-    ), "updated date does not match"
+    assert record["created_date"] == created_date.isoformat(), "created date does not match"
+    assert record["updated_date"] == updated_date.isoformat(), "updated date does not match"
 
 
 def test_driver_get_fails_with_no_records(index_driver):
@@ -439,12 +435,8 @@ def test_driver_get_latest_version(index_driver, database_conn):
     assert record["rev"] == rev, "record revision does not match"
     assert record["size"] == size, "record size does not match"
     assert record["form"] == form, "record form does not match"
-    assert (
-        record["created_date"] == created_date.isoformat()
-    ), "created date does not match"
-    assert (
-        record["updated_date"] == updated_date.isoformat()
-    ), "updated date does not match"
+    assert record["created_date"] == created_date.isoformat(), "created date does not match"
+    assert record["updated_date"] == updated_date.isoformat(), "updated date does not match"
 
 
 def test_driver_get_latest_version_with_no_record(index_driver, database_conn):
@@ -517,9 +509,7 @@ def test_driver_get_latest_version_exclude_deleted(index_driver, database_conn):
 
     assert record["baseid"] == baseid, "record baseid does not match"
     assert record["did"] != did, "record did matches deleted record"
-    assert (
-        record["did"] == non_deleted_did
-    ), "record id does not match non-deleted record"
+    assert record["did"] == non_deleted_did, "record id does not match non-deleted record"
 
 
 def test_driver_get_all_version(index_driver, database_conn):
@@ -856,9 +846,7 @@ def test_driver_update_fails_with_invalid_id(index_driver, database_conn):
     )
 
     with pytest.raises(NoRecordFound):
-        index_driver.update(
-            "some_record_that_does_not_exist", "some_record_version", rev
-        )
+        index_driver.update("some_record_that_does_not_exist", "some_record_version", rev)
 
 
 def test_driver_update_fails_with_invalid_rev(index_driver, database_conn):

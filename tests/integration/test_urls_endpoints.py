@@ -74,10 +74,7 @@ def test_query_urls(swg_index_client, swg_query_client, test_data):
 
     # test exclude url
     urls_list = swg_query_client.query_urls(exclude="awesome-x")
-    assert (
-        len(urls_list)
-        == versioned_count + unversioned_count + deleted_count - 3 * url_x_count
-    )
+    assert len(urls_list) == versioned_count + unversioned_count + deleted_count - 3 * url_x_count
 
     # test include
     urls_list = swg_query_client.query_urls(include="awesome-x")
