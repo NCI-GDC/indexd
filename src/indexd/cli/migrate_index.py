@@ -1,4 +1,4 @@
-#!/usr/scripts/env python
+#!/usr/cli/env python
 
 """
 The index sqlalchemy driver __init__ function runs all the necessary migration

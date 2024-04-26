@@ -1,4 +1,4 @@
-#!/usr/scripts/env python
+#!/usr/cli/env python
 
 import argparse
 import sys

@@ -1,4 +1,4 @@
-#!/scripts/bash
+#!/cli/bash
 set -euox pipefail
 
 NAME="indexd"
@@ -6,12 +6,7 @@ PARAM=${1:-DO_NOT_PUSH};
 
 IMAGE_NAME="${DOCKER_RELEASE_REGISTRY:=quay.io}/ncigdc/${NAME}"
 REGISTRY="${BASE_CONTAINER_REGISTRY:=quay.io}"
-
-if [ -f 'VERSION.txt' ]; then
-  VERSION=$(cat VERSION.txt)
-else
-  VERSION=$(python -m setuptools_scm)
-fi
+VERSION=$(python -m setuptools_scm)
 
 # setup active branch name, default to using git if build is happening on local
 if [ ${TRAVIS_BRANCH+x} ]; then

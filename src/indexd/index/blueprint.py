@@ -4,6 +4,8 @@ import re
 
 import flask
 
+from .. import version
+
 try:
     import importlib_metadata
 except ImportError:
@@ -505,14 +507,14 @@ def stats():
 
 
 @blueprint.route("/_version", methods=["GET"])
-def version():
+def get_version_info():
     """
     Return the version of this service.
     """
-
+    version_data = version.get_version()
     base = {
-        "version": importlib_metadata.version("indexd"),
-        "commit": "deprecated",
+        "version": version_data.version,
+        "commit": version_data.sha.replace("g", ""),
     }
 
     return flask.jsonify(base), 200

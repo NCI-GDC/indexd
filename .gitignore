@@ -92,3 +92,4 @@ swagger-codegen-cli.jar
 
 # Helm
 helm/*.tgz
+**/versionista.txt

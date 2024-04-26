@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61", "wheel", "setuptools_scm>=7", "versionista"]
+requires = ["setuptools>=61", "wheel", "setuptools_scm>=7", "versionista==1.0.1.dev4"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -25,6 +25,11 @@ dynamic = [
 [tool.black]
 line-length = 98
 include = '\.pyi?$'
+
+[tool.coverage.run]
+branch = true
+context = "unit tests"
+source = ["indexd"]
 
 [tool.coverage.html]
 title = "indexd coverage report"
@@ -53,13 +58,14 @@ log_cli = "true"
 log_auto_indent = "true"
 filterwarnings = ["ignore::DeprecationWarning"]
 addopts = [
-  "-r alv --color=true -p no:ddtrace -p no:ddtrace.pytest_bdd"
+  "-r lv --color=true -p no:ddtrace -p no:ddtrace.pytest_bdd"
 ]
 norecursedirs = [
   ".git",
   ".tox",
   "dist",
-  "build"
+  "build",
+  "swagger_client"
 ]
 testpaths = [
   "tests/unit",
@@ -67,5 +73,9 @@ testpaths = [
 ]
 
 [tool.setuptools_scm]
-local_scheme = "versionista-local-format"
+local_scheme = "no-local-version"
 version_scheme = "versionista-format"
+
+[tool.versionista]
+version_file = "src/indexd/versionista.txt"
+write_version_file = true
