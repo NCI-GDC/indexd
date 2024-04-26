@@ -7,4 +7,3 @@ def test_index_get(indexd_systems_api):
     version = Version(version_data.version)
     assert version.major is not None
     assert len(version_data.commit) == 7
-

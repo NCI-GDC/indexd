@@ -26,15 +26,15 @@ dynamic = [
 line-length = 98
 include = '\.pyi?$'
 
-[tool.coverage.run]
-branch = true
-context = "unit tests"
-source = ["indexd"]
-
 [tool.coverage.html]
 title = "indexd coverage report"
 directory = "docs/htmlcov"
 show_contexts = true
+
+[tool.coverage.run]
+branch = true
+context = "unit tests"
+source = ["indexd"]
 
 [tool.isort]
 profile = "black"
