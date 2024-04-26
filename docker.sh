@@ -22,7 +22,6 @@ GIT_BRANCH=${GIT_BRANCH/\//_}
 
 # Save the commit hash so the /status endpoint doesn't need Git.
 COMMIT=$(git rev-parse HEAD)
-echo "COMMIT=\"${COMMIT}\"" >indexd/index/version_data.py
 
 BUILD_COMMAND=(build \
   --label org.opencontainers.image.created="$(date -Iseconds)" \
@@ -37,8 +36,6 @@ BUILD_COMMAND=(build \
   -t "$IMAGE_NAME:${COMMIT:0:8}" \
   -t "$IMAGE_NAME:$GIT_BRANCH-${COMMIT:0:8}"
 )
-
-echo "$COMMIT" > DOCKER_TAG.txt
 
 docker "${BUILD_COMMAND[@]}" . --progress=plain
 
