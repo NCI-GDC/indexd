@@ -42,9 +42,9 @@ containerize:
   variables:
     DOCKER_BUILDKIT: 1
     CONTAINER_REGISTRY: $CONTAINER_REGISTRY
+    USE_PYPI_VERSION: yes
   script:
     - pip install 'tox > 4'
-    - export SERVICE_INSTALL_CMD=$SERVICE_NAME==$(python -m setuptools_scm)
     - tox -re containerize
 
 .deploy-service-with-salt:

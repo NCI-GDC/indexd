@@ -15,7 +15,13 @@ GIT_BRANCH=${GIT_BRANCH/\//_}
 # Save the commit hash so the /status endpoint doesn't need Git.
 COMMIT=$(git rev-parse HEAD)
 
-INSTALL_CMD=${SERVICE_INSTALL_CMD:="--no-deps ."}
+# should install make use of published wheel?
+if [ ${USE_PYPI_VERSION+x} ]; then
+  VERSION=$(python -m setuptools_scm)
+  INSTALL_CMD=${SERVICE_NAME}==${VERSION}
+else
+  INSTALL_CMD="--no-deps .";
+fi
 
 BUILD_COMMAND=(build \
   --build-arg SERVICE_NAME="${SERVICE_NAME}" \
