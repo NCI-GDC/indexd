@@ -42,7 +42,7 @@ setup(
     },
     install_requires=[
         "flask",
-        "jsonschema~=4.17",
+        "jsonschema~=4.17.0",
         "sqlalchemy<1.4",
         "sqlalchemy-utils>=0.32",
         "psycopg2",
