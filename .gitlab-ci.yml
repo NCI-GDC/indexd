@@ -41,30 +41,11 @@ containerize:
     - publish
   variables:
     DOCKER_BUILDKIT: 1
-    IMAGE_NAME: $CONTAINER_REGISTRY/ncigdc/$SERVICE_NAME
-    GIT_BRANCH: $CI_COMMIT_REF_NAME
-    TAG_SUFFIX: ${SERVICE_TAG_NAME:-}
+    CONTAINER_REGISTRY: $CONTAINER_REGISTRY
   script: |-
-    # replace slashes with underscore
-    GIT_BRANCH=${GIT_BRANCH/\//_}
-    COMMIT=$(git rev-parse HEAD)
-    VERSION=$(python -m setuptools_scm)
-
-    BUILD_COMMAND=(build \
-      --label org.opencontainers.image.created="$(date -Iseconds)" \
-      --label org.opencontainers.image.revision="${COMMIT}" \
-      --label org.opencontainers.ref.name="${SERVICE_NAME}:${GIT_BRANCH}" \
-      --build-arg registry="${BASE_CONTAINER_REGISTRY%\/ncigdc}" \
-      --build-arg base_version="${BASE_CONTAINER_VERSION:=3.0.2}" \
-      --build-arg APP_INSTALL_CMD="${SERVICE_NAME}==${VERSION}" \
-      --build-arg PIP_INDEX_URL \
-      --ssh default \
-      -t "$IMAGE_NAME:$GIT_BRANCH$TAG_SUFFIX" \
-      -t "$IMAGE_NAME:$COMMIT$TAG_SUFFIX" \
-    )
-
-    docker "${BUILD_COMMAND[@]}" .
-    docker push -a "$IMAGE_NAME"
+    - pip install 'tox > 4'
+    - export SERVICE_INSTALL_CMD=$SERVICE_NAME==$(python -m setuptools_scm)
+    - tox -re containerize
 
 .deploy-service-with-salt:
   before_script:

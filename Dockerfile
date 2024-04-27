@@ -1,43 +1,44 @@
-ARG BASE_VERSION=3.0.1
+ARG BASE_VERSION=3.0.2
 ARG REGISTRY=quay.io
-ARG NAME=indexd
+ARG SERVICE_NAME=indexd
 ARG PYTHON_VERSION=python3.8
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}-builder:${BASE_VERSION} AS build
-ARG NAME
+ARG SERVICE_NAME
 ARG PIP_INDEX_URL
 ARG PYTHON_VERSION
 ARG APP_INSTALL_CMD="--no-deps ."
-ENV PIP_INDEX_URL=$PIP_INDEX_URL
 
-WORKDIR /${NAME}
-# Copy only requirements.txt here so Docker can cache the layer with
-# the installed packages if the pins don't change.
-COPY requirements.txt ./
-RUN pip3 install --no-deps -r requirements.txt
-
-# Now install the code for indexd itself.
+WORKDIR /${SERVICE_NAME}
 COPY . .
-RUN pip3 install ${APP_INSTALL_CMD}
+RUN pip install --no-deps -r requirements.txt --index-url="$PIP_INDEX_URL"
 
+# install service
+RUN pip install --index-url="$PIP_INDEX_URL" ${APP_INSTALL_CMD}
 
-FROM ${REGISTRY}/ncigdc/python3.8-httpd:${BASE_VERSION}
+FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}-httpd:${BASE_VERSION}
 ARG NAME
 ARG PYTHON_VERSION
+ARG SERVICE_NAME
+ARG GIT_BRANCH
+ARG COMMIT
+ARG BUILD_DATE
 
-LABEL org.opencontainers.image.title=${NAME} \
-      org.opencontainers.image.description="${NAME} container image" \
-      org.opencontainers.image.source="https://github.com/NCI-GDC/${NAME}" \
-      org.opencontainers.image.vendor="NCI GDC"
+LABEL org.opencontainers.image.title="${SERVICE_NAME}" \
+      org.opencontainers.image.description="${SERVICE_NAME} container image" \
+      org.opencontainers.image.source="https://github.com/NCI-GDC/${SERVICE_NAME}" \
+      org.opencontainers.image.vendor="NCI GDC" \
+      org.opencontainers.image.ref.name="${SERVICE_NAME}:${GIT_BRANCH}" \
+      org.opencontainers.image.revision="${COMMIT}" \
+      org.opencontainers.image.created="${BUILD_DATE}"
 
 RUN dnf install -y libpq-15.0
 
-RUN mkdir -p /var/www/${NAME}/ \
-  && chmod 777 /var/www/${NAME}
+RUN mkdir -p /var/www/${SERVICE_NAME}/ \
+  && chmod 777 /var/www/${SERVICE_NAME}
 
-COPY wsgi.py /var/www/${NAME}/
-COPY bin/${NAME} /var/www/${NAME}/
-COPY --from=build /venv/lib/${PYTHON_VERSION}/site-packages /venv/lib/python3.8/site-packages
+COPY wsgi.py /var/www/${SERVICE_NAME}/
+COPY --from=build /venv/lib/${PYTHON_VERSION}/site-packages /venv/lib/${PYTHON_VERSION}/site-packages
 
 # Make indexd CLI utilities available for, e.g., DB schema migration.
 COPY --from=build /venv/bin/indexd /venv/bin
@@ -45,4 +46,4 @@ COPY --from=build /venv/bin/index_admin.py /venv/bin
 COPY --from=build /venv/bin/migrate_index.py /venv/bin
 
 
-WORKDIR /var/www/${NAME}
+WORKDIR /var/www/${SERVICE_NAME}

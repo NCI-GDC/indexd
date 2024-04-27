@@ -90,6 +90,10 @@ sqlalchemy-utils==0.41.1
     # via indexd (pyproject.toml)
 tomli==2.0.1
     # via setuptools-scm
+tomlkit==0.12.4
+    # via
+    #   indexd (pyproject.toml)
+    #   versionista
 typing-extensions==4.5.0
     # via
     #   cattrs
