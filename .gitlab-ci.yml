@@ -7,6 +7,7 @@ include:
 
 variables:
   SERVICE_NAME: indexd
+  DOCKER_VERSION: 26.1.0
 
 tox:
   parallel:
@@ -36,6 +37,7 @@ tox:
 containerize:
   stage: build-and-publish
   extends: .job-with-ssh-keys
+  image: docker:${DOCKER_VERSION}-dind
   needs:
     - publish
   variables:
