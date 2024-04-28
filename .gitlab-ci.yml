@@ -55,6 +55,7 @@ containerize:
     - docker --version
     - echo "Containerization step"
   script:
+    - git fetch --unshallow || true
     - >
       GIT_BRANCH=$(echo "$CI_COMMIT_REF_NAME" | sed 's/\//_/g')
 
