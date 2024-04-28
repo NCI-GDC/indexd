@@ -61,7 +61,7 @@ containerize:
     - >
       GIT_BRANCH=${CI_COMMIT_REF_NAME/\//_}
 
-      BUILD_COMMAND="build --build-arg SERVICE_NAME="${SERVICE_NAME} 
+      BUILD_COMMAND="build --build-arg SERVICE_NAME="${SERVICE_NAME}
         --build-arg COMMIT='${COMMIT}'
         --build-arg BUILD_DATE='$(date -Iseconds)'
         --build-arg PIP_INDEX_URL='${PIP_INDEX_URL}'
