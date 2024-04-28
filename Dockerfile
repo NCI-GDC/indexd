@@ -1,7 +1,7 @@
 ARG BASE_VERSION=chore_add-service-install
 ARG REGISTRY=dev-containers.osdc.io
 ARG SERVICE_NAME=indexd
-ARG PYTHON_VERSION=python3.7
+ARG PYTHON_VERSION=python3.8
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}-builder:${BASE_VERSION} AS build
 ARG SERVICE_NAME

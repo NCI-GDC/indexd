@@ -33,5 +33,8 @@ BUILD_COMMAND=(build \
 
 docker "${BUILD_COMMAND[@]}" . --progress=plain
 if [ "$PARAM" = "push" ]; then
-  docker push -a "$IMAGE_NAME"
+  docker push -a "$IMAGE_NAME:$GIT_BRANCH"
+  docker push -a "$IMAGE_NAME:$COMMIT"
+  docker push -a "$IMAGE_NAME:${COMMIT:0:8}"
+  docker push -a "$IMAGE_NAME:$GIT_BRANCH-${COMMIT:0:8}"
 fi

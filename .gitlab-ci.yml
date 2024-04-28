@@ -58,9 +58,6 @@ containerize:
     - echo "github.com ssh-rsa ${GITHUB_RSA_FINGERPRINT}" >> ~/.ssh/known_hosts
     - echo "github.com ecdsa-sha2-nistp256 ${GITHUB_ECDSA_FINGERPRINT}" >> ~/.ssh/known_hosts
   script: |-
-    # install git
-    apk add bash git
-
     # replace slashes with underscore
     GIT_BRANCH=${GIT_BRANCH/\//_}
     COMMIT=$(git rev-parse HEAD)
@@ -78,9 +75,7 @@ containerize:
     )
 
     docker "${BUILD_COMMAND[@]}" . --progress=plain
-    if [ "$PARAM" = "push" ]; then
-      docker push -a "$IMAGE_NAME"
-    fi
+    docker push -a "$IMAGE_NAME"
 
 .deploy-service-with-salt:
   before_script:
