@@ -7,14 +7,11 @@ FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}-builder:${BASE_VERSION} AS build
 ARG SERVICE_NAME
 ARG PIP_INDEX_URL
 ARG PYTHON_VERSION
-ARG APP_INSTALL_CMD="--no-deps ."
+ARG USE_PYPI_VERSION="no"
 
 WORKDIR /${SERVICE_NAME}
 COPY . .
-RUN pip install --no-deps -r requirements.txt --index-url="$PIP_INDEX_URL"
-
-# install service
-RUN pip install --index-url="$PIP_INDEX_URL" ${APP_INSTALL_CMD}
+RUN bash service-install.sh
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}-httpd:${BASE_VERSION}
 ARG NAME

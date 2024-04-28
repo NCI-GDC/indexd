@@ -42,21 +42,15 @@ containerize:
     DOCKER_BUILDKIT: 1
     GIT_BRANCH: $CI_COMMIT_REF_NAME
     IMAGE_NAME: $CONTAINER_REGISTRY/ncigdc/${SERVICE_NAME}
+    USE_PYPI_VERSION: yes
   services:
     - docker:$DOCKER_VERSION-dind
   tags:
     - dind
-  before_script:
-    - python --version
   script: |-
-    pip install versionista==1.0.1dev4
-
     # replace slashes with underscore
     GIT_BRANCH=${GIT_BRANCH/\//_}
     COMMIT=$(git rev-parse HEAD)
-
-    VERSION=$(python -m setuptools_scm)
-    INSTALL_CMD=${SERVICE_NAME}==${VERSION}
 
     BUILD_COMMAND=(build \
       --build-arg SERVICE_NAME="${SERVICE_NAME}" \

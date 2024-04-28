@@ -18,20 +18,12 @@ GIT_BRANCH=${GIT_BRANCH/\//_}
 # Save the commit hash so the /status endpoint doesn't need Git.
 COMMIT=$(git rev-parse HEAD)
 
-# should install make use of published wheel?
-if [ ${USE_PYPI_VERSION+x} ]; then
-  VERSION=$(python -m setuptools_scm)
-  INSTALL_CMD=${SERVICE_NAME}==${VERSION}
-else
-  INSTALL_CMD="--no-deps .";
-fi
-
 BUILD_COMMAND=(build \
   --build-arg SERVICE_NAME="${SERVICE_NAME}" \
   --build-arg COMMIT="${COMMIT}" \
   --build-arg BUILD_DATE="$(date -Iseconds)" \
   --build-arg PIP_INDEX_URL="${PIP_INDEX_URL}" \
-  --build-arg APP_INSTALL_CMD="${INSTALL_CMD}" \
+  --build-arg USE_PYPI_VERSION="${USE_PYPI_VERSION:=no}" \
   --add-host "${NEXUS_HOST}" \
   -t "$IMAGE_NAME:$GIT_BRANCH" \
   -t "$IMAGE_NAME:$COMMIT" \
