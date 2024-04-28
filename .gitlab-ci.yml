@@ -47,6 +47,16 @@ containerize:
     - docker:$DOCKER_VERSION-dind
   tags:
     - dind
+  before_script:
+    - apk add bash git
+    - eval $(ssh-agent -s)
+    - echo "${GITLAB_FIPS_SSH_KEY}" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - git config --global user.email "git@gitlab.datacommons.io"
+    - git config --global user.name "Gitlab CI"
+    - echo "github.com ssh-rsa ${GITHUB_RSA_FINGERPRINT}" >> ~/.ssh/known_hosts
+    - echo "github.com ecdsa-sha2-nistp256 ${GITHUB_ECDSA_FINGERPRINT}" >> ~/.ssh/known_hosts
   script: |-
     # install git
     apk add bash git

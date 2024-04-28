@@ -1,7 +1,7 @@
-ARG BASE_VERSION=3.0.2
-ARG REGISTRY=quay.io
+ARG BASE_VERSION=chore_add-service-install
+ARG REGISTRY=dev-containers.osdc.io
 ARG SERVICE_NAME=indexd
-ARG PYTHON_VERSION=python3.8
+ARG PYTHON_VERSION=python3.7
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}-builder:${BASE_VERSION} AS build
 ARG SERVICE_NAME
@@ -11,7 +11,7 @@ ARG USE_PYPI_VERSION="no"
 
 WORKDIR /${SERVICE_NAME}
 COPY . .
-RUN bash service-install.sh
+RUN bash /service-install.sh
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}-httpd:${BASE_VERSION}
 ARG NAME
