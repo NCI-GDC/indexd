@@ -3,12 +3,10 @@ include:
   - project: nci-gdc/gitlab-templates
     ref: feat/dev-2667-python-docker-services
     file:
-      - templates/artifacts/python-service.yaml
+      - templates/artifacts/python-docker-service.yaml
 
 variables:
   SERVICE_NAME: indexd
-  DOCKER_VERSION: 26.1.0
-  PIP_INDEX_URL: https://nexus.osdc.io/repository/pypi-all/simple
 
 tox:
   parallel:
@@ -34,46 +32,6 @@ tox:
     - java -version
     - pip install 'tox > 4'
     - tox -e py
-
-containerize:
-  stage: build-and-publish
-  extends: .job-with-ssh-keys
-  image: docker:${DOCKER_VERSION}-dind
-  needs:
-    - publish
-  variables:
-    DOCKER_BUILDKIT: 1
-    COMMIT: $CI_COMMIT_SHA
-    USE_PYPI_VERSION: "yes"
-    GIT_BRANCH: $CI_COMMIT_REF_NAME
-    IMAGE_NAME: $CONTAINER_REGISTRY/ncigdc/${SERVICE_NAME}
-  services:
-    - docker:$DOCKER_VERSION-dind
-  tags:
-    - dind
-  before_script:
-    - docker --version
-    - echo "Containerization step"
-  script:
-    - git fetch --unshallow || true
-    - >
-      GIT_BRANCH=$(echo "$CI_COMMIT_REF_NAME" | sed 's/\//_/g')
-
-      SHA=$(printf '%s' "$COMMIT" | cut -c 1-8)
-
-      docker build \
-        --build-arg SERVICE_NAME=${SERVICE_NAME} \
-        --build-arg COMMIT=${COMMIT} \
-        --build-arg BUILD_DATE="$(date -Iseconds)" \
-        --build-arg PIP_INDEX_URL=${PIP_INDEX_URL} \
-        --build-arg USE_PYPI_VERSION=${USE_PYPI_VERSION} \
-        -t $IMAGE_NAME:$GIT_BRANCH \
-        -t $IMAGE_NAME:$COMMIT \
-        -t $IMAGE_NAME:$SHA \
-        -t $IMAGE_NAME:$GIT_BRANCH-$SHA \
-      .
-
-      docker push -a "$IMAGE_NAME"
 
 .deploy-service-with-salt:
   before_script:
