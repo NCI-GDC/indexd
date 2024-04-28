@@ -40,15 +40,15 @@ containerize:
     - publish
   variables:
     DOCKER_BUILDKIT: 1
-    GIT_BRANCH: $CI_COMMIT_REF_NAME
     IMAGE_NAME: $CONTAINER_REGISTRY/ncigdc/${SERVICE_NAME}
     USE_PYPI_VERSION: yes
+    COMMIT: $CI_COMMIT_SHA
   services:
     - docker:$DOCKER_VERSION-dind
   tags:
     - dind
   before_script:
-    - apk add bash git
+    - apk add git
     - eval $(ssh-agent -s)
     - echo "${GITLAB_FIPS_SSH_KEY}" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -59,9 +59,7 @@ containerize:
     - echo "github.com ecdsa-sha2-nistp256 ${GITHUB_ECDSA_FINGERPRINT}" >> ~/.ssh/known_hosts
   script:
     - >
-      GIT_BRANCH=${GIT_BRANCH/\//_}
-
-      COMMIT=$(git rev-parse HEAD)
+      GIT_BRANCH=${CI_COMMIT_REF_NAME/\//_}
 
       BUILD_COMMAND=(build \
         --build-arg SERVICE_NAME="${SERVICE_NAME}" \
