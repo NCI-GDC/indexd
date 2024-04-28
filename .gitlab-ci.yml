@@ -43,6 +43,7 @@ containerize:
     IMAGE_NAME: $CONTAINER_REGISTRY/ncigdc/${SERVICE_NAME}
     USE_PYPI_VERSION: yes
     COMMIT: $CI_COMMIT_SHA
+    GIT_BRANCH: $CI_COMMIT_REF_NAME
   services:
     - docker:$DOCKER_VERSION-dind
   tags:
