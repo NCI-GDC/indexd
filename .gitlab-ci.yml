@@ -40,17 +40,16 @@ containerize:
     - publish
   variables:
     DOCKER_BUILDKIT: 1
-    IMAGE_NAME: $CONTAINER_REGISTRY/ncigdc/${SERVICE_NAME}
-    USE_PYPI_VERSION: "yes"
     COMMIT: $CI_COMMIT_SHA
+    USE_PYPI_VERSION: "yes"
     GIT_BRANCH: $CI_COMMIT_REF_NAME
-    PIP_INDEX_URL: https://nexus.osdc.io/repository/pypi-all/simple
+    IMAGE_NAME: $CONTAINER_REGISTRY/ncigdc/${SERVICE_NAME}
   services:
     - docker:$DOCKER_VERSION-dind
   tags:
     - dind
   before_script:
-    - apk add bash
+    - docker --version
   script:
     - >
       GIT_BRANCH=$(echo "$CI_COMMIT_REF_NAME" | sed 's/\//_/g')
