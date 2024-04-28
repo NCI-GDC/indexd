@@ -36,20 +36,44 @@ tox:
 containerize:
   stage: build-and-publish
   extends: .job-with-ssh-keys
-  image: ${BASE_CONTAINER_REGISTRY}/${LANGUAGE_VERSION}-builder:${BASE_CONTAINER_VERSION}
   needs:
     - publish
   variables:
     DOCKER_BUILDKIT: 1
-    USE_PYPI_VERSION: yes
     GIT_BRANCH: $CI_COMMIT_REF_NAME
+    IMAGE_NAME: $CONTAINER_REGISTRY/ncigdc/${SERVICE_NAME}
   services:
     - docker:$DOCKER_VERSION-dind
   tags:
     - dind
-  script:
-    - pip install 'tox > 4'
-    - tox -re containerize
+  before_script:
+    - python --version
+  script: |-
+    pip install versionista==1.0.1dev4
+
+    # replace slashes with underscore
+    GIT_BRANCH=${GIT_BRANCH/\//_}
+    COMMIT=$(git rev-parse HEAD)
+
+    VERSION=$(python -m setuptools_scm)
+    INSTALL_CMD=${SERVICE_NAME}==${VERSION}
+
+    BUILD_COMMAND=(build \
+      --build-arg SERVICE_NAME="${SERVICE_NAME}" \
+      --build-arg COMMIT="${COMMIT}" \
+      --build-arg BUILD_DATE="$(date -Iseconds)" \
+      --build-arg PIP_INDEX_URL="${PIP_INDEX_URL}" \
+      --build-arg APP_INSTALL_CMD="${INSTALL_CMD}" \
+      -t "$IMAGE_NAME:$GIT_BRANCH" \
+      -t "$IMAGE_NAME:$COMMIT" \
+      -t "$IMAGE_NAME:${COMMIT:0:8}" \
+      -t "$IMAGE_NAME:$GIT_BRANCH-${COMMIT:0:8}"
+    )
+
+    docker "${BUILD_COMMAND[@]}" . --progress=plain
+    if [ "$PARAM" = "push" ]; then
+      docker push -a "$IMAGE_NAME"
+    fi
 
 .deploy-service-with-salt:
   before_script:
