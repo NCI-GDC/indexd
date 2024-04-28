@@ -8,6 +8,7 @@ include:
 variables:
   SERVICE_NAME: indexd
   DOCKER_VERSION: 26.1.0
+  PIP_INDEX_URL: https://nexus.osdc.io/repository/pypi-all/simple
 
 tox:
   parallel:
@@ -52,6 +53,7 @@ containerize:
     - dind
   before_script:
     - docker --version
+    - echo "Containerization step"
   script:
     - >
       GIT_BRANCH=$(echo "$CI_COMMIT_REF_NAME" | sed 's/\//_/g')
