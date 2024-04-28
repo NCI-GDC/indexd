@@ -60,7 +60,7 @@ containerize:
   script:
     - >
       GIT_BRANCH=${GIT_BRANCH/\//_}
-      
+
       COMMIT=$(git rev-parse HEAD)
 
       BUILD_COMMAND=(build \
@@ -76,7 +76,7 @@ containerize:
       )
 
       docker "${BUILD_COMMAND[@]}" . --progress=plain
-      
+
       docker push -a "$IMAGE_NAME"
 
 .deploy-service-with-salt:
