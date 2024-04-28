@@ -56,14 +56,14 @@ containerize:
 
       SHA=$(printf '%s' "$COMMIT" | cut -c 1-8)
 
-      BUILD_COMMAND="build --build-arg SERVICE_NAME=${SERVICE_NAME} \
-        --build-arg COMMIT=${COMMIT} \
-        --build-arg BUILD_DATE=$(date -Iseconds) \
-        --build-arg PIP_INDEX_URL=${PIP_INDEX_URL} \
-        --build-arg USE_PYPI_VERSION=${USE_PYPI_VERSION} \
-        -t $IMAGE_NAME:$GIT_BRANCH \
-        -t $IMAGE_NAME:$COMMIT \
-        -t $IMAGE_NAME:$SHA \
+      BUILD_COMMAND="build --build-arg SERVICE_NAME=${SERVICE_NAME}
+        --build-arg COMMIT=${COMMIT}
+        --build-arg BUILD_DATE=$(date -Iseconds)
+        --build-arg PIP_INDEX_URL=${PIP_INDEX_URL}
+        --build-arg USE_PYPI_VERSION=${USE_PYPI_VERSION}
+        -t $IMAGE_NAME:$GIT_BRANCH
+        -t $IMAGE_NAME:$COMMIT
+        -t $IMAGE_NAME:$SHA
         -t $IMAGE_NAME:$GIT_BRANCH-$SHA"
 
       docker "${BUILD_COMMAND}" .
