@@ -1,10 +1,6 @@
 .tox
 swagger-codegen*
 venv*
-helm
-docs/
-docker.sh
-dockerrun.bash
 
 # Unit test / coverage reports
 htmlcov/
