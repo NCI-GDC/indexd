@@ -9,7 +9,10 @@ NEXUS_HOST=${PIP_INDEX_HOST:="nexus.osdc.io:172.23.11.116"}
 IMAGE_NAME="${CONTAINER_REGISTRY:=dev-containers.osdc.io}/ncigdc/${SERVICE_NAME}"
 
 # setup active branch name, default to using git if build is happening on local
-GIT_BRANCH=$(git symbolic-ref --short -q HEAD);
+if [ -z ${GIT_BRANCH+x} ]; then
+  GIT_BRANCH=$(git symbolic-ref --short -q HEAD);
+fi
+
 # replace slashes with underscore
 GIT_BRANCH=${GIT_BRANCH/\//_}
 # Save the commit hash so the /status endpoint doesn't need Git.

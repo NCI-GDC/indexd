@@ -43,6 +43,7 @@ containerize:
     DOCKER_BUILDKIT: 1
     CONTAINER_REGISTRY: $CONTAINER_REGISTRY
     USE_PYPI_VERSION: yes
+    GIT_BRNACH: $CI_COMMIT_REF_NAME
   script:
     - pip install 'tox > 4'
     - tox -re containerize
