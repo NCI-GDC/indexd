@@ -36,7 +36,6 @@ tox:
 containerize:
   stage: build-and-publish
   extends: .job-with-ssh-keys
-  image: docker:${DOCKER_VERSION}-dind
   needs:
     - publish
   variables:
