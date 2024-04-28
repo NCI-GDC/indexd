@@ -52,8 +52,6 @@ containerize:
     - apk add bash
   script:
     - >
-      #!/usr/bin/env bash
-
       GIT_BRANCH=${CI_COMMIT_REF_NAME/\//_}
 
       BUILD_COMMAND="build --build-arg SERVICE_NAME=${SERVICE_NAME} \
