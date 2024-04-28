@@ -61,7 +61,7 @@ containerize:
     - >
       GIT_BRANCH=${CI_COMMIT_REF_NAME/\//_}
 
-      BUILD_COMMAND=(build \
+      BUILD_COMMAND=build \
         --build-arg SERVICE_NAME="${SERVICE_NAME}" \
         --build-arg COMMIT="${COMMIT}" \
         --build-arg BUILD_DATE="$(date -Iseconds)" \
@@ -71,7 +71,6 @@ containerize:
         -t "$IMAGE_NAME:$COMMIT" \
         -t "$IMAGE_NAME:${COMMIT:0:8}" \
         -t "$IMAGE_NAME:$GIT_BRANCH-${COMMIT:0:8}"
-      )
 
       docker "${BUILD_COMMAND[@]}" . --progress=plain
 
