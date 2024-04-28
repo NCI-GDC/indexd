@@ -52,19 +52,21 @@ containerize:
     - apk add bash
   script:
     - >
-      GIT_BRANCH=${CI_COMMIT_REF_NAME/\//_}
+      GIT_BRANCH=${CI_COMMIT_REF_NAME | sed 's/\//_/g'}
+
+      SHA=$(printf '%s' "$COMMIT" | cut -c 8)
 
       BUILD_COMMAND="build --build-arg SERVICE_NAME=${SERVICE_NAME} \
-         --build-arg COMMIT=${COMMIT} \
-         --build-arg BUILD_DATE=$(date -Iseconds) \
-         --build-arg PIP_INDEX_URL=${PIP_INDEX_URL} \
-         --build-arg USE_PYPI_VERSION=${USE_PYPI_VERSION} \
-         -t $IMAGE_NAME:$GIT_BRANCH \
-         -t $IMAGE_NAME:$COMMIT \
-         -t $IMAGE_NAME:${COMMIT:0:8} \
-         -t $IMAGE_NAME:$GIT_BRANCH-${COMMIT:0:8}"
+              --build-arg COMMIT=${COMMIT} \
+              --build-arg BUILD_DATE=$(date -Iseconds) \
+              --build-arg PIP_INDEX_URL=${PIP_INDEX_URL} \
+              --build-arg USE_PYPI_VERSION=${USE_PYPI_VERSION} \
+              -t $IMAGE_NAME:$GIT_BRANCH \
+              -t $IMAGE_NAME:$COMMIT \
+              -t $IMAGE_NAME:$SHA \
+              -t $IMAGE_NAME:$GIT_BRANCH-$SHA"
 
-      docker "${BUILD_COMMAND[@]}" . --progress=plain
+      docker "${BUILD_COMMAND}" . --progress=plain
 
       docker push -a "$IMAGE_NAME"
 
