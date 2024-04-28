@@ -57,25 +57,27 @@ containerize:
     - git config --global user.name "Gitlab CI"
     - echo "github.com ssh-rsa ${GITHUB_RSA_FINGERPRINT}" >> ~/.ssh/known_hosts
     - echo "github.com ecdsa-sha2-nistp256 ${GITHUB_ECDSA_FINGERPRINT}" >> ~/.ssh/known_hosts
-  script: |-
-    # replace slashes with underscore
-    GIT_BRANCH=${GIT_BRANCH/\//_}
-    COMMIT=$(git rev-parse HEAD)
+  script:
+    - >
+      GIT_BRANCH=${GIT_BRANCH/\//_}
+      
+      COMMIT=$(git rev-parse HEAD)
 
-    BUILD_COMMAND=(build \
-      --build-arg SERVICE_NAME="${SERVICE_NAME}" \
-      --build-arg COMMIT="${COMMIT}" \
-      --build-arg BUILD_DATE="$(date -Iseconds)" \
-      --build-arg PIP_INDEX_URL="${PIP_INDEX_URL}" \
-      --build-arg APP_INSTALL_CMD="${INSTALL_CMD}" \
-      -t "$IMAGE_NAME:$GIT_BRANCH" \
-      -t "$IMAGE_NAME:$COMMIT" \
-      -t "$IMAGE_NAME:${COMMIT:0:8}" \
-      -t "$IMAGE_NAME:$GIT_BRANCH-${COMMIT:0:8}"
-    )
+      BUILD_COMMAND=(build \
+        --build-arg SERVICE_NAME="${SERVICE_NAME}" \
+        --build-arg COMMIT="${COMMIT}" \
+        --build-arg BUILD_DATE="$(date -Iseconds)" \
+        --build-arg PIP_INDEX_URL="${PIP_INDEX_URL}" \
+        --build-arg APP_INSTALL_CMD="${INSTALL_CMD}" \
+        -t "$IMAGE_NAME:$GIT_BRANCH" \
+        -t "$IMAGE_NAME:$COMMIT" \
+        -t "$IMAGE_NAME:${COMMIT:0:8}" \
+        -t "$IMAGE_NAME:$GIT_BRANCH-${COMMIT:0:8}"
+      )
 
-    docker "${BUILD_COMMAND[@]}" . --progress=plain
-    docker push -a "$IMAGE_NAME"
+      docker "${BUILD_COMMAND[@]}" . --progress=plain
+      
+      docker push -a "$IMAGE_NAME"
 
 .deploy-service-with-salt:
   before_script:
