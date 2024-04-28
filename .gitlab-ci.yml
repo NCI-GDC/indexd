@@ -48,6 +48,9 @@ containerize:
   tags:
     - dind
   script: |-
+    # install git
+    apk add bash git
+
     # replace slashes with underscore
     GIT_BRANCH=${GIT_BRANCH/\//_}
     COMMIT=$(git rev-parse HEAD)

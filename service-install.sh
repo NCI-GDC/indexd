@@ -3,7 +3,7 @@ set -euox pipefail
 
 # should install make use of published wheel?
 if [ ${USE_PYPI_VERSION} = "yes" ]; then
-  pip install versionista==1.0.1dev4
+  pip install versionista==${VERSIONISTA_VERSION:="1.0.1dev4"}
   VERSION=$(python -m setuptools_scm)
   INSTALL_CMD=${SERVICE_NAME}==${VERSION}
 else
