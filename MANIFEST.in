@@ -1,0 +1,5 @@
+exclude helm/** tests/** docs/** openapis/**
+
+include LICENSE
+include src/indexd/versionista.txt
+global-exclude *.pyc *.bash *.sh

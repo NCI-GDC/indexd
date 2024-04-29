@@ -92,7 +92,7 @@ def indexd_admin_user(auth_driver):
 @pytest.fixture
 def index_driver_no_migrate():
     """
-    This fixture is designed for testing migration scripts and can be used for
+    This fixture is designed for testing migration cli and can be used for
     any other situation where a migration is not desired on instantiation.
     """
     driver = SQLAlchemyIndexDriver(PG_URL, auto_migrate=False)
@@ -104,7 +104,7 @@ def index_driver_no_migrate():
 @pytest.fixture
 def alias_driver_no_migrate():
     """
-    This fixture is designed for testing migration scripts and can be used for
+    This fixture is designed for testing migration cli and can be used for
     any other situation where a migration is not desired on instantiation.
     """
     driver = SQLAlchemyAliasDriver(PG_URL, auto_migrate=False)
@@ -274,6 +274,11 @@ def swg_query_client_no_migrate(swg_config_no_migrate):
 @pytest.fixture
 def swg_bulk_client(swg_config):
     return swagger_client.BulkApi(swagger_client.ApiClient(swg_config))
+
+
+@pytest.fixture
+def indexd_systems_api(swg_config):
+    return swagger_client.SystemApi(swagger_client.ApiClient(swg_config))
 
 
 @pytest.fixture
