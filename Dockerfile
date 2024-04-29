@@ -11,7 +11,7 @@ ARG USE_PYPI_VERSION="no"
 
 WORKDIR /${SERVICE_NAME}
 COPY . .
-RUN bash service-install.local.sh
+RUN bash /service-install.sh
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}-httpd:${BASE_VERSION}
 ARG NAME
