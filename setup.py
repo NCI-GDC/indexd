@@ -21,7 +21,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.7",
     packages=find_packages(),
     package_data={
         "index": [
@@ -41,12 +41,12 @@ setup(
         ],
     },
     install_requires=[
-        "flask",
-        "jsonschema~=4.17.0",
+        "flask~=3.0",
+        "jsonschema>3",
         "sqlalchemy<1.4",
         "sqlalchemy-utils>=0.32",
-        "psycopg2",
-        "cdislogging",
+        "psycopg2>=2.7",
+        "cdislogging>=1.0",
         "requests",
         "ddtrace",
         "importlib-metadata; python_version < '3.8'",
