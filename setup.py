@@ -41,7 +41,7 @@ setup(
         ],
     },
     install_requires=[
-        "flask~=3.0",
+        "flask",
         "jsonschema>3",
         "sqlalchemy<1.4",
         "sqlalchemy-utils>=0.32",
