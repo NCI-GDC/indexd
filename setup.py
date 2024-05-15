@@ -36,7 +36,6 @@ setup(
             "pytest-flask",
             "PyYAML",
             "openapi-spec-validator",
-            # jsonschema-spec 0.1.6 depends on typing-extensions<4.6.0
             "jsonschema-spec>=0.1.6",  # used by openapi-spec-validator and have bug in 0.1.4
         ],
     },
@@ -50,5 +49,7 @@ setup(
         "requests",
         "ddtrace",
         "importlib-metadata; python_version < '3.8'",
+        # jsonschema-spec 0.1.6 depends on typing-extensions<4.6.0
+        "typing-extensions<4.6.0",
     ],
 )
