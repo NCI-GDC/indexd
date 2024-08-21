@@ -37,6 +37,7 @@ tox:
   script:
     - mkdir -p /usr/share/man/man1
     - dnf -y install java-11-amazon-corretto-headless
+    - dnf upgrade wget
     - java -version
     - pip install 'tox < 4'
     - tox -e py
