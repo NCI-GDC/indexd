@@ -1,7 +1,7 @@
 ---
 include:
   - project: nci-gdc/gitlab-templates
-    ref: master
+    ref: 0.7.8
     file:
       - templates/global/full.yaml
       - templates/python/full.yaml
@@ -33,6 +33,7 @@ tox:
     POSTGRES_USER: test
     POSTGRES_PASSWORD: test
     POSTGRES_HOST_AUTH_METHOD: trust
+    BASE_CONTAINER_VERSION: 3.0.6
   script:
     - mkdir -p /usr/share/man/man1
     - dnf -y install java-11-amazon-corretto-headless
