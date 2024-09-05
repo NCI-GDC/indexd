@@ -17,11 +17,10 @@ setup(
         "Framework :: Flask",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     packages=find_packages(),
     package_data={
         "index": [
