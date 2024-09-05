@@ -173,4 +173,5 @@ docker build -t indexd -f TestDockerfile .
 
 ## Setup Pre-Commit and Detect-Secrets
 Pre-commit should be used to setup pre-commit hooks for this repo: [Pre-Commit Instructions](https://gdc-ctds.atlassian.net/wiki/spaces/GDC/pages/460455953/Pre-Commit)
+
 Detect-secrets should be used to check for secrets being committed to the repo: [Detect Secrets Instructions](https://gdc-ctds.atlassian.net/wiki/x/EQB1Gw)
