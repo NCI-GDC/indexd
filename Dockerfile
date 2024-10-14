@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.0-experimental
 
-ARG BASE_VERSION=3.0.6
-ARG REGISTRY=dev-containers.osdc.io
+ARG BASE_VERSION=3.0.7
+ARG REGISTRY=docker.osdc.io
 ARG SERVICE_NAME=indexd
 ARG PYTHON_VERSION=python3.8
 
@@ -13,9 +13,10 @@ ARG PYTHON_VERSION
 WORKDIR /${SERVICE_NAME}
 
 COPY . .
-RUN pip install --upgrade setuptools pip && pip install versionista>=1.1.0 \
-&& python3 -m setuptools_scm \
-&& RUN pip install --no-deps -r requirements.txt .
+RUN pip install --upgrade setuptools pip \
+    && pip install versionista>=1.1.0 \
+    && python3 -m setuptools_scm \
+    && pip install --no-deps -r requirements.txt .
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}-httpd:${BASE_VERSION}
 ARG NAME

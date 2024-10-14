@@ -24,7 +24,6 @@ BUILD_COMMAND=(build \
   --build-arg BUILD_DATE="$(date -Iseconds)" \
   --build-arg PIP_INDEX_URL="${PIP_INDEX_URL}" \
   --build-arg GIT_BRANCH="${GIT_BRANCH}" \
-  --add-host "nexus.osdc.io:172.23.11.116" \
   -t "$IMAGE_NAME:$GIT_BRANCH" \
   -t "$IMAGE_NAME:$COMMIT" \
   -t "$IMAGE_NAME:${COMMIT:0:8}" \
