@@ -2,6 +2,16 @@
 requires = ["setuptools>=61", "wheel", "setuptools_scm>=7", "versionista==1.1.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.coverage.html]
+title = "indexd coverage report"
+directory = "docs/htmlcov"
+show_contexts = true
+
+[tool.coverage.run]
+branch = true
+context = "unit tests"
+source = ["indexd"]
+
 [tool.isort]
 extend_skip = [".md", ".json"]
 known_first_party = ["indexd"]
@@ -21,9 +31,8 @@ log_cli_level = "INFO"
 log_level = "INFO"
 log_cli = "true"
 log_auto_indent = "true"
-filterwarnings = ["ignore::DeprecationWarning"]
 addopts = [
-  "-r lv --color=true -p no:ddtrace -p no:ddtrace.pytest_bdd"
+  "-rlv --color=true -p no:ddtrace -p no:ddtrace.pytest_bdd"
 ]
 norecursedirs = [
   ".git",
