@@ -32,7 +32,8 @@ tox:
     - dnf -y install java-11-amazon-corretto-headless
     - dnf upgrade wget
     - java -version
-    - pip install 'tox > 4'
+    - pip install --upgrade pip
+    - pip install 'tox >= 4.8'
     - tox -e py
 
 .deploy-service-with-salt:
