@@ -15,7 +15,11 @@ from .index.blueprint import blueprint as indexd_index_blueprint
 
 def app_init(app, settings=None):
     app.logger.addHandler(cdislogging.get_stream_handler())
-    ddtrace.patch_all()
+    # TODO: When indexd is used by gdcapi (as dev dep during tests),
+    # ddtrace patches graphql because of patch_all(). To prevent that
+    # we explicitly excluded. At any rate, graphql is NOT used by
+    # indexd so it's safe to disable it.
+    ddtrace.patch_all(graphql=False)
     if not settings:
         from .default_settings import settings
     app.config.update(settings["config"])
