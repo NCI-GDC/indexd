@@ -15,8 +15,8 @@ PG_USER = os.getenv("PG_INDEXD_USER", "test")
 PG_PASS = os.getenv("PG_INDEXD_PASS", "test")
 PG_DBNAME = os.getenv("PG_INDEXD_DBNAME", "indexd_test")
 PG_URL = f"postgresql://{PG_USER}:{PG_PASS}@{PG_HOST}/{PG_DBNAME}"
-MAX_POOL_SIZE = int(os.getenv("PG_INDEXD_MAX_POOL_SIZE", "2"))
-MAX_POOL_SIZE_OVERFLOW = int(os.getenv("PG_INDEXD_MAX_POOL_SIZE_OVERFLOW", "3"))
+MAX_POOL_SIZE = int(os.getenv("PG_INDEXD_MAX_POOL_SIZE", "5"))
+MAX_POOL_SIZE_OVERFLOW = int(os.getenv("PG_INDEXD_MAX_POOL_SIZE_OVERFLOW", "10"))
 
 CONFIG["INDEX"] = {
     "driver": SQLAlchemyIndexDriver(
@@ -52,7 +52,9 @@ CONFIG["DIST"] = [
     },
 ]
 
-AUTH = SQLAlchemyAuthDriver(PG_URL, pool_size=1, max_overflow=3)
+AUTH = SQLAlchemyAuthDriver(
+    PG_URL, pool_size=MAX_POOL_SIZE, max_overflow=MAX_POOL_SIZE_OVERFLOW
+)
 
 settings = {"config": CONFIG, "auth": AUTH}
 try:
