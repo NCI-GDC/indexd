@@ -35,21 +35,20 @@ setup(
             "pytest-flask",
             "PyYAML",
             "openapi-spec-validator",
-            "jsonschema-spec>=0.1.6",  # used by openapi-spec-validator and have bug in 0.1.4
+            "jsonschema-spec",  # used by openapi-spec-validator and have bug in 0.1.4
         ],
     },
     install_requires=[
         "flask>=2.2",
         "jsonschema>3",
-        "sqlalchemy<1.4",  # TODO: Unpin sqlalchemy. Pinning is only required when psqlgraph is involved.
+        "sqlalchemy<2",
         "sqlalchemy-utils>=0.32",
         "psycopg2>=2.7",
         "cdislogging>=1.0",
         "requests>=2.32.2",
         "ddtrace>=2.9.1",
         "importlib-metadata>=1.4",
-        # jsonschema-spec 0.1.6 depends on typing-extensions<4.6.0
-        "typing-extensions<4.6.0",
+        "typing-extensions",
         "zipp>=3.19.1",
         "werkzeug>=3.0.6",
     ],
