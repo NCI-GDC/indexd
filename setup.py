@@ -35,11 +35,12 @@ setup(
             "pytest-flask",
             "PyYAML",
             "openapi-spec-validator",
-            "jsonschema-spec>=0.1.6",  # used by openapi-spec-validator and have bug in 0.1.4
+            "jsonschema-spec==0.2.4",  # project migrated to jsonschema-path after 0.2.4
         ],
     },
     install_requires=[
         "flask>=2.2",
+        "referencing<0.31.0,>=0.28.0",
         "jsonschema>3",
         "sqlalchemy<1.4",  # TODO: Unpin sqlalchemy. Pinning is only required when psqlgraph is involved.
         "sqlalchemy-utils>=0.32",
@@ -48,7 +49,6 @@ setup(
         "requests>=2.32.2",
         "ddtrace>=2.9.1",
         "importlib-metadata>=1.4",
-        # jsonschema-spec 0.1.6 depends on typing-extensions<4.6.0
         "typing-extensions<4.6.0",
         "zipp>=3.19.1",
         "werkzeug>=3.0.6",

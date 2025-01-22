@@ -47,7 +47,7 @@ jinja2==3.1.5
     # via flask
 jsonschema==4.23.0
     # via indexd (setup.py)
-jsonschema-specifications==2023.12.1
+jsonschema-specifications==2023.7.1
     # via jsonschema
 markupsafe==2.1.5
     # via
@@ -61,8 +61,9 @@ protobuf==5.29.3
     # via ddtrace
 psycopg2==2.9.10
     # via indexd (setup.py)
-referencing==0.35.1
+referencing==0.30.2
     # via
+    #   indexd (setup.py)
     #   jsonschema
     #   jsonschema-specifications
 requests==2.32.3
