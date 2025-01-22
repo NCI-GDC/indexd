@@ -35,12 +35,11 @@ setup(
             "pytest-flask",
             "PyYAML",
             "openapi-spec-validator",
-            "jsonschema-spec==0.2.4",  # project migrated to jsonschema-path after 0.2.4
+            "jsonschema-path>=0.3.1",  # previously jsonschema-spec project migrated to jsonschema-path after 0.2.4
         ],
     },
     install_requires=[
         "flask>=2.2",
-        "referencing<0.31.0,>=0.28.0",
         "jsonschema>3",
         "sqlalchemy<1.4",  # TODO: Unpin sqlalchemy. Pinning is only required when psqlgraph is involved.
         "sqlalchemy-utils>=0.32",
