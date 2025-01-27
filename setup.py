@@ -22,11 +22,6 @@ setup(
     ],
     python_requires=">=3.8",
     packages=find_packages(),
-    package_data={
-        "index": [
-            "schemas/*",
-        ]
-    },
     scripts=["bin/index_admin.py", "bin/indexd", "bin/migrate_index.py"],
     extras_require={
         "dev": [
@@ -35,12 +30,12 @@ setup(
             "pytest-flask",
             "PyYAML",
             "openapi-spec-validator",
-            "jsonschema-path>=0.3.1",  # previously jsonschema-spec project migrated to jsonschema-path after 0.2.4
         ],
     },
     install_requires=[
         "flask>=2.2",
-        "jsonschema>3",
+        "jsonschema>4.17",
+        "importlib_resources<6.2",  # >=6.2 fails for py38 but works ok for 39+
         "sqlalchemy<1.4",  # TODO: Unpin sqlalchemy. Pinning is only required when psqlgraph is involved.
         "sqlalchemy-utils>=0.32",
         "psycopg2>=2.7",
@@ -48,7 +43,7 @@ setup(
         "requests>=2.32.2",
         "ddtrace>=2.9.1",
         "importlib-metadata>=1.4",
-        "typing-extensions<4.6.0",
+        "typing-extensions",
         "zipp>=3.19.1",
         "werkzeug>=3.0.6",
     ],
