@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.0-experimental
 
-ARG BASE_VERSION=3.1.0
+ARG BASE_VERSION=3.0.9
 ARG REGISTRY=docker.osdc.io
 ARG SERVICE_NAME=indexd
 ARG PYTHON_VERSION=python3.8
