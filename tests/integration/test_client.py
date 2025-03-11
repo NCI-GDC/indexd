@@ -635,19 +635,19 @@ def test_index_update(swg_index_client):
     assert r.did
     assert r.rev
     assert swg_index_client.get_index_entry(r.did).metadata == data["metadata"]
-    dataNew = get_doc()
-    dataNew["hashes"]["md5"] = "8b9942cf415384b27cadf1f4d2d682e4"
-    dataNew["size"] = 321
-    del dataNew["form"]
-    dataNew["metadata"] = {"test": "abcd"}
-    dataNew["version"] = "ver123"
-    dataNew["acl"] = ["a", "b"]
-    r2 = swg_index_client.update_index_entry(guid=r.did, rev=r.rev, body=dataNew)
+    data_new = get_doc()
+    data_new["hashes"]["md5"] = "8b9942cf415384b27cadf1f4d2d682e4"
+    data_new["size"] = 321
+    del data_new["form"]
+    data_new["metadata"] = {"test": "abcd"}
+    data_new["version"] = "ver123"
+    data_new["acl"] = ["a", "b"]
+    r2 = swg_index_client.update_index_entry(guid=r.did, rev=r.rev, body=data_new)
     assert r2.rev != r.rev
     result = swg_index_client.get_index_entry(r.did)
-    assert result.metadata == dataNew["metadata"]
-    assert result.acl == dataNew["acl"]
-    assert result.hashes.md5 == dataNew["hashes"]["md5"]
+    assert result.metadata == data_new["metadata"]
+    assert result.acl == data_new["acl"]
+    assert result.hashes.md5 == data_new["hashes"]["md5"]
     assert result.size == 321
 
     data = get_doc()
@@ -655,12 +655,12 @@ def test_index_update(swg_index_client):
     r = swg_index_client.add_index_entry(data)
     assert r.did
     assert r.rev
-    dataNew = {
+    data_new = {
         "urls": ["s3://endpointurl/bucket/key"],
         "file_name": "test",
         "version": "ver123",
     }
-    r2 = swg_index_client.update_index_entry(guid=r.did, rev=r.rev, body=dataNew)
+    r2 = swg_index_client.update_index_entry(guid=r.did, rev=r.rev, body=data_new)
     assert r2.rev != r.rev
 
 
@@ -712,7 +712,7 @@ def test_create_index_version(swg_index_client):
     assert r.rev
     assert r.baseid
 
-    dataNew = {
+    data_new = {
         "did": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
         "form": "object",
         "size": 244,
@@ -724,9 +724,9 @@ def test_create_index_version(swg_index_client):
         },
     }
 
-    r2 = swg_index_client.add_index_new_version(guid=r.did, body=dataNew)
+    r2 = swg_index_client.add_index_new_version(guid=r.did, body=data_new)
     assert r2.baseid == r.baseid
-    assert r2.did == dataNew["did"]
+    assert r2.did == data_new["did"]
 
 
 def test_get_latest_version(swg_index_client):
@@ -823,14 +823,14 @@ def test_alias_update(swg_alias_client):
     r = swg_alias_client.upsert_alias_entry(aliasstring=ark, body=data)
     assert r.rev
 
-    dataNew = {
+    data_new = {
         "size": 456,
         "hashes": {"md5": "8b9942cf415384b27cadf1f4d2d682e5"},
         "release": "private",
         "keeper_authority": "CRI",
         "host_authorities": ["PDC"],
     }
-    r2 = swg_alias_client.upsert_alias_entry(aliasstring=ark, rev=r.rev, body=dataNew)
+    r2 = swg_alias_client.upsert_alias_entry(aliasstring=ark, rev=r.rev, body=data_new)
     assert r2.rev != r.rev
 
 

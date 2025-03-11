@@ -1,9 +1,9 @@
 import copy
 import datetime
+import logging
 import uuid
 from contextlib import contextmanager
 
-from cdislogging import get_logger
 from sqlalchemy import (
     BigInteger,
     Column,
@@ -26,7 +26,6 @@ from sqlalchemy.orm import joinedload, relationship, sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from indexd.errors import UserError
-from indexd.index.blueprint import separate_metadata
 from indexd.index.driver import IndexDriverABC
 from indexd.index.errors import (
     MultipleRecordsFound,
@@ -36,6 +35,7 @@ from indexd.index.errors import (
 )
 from indexd.utils import init_schema_version, is_empty_database, migrate_database
 
+logger = logging.getLogger(__name__)
 Base = declarative_base()
 
 
@@ -299,7 +299,6 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
         Initialize the SQLAlchemy database driver.
         """
         super().__init__(conn, **config)
-        self.logger = logger or get_logger(__name__ + "." + self.__class__.__name__)
         self.config = index_config or {}
 
         Base.metadata.bind = self.engine
@@ -400,7 +399,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 for u in acl:
                     query = query.filter(IndexRecordACE.ace == u)
             elif acl == []:
-                query = query.filter(IndexRecord.acl == None)
+                query = query.filter(IndexRecord.acl is None)
 
             if hashes:
                 for h, v in hashes.items():
@@ -1258,10 +1257,8 @@ def migrate_2(session, **kwargs):
     for loop in range(count):
         baseid = str(uuid.uuid4())
         session.execute(
-            "UPDATE index_record SET baseid = '{}'\
-             WHERE did =  (SELECT did FROM tmp_index_record WHERE RowNumber = {})".format(
-                baseid, loop + 1
-            )
+            f"UPDATE index_record SET baseid = '{baseid}'\
+             WHERE did =  (SELECT did FROM tmp_index_record WHERE RowNumber = {loop + 1})"
         )
         session.execute(f"INSERT INTO base_version(baseid) VALUES('{baseid}')")
 
@@ -1298,19 +1295,15 @@ def migrate_5(session, **kwargs):
     session.execute("CREATE INDEX index_record_url_idx ON index_record_url ( did )")
 
     session.execute(
-        "CREATE INDEX {tb}_idx ON {tb} ( did )".format(tb=IndexRecordHash.__tablename__)
+        f"CREATE INDEX {IndexRecordHash.__tablename__}_idx ON {IndexRecordHash.__tablename__} ( did )"
     )
 
     session.execute(
-        "CREATE INDEX {tb}_idx ON {tb} ( did )".format(
-            tb=IndexRecordMetadata.__tablename__
-        )
+        f"CREATE INDEX {IndexRecordMetadata.__tablename__}_idx ON {IndexRecordMetadata.__tablename__} ( did )"
     )
 
     session.execute(
-        "CREATE INDEX {tb}_idx ON {tb} ( did )".format(
-            tb=IndexRecordUrlMetadata.__tablename__
-        )
+        f"CREATE INDEX {IndexRecordUrlMetadata.__tablename__}_idx ON {IndexRecordUrlMetadata.__tablename__} ( did )"
     )
 
 
@@ -1345,9 +1338,7 @@ def migrate_9(session, **kwargs):
     session.execute("CREATE INDEX ix_index_record_size ON index_record ( size )")
 
     session.execute(
-        "CREATE INDEX index_record_hash_type_value_idx ON {tb} ( hash_value, hash_type )".format(
-            tb=IndexRecordHash.__tablename__
-        )
+        f"CREATE INDEX index_record_hash_type_value_idx ON {IndexRecordHash.__tablename__} ( hash_value, hash_type )"
     )
 
 
@@ -1388,92 +1379,80 @@ def migrate_12(session, **kwargs):
 
         # metadata migration to jsonb
         session.execute(
-            """
+            f"""
             UPDATE index_record r
             SET index_metadata = m.meta
             FROM (
                 SELECT did, CAST(json_object_agg(key, value) AS JSONB) AS meta
                 FROM index_record_metadata
-                WHERE key <> 'release_number' AND did>='{}' AND did<'{}'
+                WHERE key <> 'release_number' AND did>='{from_chunk}' AND did<'{to_chunk}'
                 GROUP BY did
             ) AS m
             WHERE r.did=m.did
-        """.format(
-                from_chunk, to_chunk
-            )
+        """
         )
 
         session.execute(
-            """
+            f"""
             UPDATE index_record r
             SET release_number = re.release_number
             FROM (
                 SELECT did, value as release_number
                 FROM index_record_metadata
-                WHERE key = 'release_number' AND did>='{}' AND did<'{}'
+                WHERE key = 'release_number' AND did>='{from_chunk}' AND did<'{to_chunk}'
             ) AS re
             WHERE r.did=re.did
-        """.format(
-                from_chunk, to_chunk
-            )
+        """
         )
 
         # urls metadata migration to jsonb
         session.execute(
-            """
+            f"""
             INSERT INTO index_record_url_metadata_jsonb (did, url)
             SELECT did, url
             FROM index_record_url
-            WHERE did>='{}' AND did<'{}'
-        """.format(
-                from_chunk, to_chunk
-            )
+            WHERE did>='{from_chunk}' AND did<'{to_chunk}'
+        """
         )
 
         session.execute(
-            """
+            f"""
             UPDATE index_record_url_metadata_jsonb as main
             SET urls_metadata = um.meta
             FROM (
                 SELECT did, url, CAST(json_object_agg(key, value) AS JSONB) AS meta
                 FROM index_record_url_metadata
-                WHERE key NOT IN ('type', 'state') AND did>='{}' AND did<'{}'
+                WHERE key NOT IN ('type', 'state') AND did>='{from_chunk}' AND did<'{to_chunk}'
                 GROUP BY did, url
             ) AS um
             WHERE main.did=um.did and main.url=um.url
-        """.format(
-                from_chunk, to_chunk
-            )
+        """
         )
 
         session.execute(
-            """
+            f"""
             UPDATE index_record_url_metadata_jsonb as main
             SET "type" = t.type
             FROM (
                 SELECT did, url, value AS type
                 FROM index_record_url_metadata
-                WHERE key = 'type' AND did>='{}' AND did<'{}'
+                WHERE key = 'type' AND did>='{from_chunk}' AND did<'{to_chunk}'
             ) AS t
             WHERE main.did=t.did and main.url=t.url
-        """.format(
-                from_chunk, to_chunk
-            )
+        """
         )
 
         session.execute(
-            """
+            f"""
             UPDATE index_record_url_metadata_jsonb as main
             SET state = s.state
             FROM (
                 SELECT did, url, value AS state
                 FROM index_record_url_metadata
-                WHERE key = 'state' AND did>='{}' AND did<'{}'
+                WHERE key = 'state' AND did>='{from_chunk}' AND did<'{to_chunk}'
             ) AS s
             WHERE main.did=s.did and main.url=s.url
-        """.format(
-                from_chunk, to_chunk
-            )
+        """
         )
 
 

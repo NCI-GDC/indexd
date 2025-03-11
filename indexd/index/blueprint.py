@@ -93,7 +93,7 @@ def get_index():
             raise UserError("pagination is not supported when ids is provided")
     try:
         limit = 100 if limit is None else int(limit)
-    except ValueError as err:
+    except ValueError:
         raise UserError("limit must be an integer")
 
     if limit <= 0 or limit > 1024:
@@ -102,7 +102,7 @@ def get_index():
     size = flask.request.args.get("size")
     try:
         size = size if size is None else int(size)
-    except ValueError as err:
+    except ValueError:
         raise UserError("size must be an integer")
 
     if size is not None and size < 0:
