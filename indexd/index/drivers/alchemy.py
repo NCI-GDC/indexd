@@ -399,7 +399,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 for u in acl:
                     query = query.filter(IndexRecordACE.ace == u)
             elif acl == []:
-                query = query.filter(IndexRecord.acl is None)
+                query = query.filter(~IndexRecord.acl.any())
 
             if hashes:
                 for h, v in hashes.items():

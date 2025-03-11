@@ -173,15 +173,15 @@ def test_list_entries_with_uploader_wrong_uploader(swg_index_client):
     """
     data = get_doc()
     data["uploader"] = "uploader_1"
-    r = swg_index_client.add_index_entry(data)
+    swg_index_client.add_index_entry(data)
 
     data = get_doc()
     data["uploader"] = "uploader_123"
-    r = swg_index_client.add_index_entry(data)
+    swg_index_client.add_index_entry(data)
 
     data = get_doc()
     data["uploader"] = "uploader_123"
-    r = swg_index_client.add_index_entry(data)
+    swg_index_client.add_index_entry(data)
 
     r = swg_index_client.list_index_entries(uploader="wrong_uploader")
     assert len(r.records) == 0
@@ -253,7 +253,7 @@ def test_get_empty_acl_record(swg_index_client):
     Test that can get a list of empty acl given uploader
     """
     doc = get_doc()
-    r = swg_index_client.add_index_entry(doc)
+    swg_index_client.add_index_entry(doc)
 
     doc = {"uploader": "uploader_123"}
     r2 = swg_index_client.create_index_blank_entry(doc)
@@ -298,11 +298,6 @@ def test_get_empty_acl_record_after_fill_size_n_hash(swg_index_client):
     doc = {"uploader": "uploader_123"}
     r2 = swg_index_client.create_index_blank_entry(doc)
     did2 = r2.did
-    updated = {
-        "size": 4,
-        "hashes": {"md5": "1b9942cf415384b27cadf1f4d2d981f5"},
-        "urls": ["s3://example/1"],
-    }
 
     # create the second blank record, only update size hashes and urls
     doc = {"uploader": "uploader_123"}
@@ -327,6 +322,7 @@ def test_get_empty_acl_record_after_fill_size_n_hash(swg_index_client):
     assert len(r.records) == 0
 
     r = swg_index_client.list_index_entries(uploader="uploader_123", acl="null")
+    print(r.records)
     assert len(r.records) == 2
     assert {r.records[0].did, r.records[1].did} == {did2, did3}
 
