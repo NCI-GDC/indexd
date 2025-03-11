@@ -10,15 +10,15 @@ except ImportError:
     import importlib.metadata as importlib_metadata
 import jsonschema
 
-from indexd.auth import authorize
-from indexd.errors import AuthError, UserError
-
-from .errors import (
-    MultipleRecordsFound,
-    NoRecordFound,
-    RevisionMismatch,
-    UnhealthyCheck,
+from indexd.auth import AuthError, authorize
+from indexd.errors import UserError
+from indexd.index.errors import (
+    MultipleRecordsFoundError,
+    NoRecordFoundError,
+    RevisionMismatchError,
+    UnhealthyCheckError,
 )
+
 from .schema import POST_RECORD_SCHEMA, PUT_RECORD_SCHEMA
 
 blueprint = flask.Blueprint("index", __name__)
@@ -524,12 +524,12 @@ def version():
     return flask.jsonify(base), 200
 
 
-@blueprint.errorhandler(NoRecordFound)
+@blueprint.errorhandler(NoRecordFoundError)
 def handle_no_record_error(err):
     return flask.jsonify(error=str(err)), 404
 
 
-@blueprint.errorhandler(MultipleRecordsFound)
+@blueprint.errorhandler(MultipleRecordsFoundError)
 def handle_multiple_records_error(err):
     return flask.jsonify(error=str(err)), 409
 
@@ -544,12 +544,12 @@ def handle_auth_error(err):
     return flask.jsonify(error=str(err)), 403
 
 
-@blueprint.errorhandler(RevisionMismatch)
+@blueprint.errorhandler(RevisionMismatchError)
 def handle_revision_mismatch(err):
     return flask.jsonify(error=str(err)), 409
 
 
-@blueprint.errorhandler(UnhealthyCheck)
+@blueprint.errorhandler(UnhealthyCheckError)
 def handle_unhealthy_check(err):
     return "Unhealthy", 500
 

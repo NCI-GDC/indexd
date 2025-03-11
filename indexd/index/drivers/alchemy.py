@@ -28,10 +28,10 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from indexd.errors import UserError
 from indexd.index.driver import IndexDriverABC
 from indexd.index.errors import (
-    MultipleRecordsFound,
-    NoRecordFound,
-    RevisionMismatch,
-    UnhealthyCheck,
+    MultipleRecordsFoundError,
+    NoRecordFoundError,
+    RevisionMismatchError,
+    UnhealthyCheckError,
 )
 from indexd.utils import init_schema_version, is_empty_database, migrate_database
 
@@ -772,15 +772,15 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             try:
                 record = query.one()
             except NoResultFound:
-                raise NoRecordFound("no record found")
+                raise NoRecordFoundError("no record found")
             except MultipleResultsFound:
-                raise MultipleRecordsFound("multiple records found")
+                raise MultipleRecordsFoundError("multiple records found")
 
             if record.size or record.hashes:
                 raise UserError("update api is not supported for non-empty record!")
 
             if rev != record.rev:
-                raise RevisionMismatch("revision mismatch")
+                raise RevisionMismatchError("revision mismatch")
 
             record.size = size
             record.hashes = [
@@ -822,9 +822,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                     .one()
                 )
             except NoResultFound:
-                raise NoRecordFound("no record found")
+                raise NoRecordFoundError("no record found")
             except MultipleResultsFound:
-                raise MultipleRecordsFound("multiple records found")
+                raise MultipleRecordsFoundError("multiple records found")
             return record.to_document_dict()
 
     def get_aliases_for_did(self, did):
@@ -848,7 +848,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             record = query.first()
             if record is None:
-                raise NoRecordFound("no record found")
+                raise NoRecordFoundError("no record found")
             return record.to_document_dict()
 
     def update(self, did, rev, changing_fields):
@@ -864,14 +864,14 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             try:
                 record = query.one()
             except NoResultFound:
-                raise NoRecordFound("no record found")
+                raise NoRecordFoundError("no record found")
             except MultipleResultsFound:
-                raise MultipleRecordsFound("multiple records found")
+                raise MultipleRecordsFoundError("multiple records found")
 
             if rev != record.rev:
-                raise RevisionMismatch("revision mismatch")
+                raise RevisionMismatchError("revision mismatch")
 
-            # Some operations might become dependant on other operations based
+            # Some operations might become dependent on other operations based
             # on future schema constraints.
             if "acl" in changing_fields:
                 for ace in record.acl:
@@ -928,12 +928,12 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             try:
                 record = query.one()
             except NoResultFound:
-                raise NoRecordFound("no record found")
+                raise NoRecordFoundError("no record found")
             except MultipleResultsFound:
-                raise MultipleRecordsFound("multiple records found")
+                raise MultipleRecordsFoundError("multiple records found")
 
             if rev != record.rev:
-                raise RevisionMismatch("revision mismatch")
+                raise RevisionMismatchError("revision mismatch")
 
             session.delete(record)
 
@@ -967,9 +967,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             try:
                 record = query.one()
             except NoResultFound:
-                raise NoRecordFound("no record found")
+                raise NoRecordFoundError("no record found")
             except MultipleResultsFound:
-                raise MultipleRecordsFound("multiple records found")
+                raise MultipleRecordsFoundError("multiple records found")
 
             baseid = record.baseid
             record = IndexRecord()
@@ -1037,11 +1037,11 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             except NoResultFound:
                 record = session.query(IndexRecord).filter_by(baseid=did).first()
                 if not record:
-                    raise NoRecordFound("no record found")
+                    raise NoRecordFoundError("no record found")
                 else:
                     baseid = record.baseid
             except MultipleResultsFound:
-                raise MultipleRecordsFound("multiple records found")
+                raise MultipleRecordsFoundError("multiple records found")
 
             query = session.query(IndexRecord)
             query = query.filter(IndexRecord.baseid == baseid)
@@ -1080,7 +1080,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             except NoResultFound:
                 baseid = did
             except MultipleResultsFound:
-                raise MultipleRecordsFound("multiple records found")
+                raise MultipleRecordsFoundError("multiple records found")
 
             query = session.query(IndexRecord)
             query = query.filter(IndexRecord.baseid == baseid).order_by(
@@ -1097,7 +1097,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 )
             record = query.first()
             if not record:
-                raise NoRecordFound("no record found")
+                raise NoRecordFoundError("no record found")
 
             return record.to_document_dict()
 
@@ -1155,7 +1155,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             try:
                 session.execute("SELECT 1")
             except Exception:
-                raise UnhealthyCheck()
+                raise UnhealthyCheckError()
 
             return True
 

@@ -25,7 +25,7 @@ log_level = "INFO"
 log_cli = "true"
 log_auto_indent = "true"
 addopts = [
-  "-rlv --color=true -p no:ddtrace -p no:ddtrace.pytest_bdd"
+  "-rFE --color=true -p no:ddtrace -p no:ddtrace.pytest_bdd"
 ]
 norecursedirs = [
   ".git",
