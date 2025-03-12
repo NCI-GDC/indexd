@@ -41,7 +41,7 @@ testpaths = [
 
 [tool.ruff]
 line-length = 88 # black's default
-src = ["indexd", "tests"]
+src = ["src", "tests"]
 target-version = "py38"
 
 [tool.ruff.format]
