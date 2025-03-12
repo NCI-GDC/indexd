@@ -13,6 +13,7 @@ dynamic = [
   "maintainers",
   "keywords",
   "classifiers",
+  "license",
   "urls",
   "scripts",
   "gui-scripts",
