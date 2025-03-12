@@ -42,7 +42,7 @@ testpaths = [
 [tool.ruff]
 line-length = 88 # black's default
 src = ["src", "tests"]
-target-version = "py38"
+target-version = "py312"
 
 [tool.ruff.format]
 docstring-code-format = true
