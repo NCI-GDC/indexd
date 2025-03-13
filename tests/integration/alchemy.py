@@ -66,6 +66,6 @@ class SQLAlchemyIndexTestDriver(SQLAlchemyDriverBase):
         super().__init__(conn, **config)
 
         Base.metadata.bind = self.engine
-        Base.metadata.create_all()
+        Base.metadata.create_all(bind=self.engine)
 
         self.Session = sessionmaker(bind=self.engine)

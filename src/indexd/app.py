@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from typing import Any
 
 import ddtrace
 import flask
@@ -14,7 +15,7 @@ from indexd.urls.blueprint import blueprint as index_urls_blueprint
 logger = logging.getLogger(__name__)
 
 
-def app_init(app: flask.Flask, settings=None):
+def app_init(app: flask.Flask, settings: dict[str, Any] | None = None) -> None:
     ddtrace.patch_all()
     if not settings:
         from .default_settings import settings
@@ -27,13 +28,14 @@ def app_init(app: flask.Flask, settings=None):
     app.register_blueprint(index_urls_blueprint, url_prefix="/_query/urls")
 
 
-def get_app():
+def get_app(_settings: dict[str, Any] | str | None = None):
     app = flask.Flask(__name__)
 
     if "INDEXD_SETTINGS" in os.environ:
         sys.path.append(os.environ["INDEXD_SETTINGS"])
 
-    settings = None
+    settings = _settings
+
     try:
         from local_settings import settings
     except ImportError:

@@ -2,6 +2,7 @@ import logging
 import uuid
 from contextlib import contextmanager
 
+import sqlalchemy
 from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String, and_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -95,7 +96,7 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
         self.Session = sessionmaker(bind=self.engine)
 
         is_empty_db = is_empty_database(driver=self)
-        Base.metadata.create_all()
+        Base.metadata.create_all(bind=self.engine)
         if is_empty_db:
             init_schema_version(
                 driver=self,
@@ -123,7 +124,7 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
         """
         with self.session as session:
             try:
-                session.execute("SELECT 1")
+                session.execute(sqlalchemy.text("SELECT 1"))
             except Exception:
                 raise UnhealthyCheckError()
 
@@ -328,7 +329,9 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
 
 def migrate_1(session, **kwargs):
     session.execute(
-        f"ALTER TABLE {AliasRecord.__tablename__} ALTER COLUMN size TYPE bigint"
+        sqlalchemy.text(
+            f"ALTER TABLE {AliasRecord.__tablename__} ALTER COLUMN size TYPE bigint"
+        )
     )
 
 

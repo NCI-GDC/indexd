@@ -1,17 +1,20 @@
 import base64
 import os
 import threading
+from collections.abc import Iterable
 
-import flask
 import pytest
 import requests
+import sqlalchemy
 import swagger_client
+from _pytest import fixtures
 from sqlalchemy import create_engine
+from testcontainers import postgres
 
 from indexd import utils as indexd_utils
 from indexd.alias.drivers.alchemy import Base as AliasBase
 from indexd.alias.drivers.alchemy import SQLAlchemyAliasDriver
-from indexd.app import app_init, get_app
+from indexd.app import get_app
 from indexd.auth.drivers.alchemy import SQLAlchemyAuthDriver
 from indexd.index.drivers.alchemy import Base as IndexBase
 from indexd.index.drivers.alchemy import SQLAlchemyIndexDriver
@@ -55,11 +58,11 @@ def truncate_tables(driver, base):
         for table in reversed(base.metadata.sorted_tables):
             # do not clear schema versions so each test does not re-trigger migration.
             if table.name not in ["index_schema_version", "alias_schema_version"]:
-                txn.execute(f"TRUNCATE {table.name} CASCADE;")
+                txn.execute(sqlalchemy.text(f"TRUNCATE {table.name} CASCADE;"))
 
 
 @pytest.fixture
-def index_driver():
+def index_driver() -> Iterable[SQLAlchemyIndexDriver]:
     driver = SQLAlchemyIndexDriver(PG_URL, auto_migrate=False)
     yield driver
     truncate_tables(driver, IndexBase)
@@ -67,7 +70,7 @@ def index_driver():
 
 
 @pytest.fixture
-def alias_driver():
+def alias_driver() -> Iterable[SQLAlchemyAliasDriver]:
     driver = SQLAlchemyAliasDriver(PG_URL, auto_migrate=False)
     yield driver
     truncate_tables(driver, AliasBase)
@@ -75,7 +78,7 @@ def alias_driver():
 
 
 @pytest.fixture(scope="session")
-def auth_driver():
+def auth_driver() -> Iterable[SQLAlchemyAuthDriver]:
     driver = SQLAlchemyAuthDriver(PG_URL)
     yield driver
     driver.dispose()
@@ -90,7 +93,9 @@ def indexd_admin_user(auth_driver):
 
 
 @pytest.fixture
-def index_driver_no_migrate():
+def index_driver_no_migrate(
+    database: postgres.PostgresContainer | None,
+) -> Iterable[SQLAlchemyIndexDriver]:
     """
     This fixture is designed for testing migration scripts and can be used for
     any other situation where a migration is not desired on instantiation.
@@ -188,7 +193,6 @@ def app(index_driver, alias_driver, auth_driver):
     it goes through an entire migration process that creates all the tables.
     The tables are already created from the fixtures in this module.
     """
-    app = flask.Flask("indexd")
     settings = {
         "config": {
             "INDEX": {
@@ -200,8 +204,7 @@ def app(index_driver, alias_driver, auth_driver):
         },
         "auth": auth_driver,
     }
-    app_init(app, settings=settings)
-    return app
+    return get_app(settings)
 
 
 @pytest.fixture
@@ -285,7 +288,9 @@ def swg_bulk_client_no_migrate(swg_config_no_migrate):
 
 
 @pytest.fixture
-def database_engine():
+def database_engine(
+    database: postgres.PostgresContainer | None,
+) -> sqlalchemy.engine.Engine:
     engine = create_engine(PG_URL)
     yield engine
     engine.dispose()
@@ -296,3 +301,23 @@ def database_conn(database_engine):
     conn = database_engine.connect()
     yield conn
     conn.close()
+
+
+@pytest.fixture(scope="session")
+def database(request: fixtures.SubRequest) -> postgres.PostgresContainer | None:
+    """Clear database migration at the end of tests."""
+
+    if os.getenv("CI_COMMIT_REF_NAME"):
+        yield
+
+    with postgres.PostgresContainer(
+        "postgres:13",
+        driver="psycopg",
+        dbname="indexd_test",
+        username="test",
+        password="test",
+    ) as pg:
+        os.environ["PG_INDEXD_HOST"] = (
+            f"{pg.get_container_host_ip()}:{pg.get_exposed_port(5432)}"
+        )
+        yield

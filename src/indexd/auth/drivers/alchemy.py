@@ -1,6 +1,7 @@
 import hashlib
 from contextlib import contextmanager
 
+import sqlalchemy
 from sqlalchemy import Column, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -35,7 +36,7 @@ class SQLAlchemyAuthDriver(AuthDriverABC):
         """
         super().__init__(conn, **config)
         Base.metadata.bind = self.engine
-        Base.metadata.create_all()
+        Base.metadata.create_all(bind=self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
     @property
@@ -92,7 +93,7 @@ class SQLAlchemyAuthDriver(AuthDriverABC):
         """
         with self.session as session:
             try:
-                session.execute("SELECT 1")
+                session.execute(sqlalchemy.text("SELECT 1"))
             except Exception:
                 raise UnhealthyCheckError()
 
