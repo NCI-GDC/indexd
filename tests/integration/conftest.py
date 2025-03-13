@@ -310,14 +310,15 @@ def database(request: fixtures.SubRequest) -> postgres.PostgresContainer | None:
     if os.getenv("CI_COMMIT_REF_NAME"):
         yield
 
-    with postgres.PostgresContainer(
-        "postgres:13",
-        driver="psycopg",
-        dbname="indexd_test",
-        username="test",
-        password="test",
-    ) as pg:
-        os.environ["PG_INDEXD_HOST"] = (
-            f"{pg.get_container_host_ip()}:{pg.get_exposed_port(5432)}"
-        )
-        yield
+    else:
+        with postgres.PostgresContainer(
+            "postgres:13",
+            driver="psycopg",
+            dbname="indexd_test",
+            username="test",
+            password="test",
+        ) as pg:
+            os.environ["PG_INDEXD_HOST"] = (
+                f"{pg.get_container_host_ip()}:{pg.get_exposed_port(5432)}"
+            )
+            yield
