@@ -8,7 +8,7 @@ include:
 variables:
   SERVICE_NAME: indexd
   LANGUAGE_VERSION: python3.13
-  BASE_CONTAINER_VERSION: 3.2.0
+  BASE_CONTAINER_VERSION: feat_dev-3358-add-ci-vars-3d78af9
 
 tox:
   services:
