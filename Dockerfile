@@ -1,4 +1,4 @@
-ARG BASE_VERSION=feat_dev-3358-add-ci-vars-3d78af9
+ARG BASE_VERSION=feat_dev-3358-add-ci-vars-c5d5972
 ARG REGISTRY=docker.osdc.io
 ARG SERVICE_NAME=indexd
 ARG PYTHON_VERSION=python3.13
