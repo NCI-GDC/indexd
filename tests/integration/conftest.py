@@ -1,12 +1,13 @@
 import base64
+import multiprocessing
 import os
-import threading
 
 import flask
 import pytest
 import requests
+import sqlalchemy
 import swagger_client
-from sqlalchemy import create_engine
+from _pytest import fixtures
 
 from indexd import utils as indexd_utils
 from indexd.alias.drivers.alchemy import Base as AliasBase
@@ -55,7 +56,7 @@ def truncate_tables(driver, base):
         for table in reversed(base.metadata.sorted_tables):
             # do not clear schema versions so each test does not re-trigger migration.
             if table.name not in ["index_schema_version", "alias_schema_version"]:
-                txn.execute(f"TRUNCATE {table.name} CASCADE;")
+                txn.execute(sqlalchemy.text(f"TRUNCATE {table.name} CASCADE;"))
 
 
 @pytest.fixture
@@ -135,7 +136,7 @@ def create_indexd_tables_no_migrate(
 
 
 @pytest.fixture(scope="session")
-def indexd_server():
+def indexd_server(request: fixtures.SubRequest) -> "MockServer":
     """
     Starts the indexd server, and cleans up its mess.
     Most tests will use the client which stems from this
@@ -143,8 +144,8 @@ def indexd_server():
 
     Runs once per test session.
     """
-    app = get_app()
-    app.config["DIST"].append(
+    _app = get_app()
+    _app.config["DIST"].append(
         {
             "name": "test",
             "host": f"http://localhost:{INDEXD_TEST_PORT}/index/",
@@ -155,14 +156,19 @@ def indexd_server():
     hostname = "localhost"
     port = INDEXD_TEST_PORT
     debug = False
-    t = threading.Thread(
-        target=app.run,
-        daemon=True,
+    t = multiprocessing.Process(
+        target=_app.run,
         kwargs={"host": hostname, "port": port, "debug": debug},
     )
     t.start()
+
+    def stop_thread():
+        t.join(timeout=1)
+        t.terminate()
+
     wait_for_indexd_alive(port)
-    yield MockServer(port=port)
+    request.addfinalizer(stop_thread)
+    return MockServer(port=port)
 
 
 def wait_for_indexd_alive(port):
@@ -286,7 +292,7 @@ def swg_bulk_client_no_migrate(swg_config_no_migrate):
 
 @pytest.fixture
 def database_engine():
-    engine = create_engine(PG_URL)
+    engine = sqlalchemy.create_engine(PG_URL)
     yield engine
     engine.dispose()
 

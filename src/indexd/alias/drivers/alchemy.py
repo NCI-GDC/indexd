@@ -2,10 +2,8 @@ import logging
 import uuid
 from contextlib import contextmanager
 
-from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String, and_
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+import sqlalchemy
+from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String, and_, exc, orm
 
 from indexd.alias.driver import AliasDriverABC
 from indexd.alias.errors import (
@@ -17,7 +15,7 @@ from indexd.index.errors import UnhealthyCheckError
 from indexd.utils import init_schema_version, is_empty_database, migrate_database
 
 logger = logging.getLogger(__name__)
-Base = declarative_base()
+Base = sqlalchemy.orm.declarative_base()
 
 
 class AliasSchemaVersion(Base):
@@ -40,7 +38,7 @@ class AliasRecord(Base):
     rev = Column(String)
     size = Column(BigInteger)
 
-    hashes = relationship(
+    hashes = orm.relationship(
         "AliasRecordHash",
         backref="alias_record",
         cascade="all, delete-orphan",
@@ -49,7 +47,7 @@ class AliasRecord(Base):
     release = Column(String)
     metastring = Column(String)
 
-    host_authorities = relationship(
+    host_authorities = orm.relationship(
         "AliasRecordHostAuthority",
         backref="alias_record",
         cascade="all, delete-orphan",
@@ -92,10 +90,10 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
         """
         super().__init__(conn, **config)
         Base.metadata.bind = self.engine
-        self.Session = sessionmaker(bind=self.engine)
+        self.Session = orm.sessionmaker(bind=self.engine)
 
         is_empty_db = is_empty_database(driver=self)
-        Base.metadata.create_all()
+        Base.metadata.create_all(bind=self.engine)
         if is_empty_db:
             init_schema_version(
                 driver=self,
@@ -123,7 +121,7 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
         """
         with self.session as session:
             try:
-                session.execute("SELECT 1")
+                session.execute(sqlalchemy.text("SELECT 1"))
             except Exception:
                 raise UnhealthyCheckError()
 
@@ -195,9 +193,9 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
 
             try:
                 record = query.one()
-            except NoResultFound:
+            except exc.NoResultFound:
                 record = AliasRecord()
-            except MultipleResultsFound:
+            except exc.MultipleResultsFound:
                 raise MultipleRecordsFoundError("multiple records found")
 
             record.name = name
@@ -252,9 +250,9 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
 
             try:
                 record = query.one()
-            except NoResultFound:
+            except exc.NoResultFound:
                 raise NoRecordFoundError("no record found")
-            except MultipleResultsFound:
+            except exc.MultipleResultsFound:
                 raise MultipleRecordsFoundError("multiple records found")
 
             rev = record.rev
@@ -289,9 +287,9 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
 
             try:
                 record = query.one()
-            except NoResultFound:
+            except exc.NoResultFound:
                 raise NoRecordFoundError("no record found")
-            except MultipleResultsFound:
+            except exc.MultipleResultsFound:
                 raise MultipleRecordsFoundError("multiple records found")
 
             if rev is not None and rev != record.rev:
@@ -328,7 +326,9 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
 
 def migrate_1(session, **kwargs):
     session.execute(
-        f"ALTER TABLE {AliasRecord.__tablename__} ALTER COLUMN size TYPE bigint"
+        sqlalchemy.text(
+            f"ALTER TABLE {AliasRecord.__tablename__} ALTER COLUMN size TYPE bigint"
+        )
     )
 
 

@@ -1,9 +1,9 @@
 import copy
-import datetime
 import logging
 import uuid
 from contextlib import contextmanager
 
+import sqlalchemy
 from sqlalchemy import (
     BigInteger,
     Column,
@@ -14,16 +14,14 @@ from sqlalchemy import (
     Integer,
     String,
     and_,
+    exc,
     func,
     not_,
     or_,
+    orm,
     select,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.exc import IntegrityError, ProgrammingError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import joinedload, relationship, sessionmaker
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from indexd.errors import UserError
 from indexd.index.driver import IndexDriverABC
@@ -36,7 +34,7 @@ from indexd.index.errors import (
 from indexd.utils import init_schema_version, is_empty_database, migrate_database
 
 logger = logging.getLogger(__name__)
-Base = declarative_base()
+Base = sqlalchemy.orm.declarative_base()
 
 
 class BaseVersion(Base):
@@ -77,32 +75,32 @@ class IndexRecord(Base):
     form = Column(String)
     size = Column(BigInteger, index=True)
     release_number = Column(String, index=True)
-    created_date = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_date = Column(DateTime, default=datetime.datetime.utcnow)
+    created_date = Column(DateTime, server_default=sqlalchemy.text("now()"))
+    updated_date = Column(DateTime, server_default=sqlalchemy.text("now()"))
     file_name = Column(String, index=True)
     version = Column(String, index=True)
     uploader = Column(String, index=True)
     index_metadata = Column(JSONB)
 
-    urls_metadata = relationship(
+    urls_metadata = orm.relationship(
         "IndexRecordUrlMetadataJsonb",
         backref="index_record",
         cascade="all, delete-orphan",
     )
 
-    acl = relationship(
+    acl = orm.relationship(
         "IndexRecordACE",
         backref="index_record",
         cascade="all, delete-orphan",
     )
 
-    hashes = relationship(
+    hashes = orm.relationship(
         "IndexRecordHash",
         backref="index_record",
         cascade="all, delete-orphan",
     )
 
-    aliases = relationship(
+    aliases = orm.relationship(
         "IndexRecordAlias",
         backref="index_record",
         cascade="all, delete-orphan",
@@ -300,10 +298,10 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
         self.config = index_config or {}
 
         Base.metadata.bind = self.engine
-        self.Session = sessionmaker(bind=self.engine)
+        self._session_class = orm.sessionmaker(bind=self.engine)
 
         is_empty_db = is_empty_database(driver=self)
-        Base.metadata.create_all()
+        Base.metadata.create_all(bind=self.engine)
         if is_empty_db:
             init_schema_version(
                 driver=self,
@@ -331,7 +329,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
         """
         Provide a transactional scope around a series of operations.
         """
-        session = self.Session()
+        session = self._session_class()
 
         try:
             yield session
@@ -367,10 +365,10 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             # Enable joinedload on all relationships so that we won't have to
             # do a bunch of selects when we assemble our response.
-            query = query.options(joinedload(IndexRecord.urls_metadata))
-            query = query.options(joinedload(IndexRecord.acl))
-            query = query.options(joinedload(IndexRecord.hashes))
-            query = query.options(joinedload(IndexRecord.aliases))
+            query = query.options(orm.joinedload(IndexRecord.urls_metadata))
+            query = query.options(orm.joinedload(IndexRecord.acl))
+            query = query.options(orm.joinedload(IndexRecord.hashes))
+            query = query.options(orm.joinedload(IndexRecord.aliases))
 
             if start is not None:
                 query = query.filter(IndexRecord.did > start)
@@ -723,7 +721,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                 if self.config.get("ADD_PREFIX_ALIAS"):
                     self.add_prefix_alias(record, session)
                 session.commit()
-            except IntegrityError:
+            except exc.IntegrityError:
                 raise UserError(f'did "{record.did}" already exists', 400)
 
             return record.did, record.rev, record.baseid
@@ -769,9 +767,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             try:
                 record = query.one()
-            except NoResultFound:
+            except exc.NoResultFound:
                 raise NoRecordFoundError("no record found")
-            except MultipleResultsFound:
+            except exc.MultipleResultsFound:
                 raise MultipleRecordsFoundError("multiple records found")
 
             if record.size or record.hashes:
@@ -819,9 +817,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
                     .filter(IndexRecord.aliases.any(name=alias))
                     .one()
                 )
-            except NoResultFound:
+            except exc.NoResultFound:
                 raise NoRecordFoundError("no record found")
-            except MultipleResultsFound:
+            except exc.MultipleResultsFound:
                 raise MultipleRecordsFoundError("multiple records found")
             return record.to_document_dict()
 
@@ -861,9 +859,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             try:
                 record = query.one()
-            except NoResultFound:
+            except exc.NoResultFound:
                 raise NoRecordFoundError("no record found")
-            except MultipleResultsFound:
+            except exc.MultipleResultsFound:
                 raise MultipleRecordsFoundError("multiple records found")
 
             if rev != record.rev:
@@ -925,9 +923,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             try:
                 record = query.one()
-            except NoResultFound:
+            except exc.NoResultFound:
                 raise NoRecordFoundError("no record found")
-            except MultipleResultsFound:
+            except exc.MultipleResultsFound:
                 raise MultipleRecordsFoundError("multiple records found")
 
             if rev != record.rev:
@@ -964,9 +962,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
 
             try:
                 record = query.one()
-            except NoResultFound:
+            except exc.NoResultFound:
                 raise NoRecordFoundError("no record found")
-            except MultipleResultsFound:
+            except exc.MultipleResultsFound:
                 raise MultipleRecordsFoundError("multiple records found")
 
             baseid = record.baseid
@@ -1010,7 +1008,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             try:
                 session.add(record)
                 session.commit()
-            except IntegrityError:
+            except exc.IntegrityError:
                 raise UserError(f"{did} already exists", 400)
 
             return record.did, record.baseid, record.rev
@@ -1032,13 +1030,13 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             try:
                 record = query.one()
                 baseid = record.baseid
-            except NoResultFound:
+            except exc.NoResultFound:
                 record = session.query(IndexRecord).filter_by(baseid=did).first()
                 if not record:
                     raise NoRecordFoundError("no record found")
                 else:
                     baseid = record.baseid
-            except MultipleResultsFound:
+            except exc.MultipleResultsFound:
                 raise MultipleRecordsFoundError("multiple records found")
 
             query = session.query(IndexRecord)
@@ -1075,9 +1073,9 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
             try:
                 record = query.one()
                 baseid = record.baseid
-            except NoResultFound:
+            except exc.NoResultFound:
                 baseid = did
-            except MultipleResultsFound:
+            except exc.MultipleResultsFound:
                 raise MultipleRecordsFoundError("multiple records found")
 
             query = session.query(IndexRecord)
@@ -1151,7 +1149,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
         """
         with self.session as session:
             try:
-                session.execute("SELECT 1")
+                session.execute(sqlalchemy.text("SELECT 1"))
             except Exception:
                 raise UnhealthyCheckError()
 
@@ -1220,7 +1218,9 @@ def extract_urls_metadata(urls_metadata_results):
 # change to a model is made, one or more migration steps might not work.
 # In the future consider using SQL queries to do the migrations.
 def migrate_1(session, **kwargs):
-    session.execute("ALTER TABLE index_record ALTER COLUMN size TYPE bigint")
+    session.execute(
+        sqlalchemy.text("ALTER TABLE index_record ALTER COLUMN size TYPE bigint")
+    )
 
 
 def migrate_2(session, **kwargs):
@@ -1229,59 +1229,79 @@ def migrate_2(session, **kwargs):
     """
     try:
         session.execute(
-            "ALTER TABLE index_record \
+            sqlalchemy.text(
+                "ALTER TABLE index_record \
                 ADD COLUMN baseid VARCHAR DEFAULT NULL, \
                 ADD COLUMN created_date TIMESTAMP DEFAULT NOW(), \
                 ADD COLUMN updated_date TIMESTAMP DEFAULT NOW()"
+            )
         )
-    except ProgrammingError:
+    except exc.ProgrammingError:
         session.rollback()
     session.commit()
 
-    count = session.execute("SELECT COUNT(*) FROM index_record").fetchone()[0]
+    count = session.execute(
+        sqlalchemy.text("SELECT COUNT(*) FROM index_record")
+    ).fetchone()[0]
 
     # create tmp_index_record table for fast retrival
     try:
         session.execute(
-            """
+            sqlalchemy.text(
+                """
             CREATE TABLE tmp_index_record AS
                 SELECT did, ROW_NUMBER() OVER (ORDER BY did) AS RowNumber
                 FROM index_record
         """
+            )
         )
-    except ProgrammingError:
+    except exc.ProgrammingError:
         session.rollback()
 
     for loop in range(count):
         baseid = str(uuid.uuid4())
         session.execute(
-            f"UPDATE index_record SET baseid = '{baseid}'\
+            sqlalchemy.text(
+                f"UPDATE index_record SET baseid = '{baseid}'\
              WHERE did =  (SELECT did FROM tmp_index_record WHERE RowNumber = {loop + 1})"
+            )
         )
-        session.execute(f"INSERT INTO base_version(baseid) VALUES('{baseid}')")
+        session.execute(
+            sqlalchemy.text(f"INSERT INTO base_version(baseid) VALUES('{baseid}')")
+        )
 
     session.execute(
-        "ALTER TABLE index_record \
+        sqlalchemy.text(
+            "ALTER TABLE index_record \
          ADD CONSTRAINT baseid_FK FOREIGN KEY (baseid) references base_version(baseid)"
+        )
     )
 
     # drop tmp table
-    session.execute("DROP TABLE IF EXISTS tmp_index_record")
+    session.execute(sqlalchemy.text("DROP TABLE IF EXISTS tmp_index_record"))
 
 
 def migrate_3(session, **kwargs):
-    session.execute("ALTER TABLE index_record ADD COLUMN file_name VARCHAR")
+    session.execute(
+        sqlalchemy.text("ALTER TABLE index_record ADD COLUMN file_name VARCHAR")
+    )
 
     session.execute(
-        "CREATE INDEX index_record__file_name_idx ON index_record ( file_name )"
+        sqlalchemy.text(
+            "CREATE INDEX index_record__file_name_idx ON index_record ( file_name )"
+        )
     )
 
 
 def migrate_4(session, **kwargs):
-    session.execute("ALTER TABLE index_record ADD COLUMN version VARCHAR")
+    session.execute(
+        sqlalchemy.text("ALTER TABLE index_record ADD COLUMN version VARCHAR")
+    )
 
     session.execute(
-        "CREATE INDEX index_record__version_idx ON index_record ( version )"
+        sqlalchemy.text(
+            "CREATE INDEX index_record__version_idx ON index_record ( version )"
+        )
     )
 
 
@@ -1290,18 +1310,26 @@ def migrate_5(session, **kwargs):
     Create Index did on IndexRecordUrl, IndexRecordMetadata and
     IndexRecordUrlMetadata tables
     """
-    session.execute("CREATE INDEX index_record_url_idx ON index_record_url ( did )")
-
     session.execute(
-        f"CREATE INDEX {IndexRecordHash.__tablename__}_idx ON {IndexRecordHash.__tablename__} ( did )"
+        sqlalchemy.text("CREATE INDEX index_record_url_idx ON index_record_url ( did )")
     )
 
     session.execute(
-        f"CREATE INDEX {IndexRecordMetadata.__tablename__}_idx ON {IndexRecordMetadata.__tablename__} ( did )"
+        sqlalchemy.text(
+            f"CREATE INDEX {IndexRecordHash.__tablename__}_idx ON {IndexRecordHash.__tablename__} ( did )"
+        )
     )
 
     session.execute(
-        f"CREATE INDEX {IndexRecordUrlMetadata.__tablename__}_idx ON {IndexRecordUrlMetadata.__tablename__} ( did )"
+        sqlalchemy.text(
+            f"CREATE INDEX {IndexRecordMetadata.__tablename__}_idx ON {IndexRecordMetadata.__tablename__} ( did )"
+        )
+    )
+
+    session.execute(
+        sqlalchemy.text(
+            f"CREATE INDEX {IndexRecordUrlMetadata.__tablename__}_idx ON {IndexRecordUrlMetadata.__tablename__} ( did )"
+        )
     )
 
 
@@ -1325,7 +1353,11 @@ def migrate_8(session, **kwargs):
     """
     create index on IndexRecord.baseid
     """
-    session.execute("CREATE INDEX ix_index_record_baseid ON index_record ( baseid )")
+    session.execute(
+        sqlalchemy.text(
+            "CREATE INDEX ix_index_record_baseid ON index_record ( baseid )"
+        )
+    )
 
 
 def migrate_9(session, **kwargs):
@@ -1333,30 +1365,50 @@ def migrate_9(session, **kwargs):
     create index on IndexRecordHash.hash_value
     create index on IndexRecord.size
     """
-    session.execute("CREATE INDEX ix_index_record_size ON index_record ( size )")
+    session.execute(
+        sqlalchemy.text("CREATE INDEX ix_index_record_size ON index_record ( size )")
+    )
 
     session.execute(
-        f"CREATE INDEX index_record_hash_type_value_idx ON {IndexRecordHash.__tablename__} ( hash_value, hash_type )"
+        sqlalchemy.text(
+            f"CREATE INDEX index_record_hash_type_value_idx ON {IndexRecordHash.__tablename__} ( hash_value, hash_type )"
+        )
     )
 
 
 def migrate_10(session, **kwargs):
-    session.execute("ALTER TABLE index_record ADD COLUMN uploader VARCHAR")
+    session.execute(
+        sqlalchemy.text("ALTER TABLE index_record ADD COLUMN uploader VARCHAR")
+    )
 
     session.execute(
-        "CREATE INDEX index_record__uploader_idx ON index_record ( uploader )"
+        sqlalchemy.text(
+            "CREATE INDEX index_record__uploader_idx ON index_record ( uploader )"
+        )
     )
 
 
 def migrate_11(session, **kwargs):
-    session.execute("ALTER TABLE index_record ADD COLUMN release_number VARCHAR")
-    session.execute("ALTER TABLE index_record ADD COLUMN index_metadata jsonb")
-    session.execute("ALTER TABLE index_record DROP CONSTRAINT index_record_baseid_fkey")
     session.execute(
-        "ALTER TABLE index_record_metadata DROP CONSTRAINT index_record_metadata_did_fkey"
+        sqlalchemy.text("ALTER TABLE index_record ADD COLUMN release_number VARCHAR")
     )
     session.execute(
-        "ALTER TABLE index_record_url DROP CONSTRAINT index_record_url_did_fkey"
+        sqlalchemy.text("ALTER TABLE index_record ADD COLUMN index_metadata jsonb")
+    )
+    session.execute(
+        sqlalchemy.text(
+            "ALTER TABLE index_record DROP CONSTRAINT index_record_baseid_fkey"
+        )
+    )
+    session.execute(
+        sqlalchemy.text(
+            "ALTER TABLE index_record_metadata DROP CONSTRAINT index_record_metadata_did_fkey"
+        )
+    )
+    session.execute(
+        sqlalchemy.text(
+            "ALTER TABLE index_record_url DROP CONSTRAINT index_record_url_did_fkey"
+        )
     )
 
 
@@ -1377,7 +1429,8 @@ def migrate_12(session, **kwargs):
 
         # metadata migration to jsonb
         session.execute(
-            f"""
+            sqlalchemy.text(
+                f"""
             UPDATE index_record r
             SET index_metadata = m.meta
             FROM (
@@ -1388,10 +1441,12 @@ def migrate_12(session, **kwargs):
             ) AS m
             WHERE r.did=m.did
         """
+            )
         )
 
         session.execute(
-            f"""
+            sqlalchemy.text(
+                f"""
             UPDATE index_record r
             SET release_number = re.release_number
             FROM (
@@ -1401,20 +1456,24 @@ def migrate_12(session, **kwargs):
             ) AS re
             WHERE r.did=re.did
         """
+            )
         )
 
         # urls metadata migration to jsonb
         session.execute(
-            f"""
+            sqlalchemy.text(
+                f"""
             INSERT INTO index_record_url_metadata_jsonb (did, url)
             SELECT did, url
             FROM index_record_url
             WHERE did>='{from_chunk}' AND did<'{to_chunk}'
         """
+            )
         )
 
         session.execute(
-            f"""
+            sqlalchemy.text(
+                f"""
             UPDATE index_record_url_metadata_jsonb as main
             SET urls_metadata = um.meta
             FROM (
@@ -1425,10 +1484,12 @@ def migrate_12(session, **kwargs):
             ) AS um
             WHERE main.did=um.did and main.url=um.url
         """
+            )
         )
 
         session.execute(
-            f"""
+            sqlalchemy.text(
+                f"""
             UPDATE index_record_url_metadata_jsonb as main
             SET "type" = t.type
             FROM (
@@ -1438,10 +1499,12 @@ def migrate_12(session, **kwargs):
             ) AS t
             WHERE main.did=t.did and main.url=t.url
         """
+            )
         )
 
         session.execute(
-            f"""
+            sqlalchemy.text(
+                f"""
             UPDATE index_record_url_metadata_jsonb as main
             SET state = s.state
             FROM (
@@ -1451,6 +1514,7 @@ def migrate_12(session, **kwargs):
             ) AS s
             WHERE main.did=s.did and main.url=s.url
         """
+            )
         )
 
 

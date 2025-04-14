@@ -2,9 +2,10 @@ import logging
 import os
 import re
 
+import sqlalchemy
 import sqlalchemy_utils
 from sqlalchemy import create_engine
-from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy.engine import Engine
 
 logger = logging.getLogger(__name__)
 
@@ -113,19 +114,23 @@ def setup_database(
 
     if not no_user:
         try:
-            user_stmt = f"CREATE USER {user} WITH PASSWORD '{password}'"
+            user_stmt = sqlalchemy.text(
+                f"CREATE USER {user} WITH PASSWORD '{password}'"
+            )
             conn.execute(user_stmt)
 
-            perm_stmt = f"GRANT ALL PRIVILEGES ON DATABASE {database} to {password}"
+            perm_stmt = sqlalchemy.text(
+                f"GRANT ALL PRIVILEGES ON DATABASE {database} to {password}"
+            )
             conn.execute(perm_stmt)
-            conn.execute("commit")
+            conn.commit()
         except Exception as e:
             logger.warning("Unable to add user: %s", e)
     conn.close()
     engine.dispose()
 
 
-def check_engine_for_migrate(engine):
+def check_engine_for_migrate(engine: Engine) -> bool:
     """
     check if a db engine support database migration
 
@@ -138,7 +143,7 @@ def check_engine_for_migrate(engine):
     return engine.dialect.supports_alter
 
 
-def init_schema_version(driver, model, current_version):
+def init_schema_version(driver, model, current_version: int) -> int:
     """
     initialize schema table with a initialized singleton of version
 
@@ -203,6 +208,6 @@ def is_empty_database(driver):
     Returns:
         Boolean
     """
-    table_list = Inspector.from_engine(driver.engine).get_table_names()
+    table_list = sqlalchemy.inspect(driver.engine).get_table_names()
 
     return len(table_list) == 0

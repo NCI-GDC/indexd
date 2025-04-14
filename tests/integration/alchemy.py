@@ -1,10 +1,10 @@
+import sqlalchemy
 from sqlalchemy import BigInteger, Column, ForeignKey, String
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
 from indexd.driver_base import SQLAlchemyDriverBase
 
-Base = declarative_base()
+Base = sqlalchemy.orm.declarative_base()
 CURRENT_SCHEMA_VERSION = 2
 
 
@@ -66,6 +66,6 @@ class SQLAlchemyIndexTestDriver(SQLAlchemyDriverBase):
         super().__init__(conn, **config)
 
         Base.metadata.bind = self.engine
-        Base.metadata.create_all()
+        Base.metadata.create_all(bind=self.engine)
 
         self.Session = sessionmaker(bind=self.engine)
