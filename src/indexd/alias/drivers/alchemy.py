@@ -2,8 +2,8 @@ import logging
 import uuid
 from contextlib import contextmanager
 
-import sqlalchemy
-from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String, and_, exc, orm
+import sqlalchemy as sa
+from sqlalchemy import exc, orm
 
 from indexd.alias.driver import AliasDriverABC
 from indexd.alias.errors import (
@@ -15,7 +15,7 @@ from indexd.index.errors import UnhealthyCheckError
 from indexd.utils import init_schema_version, is_empty_database, migrate_database
 
 logger = logging.getLogger(__name__)
-Base = sqlalchemy.orm.declarative_base()
+Base = orm.declarative_base()
 
 
 class AliasSchemaVersion(Base):
@@ -24,7 +24,7 @@ class AliasSchemaVersion(Base):
     """
 
     __tablename__ = "alias_schema_version"
-    version = Column(Integer, primary_key=True)
+    version: orm.Mapped[int] = sa.Column(sa.Integer, primary_key=True)
 
 
 class AliasRecord(Base):
@@ -34,26 +34,26 @@ class AliasRecord(Base):
 
     __tablename__ = "alias_record"
 
-    name = Column(String, primary_key=True)
-    rev = Column(String)
-    size = Column(BigInteger)
+    name: orm.Mapped[str] = sa.Column(sa.String, primary_key=True)
+    rev: orm.Mapped[str] = sa.Column(sa.String)
+    size: orm.Mapped[int] = sa.Column(sa.BigInteger)
 
-    hashes = orm.relationship(
+    hashes: orm.Mapped[list["AliasRecordHash"]] = orm.relationship(
         "AliasRecordHash",
-        backref="alias_record",
+        back_populates="alias_record",
         cascade="all, delete-orphan",
     )
 
-    release = Column(String)
-    metastring = Column(String)
+    release: orm.Mapped[str] = sa.Column(sa.String)
+    metastring: orm.Mapped[str] = sa.Column(sa.String)
 
-    host_authorities = orm.relationship(
+    host_authorities: orm.Mapped[list["AliasRecordHostAuthority"]] = orm.relationship(
         "AliasRecordHostAuthority",
-        backref="alias_record",
+        back_populates="alias_record",
         cascade="all, delete-orphan",
     )
 
-    keeper_authority = Column(String)
+    keeper_authority: orm.Mapped[str] = sa.Column(sa.String)
 
 
 class AliasRecordHash(Base):
@@ -63,9 +63,13 @@ class AliasRecordHash(Base):
 
     __tablename__ = "alias_record_hash"
 
-    name = Column(String, ForeignKey("alias_record.name"), primary_key=True)
-    hash_type = Column(String, primary_key=True)
-    hash_value = Column(String)
+    name: orm.Mapped[str] = sa.Column(
+        sa.String, sa.ForeignKey("alias_record.name"), primary_key=True
+    )
+    hash_type: orm.Mapped[str] = sa.Column(sa.String, primary_key=True)
+    hash_value: orm.Mapped[str] = sa.Column(sa.String)
+
+    alias_record: orm.Mapped[AliasRecord] = orm.relationship(back_populates="hashes")
 
 
 class AliasRecordHostAuthority(Base):
@@ -75,8 +79,14 @@ class AliasRecordHostAuthority(Base):
 
     __tablename__ = "alias_record_host_authority"
 
-    name = Column(String, ForeignKey("alias_record.name"), primary_key=True)
-    host = Column(String, primary_key=True)
+    name: orm.Mapped[str] = sa.Column(
+        sa.String, sa.ForeignKey("alias_record.name"), primary_key=True
+    )
+    host: orm.Mapped[str] = sa.Column(sa.String, primary_key=True)
+
+    alias_record: orm.Mapped[AliasRecord] = orm.relationship(
+        back_populates="host_authorities"
+    )
 
 
 class SQLAlchemyAliasDriver(AliasDriverABC):
@@ -121,7 +131,7 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
         """
         with self.session as session:
             try:
-                session.execute(sqlalchemy.text("SELECT 1"))
+                session.execute(sa.text("SELECT 1"))
             except Exception:
                 raise UnhealthyCheckError()
 
@@ -160,7 +170,7 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
             if hashes is not None:
                 for h, v in hashes.items():
                     subq = session.query(AliasRecordHash.name).filter(
-                        and_(
+                        sa.and_(
                             AliasRecordHash.hash_type == h,
                             AliasRecordHash.hash_value == v,
                         )
@@ -326,7 +336,7 @@ class SQLAlchemyAliasDriver(AliasDriverABC):
 
 def migrate_1(session, **kwargs):
     session.execute(
-        sqlalchemy.text(
+        sa.text(
             f"ALTER TABLE {AliasRecord.__tablename__} ALTER COLUMN size TYPE bigint"
         )
     )

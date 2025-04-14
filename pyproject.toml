@@ -60,6 +60,12 @@ testpaths = [
   "tests/unit",
   "tests/integration"
 ]
+env = [
+  "SQLALCHEMY_WARN_20=1",
+  "LOGSTICK_LOG_LEVEL=debug",
+  "LOGSTICK_ROOT_LOG_LEVEL=info",
+  "LOGSTICK_OUTPUT_FORMAT=raw"
+]
 
 [tool.ruff]
 line-length = 88 # black's default

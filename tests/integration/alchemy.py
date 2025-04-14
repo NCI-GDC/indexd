@@ -1,10 +1,9 @@
-import sqlalchemy
-from sqlalchemy import BigInteger, Column, ForeignKey, String
-from sqlalchemy.orm import relationship, sessionmaker
+import sqlalchemy as sa
+from sqlalchemy import orm
 
 from indexd.driver_base import SQLAlchemyDriverBase
 
-Base = sqlalchemy.orm.declarative_base()
+Base = orm.declarative_base()
 CURRENT_SCHEMA_VERSION = 2
 
 
@@ -15,21 +14,21 @@ class IndexRecord(Base):
 
     __tablename__ = "index_record"
 
-    did = Column(String, primary_key=True)
+    did = sa.Column(sa.String, primary_key=True)
 
-    rev = Column(String)
-    form = Column(String)
-    size = Column(BigInteger)
+    rev = sa.Column(sa.String)
+    form = sa.Column(sa.String)
+    size = sa.Column(sa.BigInteger)
 
-    urls = relationship(
+    urls = orm.relationship(
         "IndexRecordUrl",
-        backref="index_record",
+        back_populates="index_record",
         cascade="all, delete-orphan",
     )
 
-    hashes = relationship(
+    hashes = orm.relationship(
         "IndexRecordHash",
-        backref="index_record",
+        back_populates="index_record",
         cascade="all, delete-orphan",
     )
 
@@ -41,8 +40,8 @@ class IndexRecordUrl(Base):
 
     __tablename__ = "index_record_url"
 
-    did = Column(String, ForeignKey("index_record.did"), primary_key=True)
-    url = Column(String, primary_key=True)
+    did = sa.Column(sa.String, sa.ForeignKey("index_record.did"), primary_key=True)
+    url = sa.Column(sa.String, primary_key=True)
 
 
 class IndexRecordHash(Base):
@@ -52,9 +51,9 @@ class IndexRecordHash(Base):
 
     __tablename__ = "index_record_hash"
 
-    did = Column(String, ForeignKey("index_record.did"), primary_key=True)
-    hash_type = Column(String, primary_key=True)
-    hash_value = Column(String)
+    did = sa.Column(sa.String, sa.ForeignKey("index_record.did"), primary_key=True)
+    hash_type = sa.Column(sa.String, primary_key=True)
+    hash_value = sa.Column(sa.String)
 
 
 class SQLAlchemyIndexTestDriver(SQLAlchemyDriverBase):
@@ -68,4 +67,4 @@ class SQLAlchemyIndexTestDriver(SQLAlchemyDriverBase):
         Base.metadata.bind = self.engine
         Base.metadata.create_all(bind=self.engine)
 
-        self.Session = sessionmaker(bind=self.engine)
+        self.Session = orm.sessionmaker(bind=self.engine)

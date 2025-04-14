@@ -1,14 +1,14 @@
 import hashlib
 from contextlib import contextmanager
 
-import sqlalchemy
+import sqlalchemy as sa
 from sqlalchemy import exc, orm
 
 from indexd.auth.driver import AuthDriverABC
 from indexd.auth.errors import AuthError
 from indexd.index.errors import UnhealthyCheckError
 
-Base = sqlalchemy.orm.declarative_base()
+Base = orm.declarative_base()
 
 
 class AuthRecord(Base):
@@ -18,8 +18,8 @@ class AuthRecord(Base):
 
     __tablename__ = "auth_record"
 
-    username = sqlalchemy.Column(sqlalchemy.String, primary_key=True)
-    password = sqlalchemy.Column(sqlalchemy.String)
+    username: orm.Mapped[str] = sa.Column(sa.String, primary_key=True)
+    password: orm.Mapped[str] = sa.Column(sa.String)
 
 
 class SQLAlchemyAuthDriver(AuthDriverABC):
@@ -90,7 +90,7 @@ class SQLAlchemyAuthDriver(AuthDriverABC):
         """
         with self.session as session:
             try:
-                session.execute(sqlalchemy.text("SELECT 1"))
+                session.execute(sa.text("SELECT 1"))
             except Exception:
                 raise UnhealthyCheckError()
 
