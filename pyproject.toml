@@ -36,13 +36,8 @@ source = ["indexd"]
 minversion = 6.0
 python_files = "test_*.py"
 python_functions = "test_*"
-# Silence warning by opting in to use pytest 6's new default value
-junit_family = "xunit2"
-junit_logging = "system-out"
-console_output_style = "classic"
 log_cli_level = "INFO"
-log_level = "INFO"
-log_cli = "true"
+log_cli = "1"
 log_auto_indent = "true"
 addopts = [
   "-rvlFE --color=true -p no:ddtrace -p no:ddtrace.pytest_bdd"
