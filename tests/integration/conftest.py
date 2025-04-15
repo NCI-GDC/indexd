@@ -2,7 +2,6 @@ import base64
 import multiprocessing
 import os
 
-import flask
 import pytest
 import requests
 import sqlalchemy
@@ -12,7 +11,7 @@ from _pytest import fixtures
 from indexd import utils as indexd_utils
 from indexd.alias.drivers.alchemy import Base as AliasBase
 from indexd.alias.drivers.alchemy import SQLAlchemyAliasDriver
-from indexd.app import app_init, get_app
+from indexd.app import get_app
 from indexd.auth.drivers.alchemy import SQLAlchemyAuthDriver
 from indexd.index.drivers.alchemy import Base as IndexBase
 from indexd.index.drivers.alchemy import SQLAlchemyIndexDriver
@@ -194,7 +193,6 @@ def app(index_driver, alias_driver, auth_driver):
     it goes through an entire migration process that creates all the tables.
     The tables are already created from the fixtures in this module.
     """
-    app = flask.Flask("indexd")
     settings = {
         "config": {
             "INDEX": {
@@ -206,8 +204,7 @@ def app(index_driver, alias_driver, auth_driver):
         },
         "auth": auth_driver,
     }
-    app_init(app, settings=settings)
-    return app
+    return get_app(_settings=settings)
 
 
 @pytest.fixture

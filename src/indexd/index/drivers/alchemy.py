@@ -1206,7 +1206,7 @@ class SQLAlchemyIndexDriver(IndexDriverABC):
         """
         with self.session as session:
             return session.execute(
-                sa.select([func.count()]).select_from(IndexRecord)
+                sa.select(func.count("*")).select_from(IndexRecord)
             ).scalar()
 
 

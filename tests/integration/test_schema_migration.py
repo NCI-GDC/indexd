@@ -2,6 +2,7 @@ import uuid
 
 import pytest
 import sqlalchemy
+from sqlalchemy import orm
 from sqlalchemy_utils import database_exists, drop_database
 
 from indexd import utils as indexd_utils
@@ -19,7 +20,7 @@ from indexd.index.drivers.alchemy import (
 from tests.integration.alchemy import SQLAlchemyIndexTestDriver
 from tests.integration.util import make_sql_statement
 
-Base = sqlalchemy.orm.declarative_base()
+Base = orm.declarative_base()
 
 TEST_DB = f"postgresql://{indexd_utils.IndexdConfig['root_auth']}@{indexd_utils.IndexdConfig['host']}/test_migration_db"
 
