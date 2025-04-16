@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from logstick import recipies
+import indexd
 
 # Based on the example from https://github.com/benoitc/gunicorn/blob/master/examples/example_config.py
 #
@@ -154,4 +154,4 @@ loglevel = "info"
 accesslog = "-"
 
 # JSON formatter.
-logconfig_dict = recipies.GUNICORN_LOG_CONFIG
+logconfig_dict = indexd.LOG_CFG
