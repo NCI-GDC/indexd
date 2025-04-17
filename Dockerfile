@@ -17,9 +17,9 @@ WORKDIR /${SERVICE_NAME}
 
 COPY . .
 RUN pip install --upgrade setuptools pip \
-    && pip install versionista>=1.1.0 --extra-index-url https://nexus.osdc.io/repository/pypi-gdc-releases/simple \
+    && pip install versionista>=1.1.0 --extra-index-url "$PIP_INDEX_URL" \
     && python3 -m setuptools_scm \
-    && pip install --no-deps -r requirements.txt .
+    && pip install --no-deps -r requirements.txt .[server]
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}:${BASE_VERSION}
 ARG NAME
