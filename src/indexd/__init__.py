@@ -5,7 +5,7 @@ import logstick
 LOG_CFG = logstick.configure_logging(
     namespace=__name__,
     disable_existing_loggers=False,
-    extra_namespaces=["gunicorn.access", "gunicorn.error", "werkzeug"],
+    extra_namespaces=["werkzeug"],
 )
 __distribution = distribution(__name__)
 VERSION = __distribution.version
