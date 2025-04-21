@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from logstick.recipies import GUNICORN_LOG_CONFIG
+from logstick.recipes import GUNICORN_LOG_CONFIG
 
 # Based on the example from https://github.com/benoitc/gunicorn/blob/master/examples/example_config.py
 #

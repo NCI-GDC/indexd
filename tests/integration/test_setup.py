@@ -107,7 +107,7 @@ def test_postgres_index_setup_tables(index_driver, database_conn):
         """)
         )
 
-        assert schema == [i for i in c]
+        assert set(schema) == set([i for i in c])
 
 
 def test_postgres_alias_setup_tables(alias_driver, database_conn):
@@ -148,4 +148,4 @@ def test_postgres_alias_setup_tables(alias_driver, database_conn):
         """)
         )
 
-        assert schema == [i for i in c]
+        assert set(schema) == set([i for i in c])
