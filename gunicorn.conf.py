@@ -1,12 +1,8 @@
 from __future__ import annotations
 
-import datetime
-import logging
 import os
-import sys
 
-import json_log_formatter
-from ddtrace import tracer
+from logstick.recipes import GUNICORN_LOG_CONFIG
 
 # Based on the example from https://github.com/benoitc/gunicorn/blob/master/examples/example_config.py
 #
@@ -157,117 +153,5 @@ errorlog = "-"
 loglevel = "info"
 accesslog = "-"
 
-
-# Testing example from https://til.codeinthehole.com/posts/how-to-get-gunicorn-to-log-as-json/
-class JsonRequestFormatter(json_log_formatter.JSONFormatter):
-    def json_record(
-        self,
-        message: str,
-        extra: dict[str, str | int | float],
-        record: logging.LogRecord,
-    ) -> dict[str, str | int | float]:
-        # Convert the log record to a JSON object.
-        # See https://docs.gunicorn.org/en/stable/settings.html#access-log-format
-
-        response_time = datetime.datetime.strptime(
-            record.args["t"], "[%d/%b/%Y:%H:%M:%S %z]"
-        )
-        url = record.args["U"]
-        if record.args["q"]:
-            url += f"?{record.args['q']}"
-
-        span = tracer.current_span()
-        trace_id, span_id = (
-            (str((1 << 64) - 1 & span.trace_id), span.span_id) if span else (None, None)
-        )
-
-        return dict(
-            ts=response_time.isoformat(),
-            path=url,
-            query=record.args["q"],
-            http=dict(
-                status_code=str(record.args["s"]),
-                method=record.args["m"],
-                response_body_bytes=record.args["b"],
-                user_agent=record.args["a"],
-                referer=record.args["f"],
-                x_forwarded_for=record.args["{x-forwarded-for}i"],
-            ),
-            remote_addr=record.args["h"],
-            remote_user=record.args["u"],
-            protocol=record.args["H"],
-            duration_in_ms=record.args["M"],
-            traceparent=record.args["{traceparent}i"],
-            tracestate=record.args["{tracestate}i"],
-            dd=dict(
-                trace_id=str(trace_id or 0),
-                span_id=str(span_id or 0),
-            ),
-        )
-
-
-class JsonErrorFormatter(json_log_formatter.JSONFormatter):
-    def json_record(
-        self,
-        message: str,
-        extra: dict[str, str | int | float],
-        record: logging.LogRecord,
-    ) -> dict[str, str | int | float]:
-        payload: dict[str, str | int | float] = super().json_record(
-            message, extra, record
-        )
-        span = tracer.current_span()
-        trace_id, span_id = (
-            (str((1 << 64) - 1 & span.trace_id), span.span_id) if span else (None, None)
-        )
-        payload["dd.trace_id"] = str(trace_id or 0)
-        payload["dd.span_id"] = str(span_id or 0)
-        payload["level"] = record.levelname
-        return payload
-
-
-gunicorn_loglevel = os.getenv("APP_GUNICORN_LOGLEVEL", "INFO")
-generic_loglevel = os.getenv("APP_GENERIC_LOGLEVEL", "INFO")
-# Ensure the two named loggers that Gunicorn uses are configured to use a custom
 # JSON formatter.
-logconfig_dict = {
-    "version": 1,
-    "formatters": {
-        "json_request": {
-            "()": JsonRequestFormatter,
-        },
-        "json_error": {
-            "()": JsonErrorFormatter,
-        },
-    },
-    "handlers": {
-        "json_request": {
-            "class": "logging.StreamHandler",
-            "stream": sys.stdout,
-            "formatter": "json_request",
-        },
-        "json_error": {
-            "class": "logging.StreamHandler",
-            "stream": sys.stdout,
-            "formatter": "json_error",
-        },
-    },
-    "root": {"level": "INFO", "handlers": []},
-    "loggers": {
-        "gunicorn.access": {
-            "level": gunicorn_loglevel,
-            "handlers": ["json_request"],
-            "propagate": False,
-        },
-        "gunicorn.error": {
-            "level": gunicorn_loglevel,
-            "handlers": ["json_error"],
-            "propagate": False,
-        },
-        "": {
-            "level": generic_loglevel,
-            "handlers": ["json_error"],
-            "propagate": False,
-        },
-    },
-}
+logconfig_dict = GUNICORN_LOG_CONFIG
