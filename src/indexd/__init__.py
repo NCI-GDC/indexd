@@ -2,7 +2,7 @@ from importlib.metadata import distribution
 
 import logstick
 
-LOG_CFG = logstick.configure_logging(
+logstick.configure_logging(
     namespace=__name__,
     disable_existing_loggers=False,
     extra_namespaces=["werkzeug"],

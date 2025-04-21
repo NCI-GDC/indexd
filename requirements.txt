@@ -38,7 +38,7 @@ jsonschema==4.23.0
     # via indexd (pyproject.toml)
 jsonschema-specifications==2024.10.1
     # via jsonschema
-logstick==0.1.5rc3
+logstick==0.1.5
     # via indexd (pyproject.toml)
 markdown-it-py==3.0.0
     # via rich
