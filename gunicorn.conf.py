@@ -133,7 +133,7 @@ max_requests_jitter = os.getenv("GUNICORN_MAX_REQUESTS_JITTER", 0)
 #       None to signal that Python should choose one on its own.
 #
 
-daemon = False
+daemon = True
 raw_env = []
 pidfile = None
 umask = 0o27
