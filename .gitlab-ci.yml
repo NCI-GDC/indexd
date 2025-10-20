@@ -26,6 +26,7 @@ tox:
     POSTGRES_USER: test
     POSTGRES_PASSWORD: test
     POSTGRES_HOST_AUTH_METHOD: trust
+    UV_PYTHON: /py
   before_script:
     - mkdir -p /usr/share/man/man1
     - dnf -y install java-11-amazon-corretto-headless
