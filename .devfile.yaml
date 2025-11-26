@@ -18,15 +18,12 @@ metadata:
   language: Python
   provider: Red Hat
   version: 0.0.1
-starterProjects:
-  - name: indexd-example
-    git:
-      remotes:
-        origin: https://github.com/NCI-GDC/indexd
 components:
   - name: py-web
+    attributes:
+      gl/inject-editor: true
     container:
-      image: docker.osdc.io/ncigdc/python3.13-builder:3.2.3
+      image: docker.osdc.io/ncigdc/python3.13-builder:4.0.0
       args: [tail, -f, /dev/null]
       mountSources: true
       endpoints:
@@ -58,7 +55,7 @@ components:
           value: https://nexus.osdc.io/repository/pypi-all/simple
   - name: postgres
     container:
-      image: docker.osdc.io/ncigdc/ci-postgres-13:3.2.3
+      image: docker.osdc.io/ncigdc/ci-postgres-13:4.0.0
       memoryLimit: 512Mi
       endpoints:
         - name: postgres
