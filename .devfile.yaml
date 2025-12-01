@@ -53,7 +53,7 @@ components:
           value: https://nexus.osdc.io/repository/pypi-all/simple
   - name: postgres
     container:
-      image: docker.osdc.io/ncigdc/ci-postgres-13:4.0.0
+      image: docker.osdc.io/ncigdc/ci-postgres-18:4.0.0
       memoryLimit: 512Mi
       endpoints:
         - name: postgres
