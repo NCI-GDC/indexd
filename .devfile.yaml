@@ -25,7 +25,7 @@ components:
     cpuRequest: '2'
     memoryRequest: 4Gi
     cpuLimit: '4'
-    memoryLimit: 8Gi
+    memoryLimit: 6Gi
     container:
       image: docker.osdc.io/ncigdc/python3.13-builder:0.1587825349.69
       endpoints:
@@ -58,6 +58,10 @@ components:
   - name: postgres
     container:
       image: docker.osdc.io/ncigdc/ci-postgres-18:4.0.0
+      cpuRequest: '1'
+      memoryRequest: 512Mi
+      cpuLimit: '2'
+      memoryLimit: 1Gi
       endpoints:
         - name: postgres
           targetPort: 5432
