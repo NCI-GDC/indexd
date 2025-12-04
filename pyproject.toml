@@ -22,6 +22,19 @@ dynamic = [
   "optional-dependencies"
 ]
 
+[dependency-groups]
+dev = [
+  "debugpy",
+  "openapi-spec-validator",
+  "pre-commit",
+  "pytest",
+  "pytest-cov",
+  "pytest-env",
+  "pytest-flask",
+  "PyYAML",
+  "tox",
+]
+
 [tool.coverage.html]
 title = "indexd coverage report"
 directory = "docs/htmlcov"
@@ -92,3 +105,14 @@ keep-runtime-typing = true
 [tool.setuptools_scm]
 local_scheme = "versionista-local-format"
 version_scheme = "versionista-format"
+
+[tool.uv]
+no-binary-package = ["psycopg2"]
+
+[[tool.uv.index]]
+name = "gdc-release"
+url = "https://nexus.osdc.io/repository/pypi-gdc-releases/simple"
+default = true
+
+[tool.uv.sources]
+versionista = {index = "gdc-release"}

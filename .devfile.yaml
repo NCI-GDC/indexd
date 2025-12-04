@@ -78,8 +78,7 @@ components:
 commands:
   - id: pip-install-requirements
     exec:
-      commandLine: pip install setuptools_scm && python3 -m setuptools_scm && pip
-        install --no-deps -r requirements.txt .
+      commandLine: uv sync
       component: py-web
   - id: run-app
     exec:
@@ -87,8 +86,8 @@ commands:
       component: py-web
   - id: tox
     exec:
-      commandLine: mkdir -p /usr/share/man/man1 && dnf -y install java-11-amazon-corretto-headless
-        && dnf upgrade wget && java -version && pip install "tox > 4" && tox -e py
+      commandLine: sudo dnf -y install java-11-amazon-corretto-headless && sudo dnf
+        upgrade wget && java -version && tox -e py
       component: py-web
   - id: debug
     exec:
