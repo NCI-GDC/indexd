@@ -22,6 +22,10 @@ components:
   - name: py-web
     attributes:
       gl/inject-editor: true
+    cpuRequest: '2'
+    memoryRequest: 4Gi
+    cpuLimit: '6'
+    memoryLimit: 8Gi
     container:
       image: docker.osdc.io/ncigdc/python3.13-builder:0.1587825349.69
       endpoints:
