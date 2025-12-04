@@ -24,6 +24,8 @@ components:
       gl/inject-editor: true
     container:
       image: docker.osdc.io/ncigdc/python3.13-builder:0.1587825349.69
+      command: [tail]
+      args: [-f, /dev/null]
       endpoints:
         - name: http-django
           targetPort: 80
