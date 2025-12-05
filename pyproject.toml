@@ -33,6 +33,7 @@ dev = [
   "pytest-flask",
   "PyYAML",
   "tox",
+  "inotify",
 ]
 
 [tool.coverage.html]

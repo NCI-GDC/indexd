@@ -37,6 +37,10 @@ components:
       env:
         - name: DEBUG_PORT
           value: '5858'
+        - name: INDEXD_USER
+          value: admin
+        - name: INDEXD_PASS
+          value: admin
         - name: PG_HOST
           value: localhost
         - name: PG_INDEXD_USER
@@ -84,13 +88,13 @@ commands:
     exec:
       commandLine: sudo dnf -y install java-11-amazon-corretto-headless
       component: py-web
+  - id: run-app
+    exec:
+      commandLine: sudo -E .venv/bin/gunicorn wsgi --reload
+      component: py-web
   - id: tox
     exec:
       commandLine: source .venv/bin/activate && tox -e py
-      component: py-web
-  - id: run-app
-    exec:
-      commandLine: /venv/bin/gunicorn -c gunicorn.conf.py wsgi
       component: py-web
   - id: debug
     exec:
@@ -102,3 +106,4 @@ events:
   postStart:
     - install-py-deps
     - install-java-deps
+    - run-app
