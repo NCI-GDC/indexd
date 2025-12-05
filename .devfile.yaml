@@ -76,21 +76,29 @@ components:
         - name: POSTGRES_HOST_AUTH_METHOD
           value: trust
 commands:
-  - id: pip-install-requirements
+  - id: install-py-deps
     exec:
-      commandLine: uv sync
+      commandLine: uv sync --all-extras
+      component: py-web
+  - id: install-java-deps
+    exec:
+      commandLine: sudo dnf -y install java-11-amazon-corretto-headless
+      component: py-web
+  - id: tox
+    exec:
+      commandLine: source .venv/bin/activate && tox -e py
       component: py-web
   - id: run-app
     exec:
       commandLine: /venv/bin/gunicorn -c gunicorn.conf.py wsgi
-      component: py-web
-  - id: tox
-    exec:
-      commandLine: sudo dnf -y install java-11-amazon-corretto-headless && sudo dnf
-        upgrade wget && java -version && tox -e py
       component: py-web
   - id: debug
     exec:
       commandLine: pip install debugpy && export DEBUG_MODE=True && python -m debugpy
         --listen 0.0.0.0:${DEBUG_PORT} manage.py runserver 0.0.0.0:80 --noreload --nothreading
       component: py-web
+
+events:
+  postStart:
+    - install-py-deps
+    - install-java-deps
