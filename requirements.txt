@@ -99,9 +99,7 @@ typing-extensions==4.15.0
     #   opentelemetry-api
     #   sqlalchemy
 urllib3==2.6.2
-    # via
-    #   indexd (pyproject.toml)
-    #   requests
+    # via requests
 werkzeug==3.1.4
     # via
     #   flask
