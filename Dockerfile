@@ -17,9 +17,8 @@ ENV CI_COMMIT_REF_NAME=$GIT_BRANCH_NAME \
 WORKDIR /${SERVICE_NAME}
 
 COPY . .
-RUN pip install versionista>=1.1.0 \
-    && python3 -m setuptools_scm \
-    && pip install --no-deps -r requirements.txt .
+RUN uv venv /venv \
+    && uv sync --locked --no-dev
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}:${BASE_VERSION}
 ARG NAME
