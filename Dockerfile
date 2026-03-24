@@ -22,21 +22,7 @@ ENV UV_PROJECT_ENVIRONMENT='/venv'
 WORKDIR /${SERVICE_NAME}
 
 COPY . .
-RUN ls -la . \
-    && ls -la /venv \
-    && uv run python -V \
-    && uv python find \
-    && uv run python -c "import sys; print(sys.prefix)" \
-    && (env | grep VIRTUAL_ENV) \
-    && (env | grep UV_PROJECT_ENVIRONMENT)
 RUN uv sync --locked --no-dev
-RUN ls -la . \
-    && ls -la /venv \
-    && uv run python -V \
-    && uv python find \
-    && uv run python -c "import sys; print(sys.prefix)" \
-    && (env | grep VIRTUAL_ENV) \
-    && (env | grep UV_PROJECT_ENVIRONMENT)
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}:${BASE_VERSION}
 ARG NAME
