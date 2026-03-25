@@ -22,7 +22,7 @@ ENV UV_PROJECT_ENVIRONMENT='/venv'
 WORKDIR /${SERVICE_NAME}
 
 COPY . .
-RUN uv sync --locked --no-dev
+RUN uv sync --locked --no-dev --no-editable
 
 FROM ${REGISTRY}/ncigdc/${PYTHON_VERSION}:${BASE_VERSION}
 ARG NAME
