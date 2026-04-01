@@ -1,5 +1,6 @@
 [build-system]
-requires = ["setuptools<82.0", "wheel", "setuptools_scm>=7"]
+# setuptools is pinned to <82.0 due to openapi-schema-validator not working with a newer version due to pkg_resources being removed from setuptools
+requires = ["setuptools<81.0", "wheel", "setuptools_scm>=7"]
 build-backend = "setuptools.build_meta"
 
 [project]
