@@ -1,7 +1,7 @@
 ---
 include:
   - project: nci-gdc/gitlab-templates
-    ref: master
+    ref: 0.8.0 # pinned due to openapi_schema_validator in the uv pipeline
     file:
       - templates/artifacts/python-docker-service.yaml
 
