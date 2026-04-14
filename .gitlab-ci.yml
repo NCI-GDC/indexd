@@ -1,17 +1,18 @@
 ---
 include:
   - project: nci-gdc/gitlab-templates
-    ref: master
+    ref: feat/components
     file:
       - templates/artifacts/python-docker-service.yaml
 
 variables:
   SERVICE_NAME: indexd
   LANGUAGE_VERSION: python3.13
-  BASE_CONTAINER_VERSION: 3.5.0
+  BASE_CONTAINER_VERSION: 4
   PRE_COMMIT_PY_VERSION: "3.13"
 
 tox:
+  extends: .tox
   services:
     - name: docker.osdc.io/ncigdc/ci-postgres-13:${BASE_CONTAINER_VERSION}
       alias: postgres
@@ -26,13 +27,11 @@ tox:
     POSTGRES_USER: test
     POSTGRES_PASSWORD: test
     POSTGRES_HOST_AUTH_METHOD: trust
-  script:
+  before_script:
+    - !reference [.tox, before_script]
     - mkdir -p /usr/share/man/man1
     - dnf -y install java-11-amazon-corretto-headless
     - dnf upgrade wget
-    - java -version
-    - pip install 'tox > 4'
-    - tox -e py
 
 .deploy-service-with-salt:
   before_script:
