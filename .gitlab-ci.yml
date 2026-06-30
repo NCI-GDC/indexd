@@ -13,7 +13,7 @@ variables:
 
 tox:
   services:
-    - name: docker.osdc.io/ncigdc/ci-postgres-13:${BASE_CONTAINER_VERSION}
+    - name: docker.osdc.io/ncigdc/ci-postgres-18
       alias: postgres
   variables:
     PG_INDEXD_USER: test
