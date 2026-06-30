@@ -8,6 +8,8 @@ repos:
       - id: check-yaml
         exclude: ^helm/templates/|^\.gitlab-ci.yml
       - id: check-toml
+        args: [--in-place]
+        exclude: uv.lock
       - id: check-json
       - id: pretty-format-json
         args: [--autofix]
