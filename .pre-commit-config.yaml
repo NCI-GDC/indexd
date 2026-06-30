@@ -8,8 +8,6 @@ repos:
       - id: check-yaml
         exclude: ^helm/templates/|^\.gitlab-ci.yml
       - id: check-toml
-        args: [--in-place]
-        exclude: uv.lock
       - id: check-json
       - id: pretty-format-json
         args: [--autofix]
@@ -33,7 +31,7 @@ repos:
     hooks:
       - id: toml-sort
         args: [--in-place]
-        exclude: pyproject.toml
+        exclude: pyproject.toml|uv.lock
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.21.2
     hooks:
