@@ -219,6 +219,22 @@ wheels = [
 ]
 
 [[package]]
+name = "greenlet"
+version = "3.5.6"
+source = { registry = "https://nexus.osdc.io/repository/pypi-all/simple" }
+sdist = { url = "https://nexus.osdc.io/repository/pypi-all/packages/greenlet/3.5.6/greenlet-3.5.6.tar.gz", hash = "sha256:8e67c43bdfc88d5fee6db0d3e40175b362fc95fb85f0412d233b9b203c53a575" }
+wheels = [
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/greenlet/3.5.6/greenlet-3.5.6-cp313-cp313-macosx_11_0_universal2.whl", hash = "sha256:f96f0e30b5a95c7631b12bfe214cbc90ec8fe8cfa36920596c10514a65743519" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/greenlet/3.5.6/greenlet-3.5.6-cp313-cp313-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:c75116c9de79949de23006e2d9b35ee82874c594fcf5c0311b439acaa14b8441" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/greenlet/3.5.6/greenlet-3.5.6-cp313-cp313-manylinux_2_24_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:cad5782f93f7f738b62c6527b6f32a60694d924029f299a8b524758cfa53d815" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/greenlet/3.5.6/greenlet-3.5.6-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:f98e8215e172f567ce80eeaed9107fb4d32b6c44f26983d9b8334658136a205a" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/greenlet/3.5.6/greenlet-3.5.6-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:df19e2d0b1620039af5102563fbd96e8938c7f5c3f5828528d641d9fc585525e" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/greenlet/3.5.6/greenlet-3.5.6-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:06c0e933290fba8ffe53ead4ae1b8044b0e9754b75cebf381aa2bc3e50d82fac" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/greenlet/3.5.6/greenlet-3.5.6-cp313-cp313-win_amd64.whl", hash = "sha256:5b602b4201b965a8354d74e232364a66ff243dd142e350d035f46169bb36e13d" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/greenlet/3.5.6/greenlet-3.5.6-cp313-cp313-win_arm64.whl", hash = "sha256:876077e7ebb8c84ed068e2b23d4c62ebb010d60df84b9591af1be2f39010ffb2" },
+]
+
+[[package]]
 name = "gunicorn"
 version = "26.2.0"
 source = { registry = "https://nexus.osdc.io/repository/pypi-all/simple" }
@@ -283,7 +299,7 @@ requires-dist = [
     { name = "pyyaml", marker = "extra == 'dev'" },
     { name = "requests", specifier = ">=2.32.4" },
     { name = "setproctitle", specifier = ">=1.3.4" },
-    { name = "sqlalchemy", specifier = ">=2.0" },
+    { name = "sqlalchemy", specifier = "<2.1" },
     { name = "sqlalchemy-utils", specifier = ">=0.32" },
     { name = "typing-extensions" },
     { name = "werkzeug", specifier = ">=3.1.4" },
@@ -794,24 +810,22 @@ wheels = [
 
 [[package]]
 name = "sqlalchemy"
-version = "2.1.3"
+version = "2.0.54"
 source = { registry = "https://nexus.osdc.io/repository/pypi-all/simple" }
 dependencies = [
+    { name = "greenlet", marker = "platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3.tar.gz", hash = "sha256:ade5281df06038c6394f532590d592d3381ee5d11b9e0006a2570aef41145118" }
+sdist = { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.0.54/sqlalchemy-2.0.54.tar.gz", hash = "sha256:baa8521e8ee9f24e75dfc7aaabc08020e551ef0d48d7c3e3536f5cddf277586b" }
 wheels = [
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:260bdd8baa1dc631d76d14b26ad009ebbb665b4469666afef8dcaa1f964016cb" },
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:5fc01a8047d6a4f4e997441994f07af79fdd470fc80669751e32f91153d6b491" },
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b1b3ff10eba0f9290142375e667351c99d24ee7fcff6e0f85bd8be9d39b50a17" },
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-cp313-cp313-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:efb1ebf695e80d9a69f5bbff9d812d2491fd168b27d6b42ad4c8a4d3d6faaef1" },
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:a95754928d47b37ea5c4b5180101db2afabef1da0dd5cd0c573b547d5d036ff0" },
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-cp313-cp313-musllinux_1_2_riscv64.whl", hash = "sha256:7606b413730ac6002930faa96f52195ed6969040b78071a3336370661f5e9e09" },
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:76c3d5c7ada0925ff12e8c2395c547f88fcfccc13368ff8e8dd55ab5e28dcdab" },
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-cp313-cp313-win32.whl", hash = "sha256:cb6fc5c856e8f1c0228bf74b636c0a03a6c12dd502ced7aa82ced21dcdc7f547" },
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-cp313-cp313-win_amd64.whl", hash = "sha256:82d4c63d338737d593f1d29c4dae0a124577a9a76186d90b5c0f9ec9cbeeab35" },
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-cp313-cp313-win_arm64.whl", hash = "sha256:0ab6f42761cc5c48d2f3e8a70810d10630d8222a51a7111cf9b3a48f22c3f148" },
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.1.3/sqlalchemy-2.1.3-py3-none-any.whl", hash = "sha256:6f0cf4debd86cb5623a50310784bd005c215761ca7f618d0d4f46193d033675a" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.0.54/sqlalchemy-2.0.54-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:b374e3bc91e246a942592a98ba6a23be76fff21358b00546ac8c0ebc0fd0e00b" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.0.54/sqlalchemy-2.0.54-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:31d5458672a6f72db2c087f4a5098b3c8503ea0254186ff29205d63afa9401a4" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.0.54/sqlalchemy-2.0.54-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:cad78d04254967bdbcccbed5e631d88fe4868530946ab0929aa45e9032849518" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.0.54/sqlalchemy-2.0.54-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:48611087a75d26d798003645c688c7d3cfc26b89dbe4a2c568d6b378d330deae" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.0.54/sqlalchemy-2.0.54-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:d6adf80277372a89910a0f3ccfe960b846d279dc55b366dd5c5ec07f41c84758" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.0.54/sqlalchemy-2.0.54-cp313-cp313-win32.whl", hash = "sha256:264460333ed0b177cbb1956355d0ee4e0cab83fb415c934ce12a25db2e7be39c" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.0.54/sqlalchemy-2.0.54-cp313-cp313-win_amd64.whl", hash = "sha256:cf89e92bf0d4204a6afcc17af27b9271ed9c7e34e17d6f80c085d431ea4a1747" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/sqlalchemy/2.0.54/sqlalchemy-2.0.54-py3-none-any.whl", hash = "sha256:7e33a631ab1474f8fe6b910bd1a07b7b8009c4c78cdd3fb18001b03e3bc2e1d2" },
 ]
 
 [[package]]
