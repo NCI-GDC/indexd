@@ -302,7 +302,7 @@ requires-dist = [
     { name = "sqlalchemy", specifier = "<2.1" },
     { name = "sqlalchemy-utils", specifier = ">=0.32" },
     { name = "typing-extensions" },
-    { name = "werkzeug", specifier = ">=3.1.4" },
+    { name = "werkzeug", specifier = ">=3.1.9" },
     { name = "zipp", specifier = ">=3.19.1" },
 ]
 provides-extras = ["dev"]
