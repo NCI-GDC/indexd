@@ -246,7 +246,7 @@ dependencies = [
     { name = "json-log-formatter" },
     { name = "jsonschema" },
     { name = "logstick" },
-    { name = "psycopg2" },
+    { name = "psycopg" },
     { name = "requests" },
     { name = "setproctitle" },
     { name = "sqlalchemy" },
@@ -275,7 +275,7 @@ requires-dist = [
     { name = "jsonschema", specifier = ">4.17" },
     { name = "logstick", specifier = ">=0.1.6" },
     { name = "openapi-spec-validator", marker = "extra == 'dev'" },
-    { name = "psycopg2", specifier = ">=2.7" },
+    { name = "psycopg" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "pytest-cov", marker = "extra == 'dev'" },
     { name = "pytest-env", marker = "extra == 'dev'" },
@@ -528,12 +528,15 @@ wheels = [
 ]
 
 [[package]]
-name = "psycopg2"
-version = "2.9.13"
+name = "psycopg"
+version = "3.3.6"
 source = { registry = "https://nexus.osdc.io/repository/pypi-all/simple" }
-sdist = { url = "https://nexus.osdc.io/repository/pypi-all/packages/psycopg2/2.9.13/psycopg2-2.9.13.tar.gz", hash = "sha256:d36784fc2dae69523ba4b79c7d1d1b4d6e83e87836874f111262f4db940b16a6" }
+dependencies = [
+    { name = "tzdata", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://nexus.osdc.io/repository/pypi-all/packages/psycopg/3.3.6/psycopg-3.3.6.tar.gz", hash = "sha256:c081f2250df751a943036e42db6df4571c66cd0aabe8291a7a506512b12007d2" }
 wheels = [
-    { url = "https://nexus.osdc.io/repository/pypi-all/packages/psycopg2/2.9.13/psycopg2-2.9.13-cp313-cp313-win_amd64.whl", hash = "sha256:165e25c1b0e616a1f28080c5c68bd2dc015051d83c90240b2171d3e76ca2b5ff" },
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/psycopg/3.3.6/psycopg-3.3.6-py3-none-any.whl", hash = "sha256:a1db9f7148b06a28606767efaca51fa6f9398c5c0a3810519be69d7000bdb631" },
 ]
 
 [[package]]
@@ -852,6 +855,15 @@ dependencies = [
 sdist = { url = "https://nexus.osdc.io/repository/pypi-all/packages/typing-inspection/0.4.4/typing_inspection-0.4.4.tar.gz", hash = "sha256:547274fa6b0a561ccf549cc9524b999a578e737d015d8709d021f9d0d13bea47" }
 wheels = [
     { url = "https://nexus.osdc.io/repository/pypi-all/packages/typing-inspection/0.4.4/typing_inspection-0.4.4-py3-none-any.whl", hash = "sha256:65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147" },
+]
+
+[[package]]
+name = "tzdata"
+version = "2026.5"
+source = { registry = "https://nexus.osdc.io/repository/pypi-all/simple" }
+sdist = { url = "https://nexus.osdc.io/repository/pypi-all/packages/tzdata/2026.5/tzdata-2026.5.tar.gz", hash = "sha256:8cc73c0a0bfca7dbfa59235d60b2eff82231dee33f53d206db1acd9173cfc0a7" }
+wheels = [
+    { url = "https://nexus.osdc.io/repository/pypi-all/packages/tzdata/2026.5/tzdata-2026.5-py2.py3-none-any.whl", hash = "sha256:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac" },
 ]
 
 [[package]]
