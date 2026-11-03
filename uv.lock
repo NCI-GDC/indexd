@@ -288,7 +288,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ddtrace", specifier = ">=4.8.2" },
+    { name = "ddtrace", specifier = ">=4.15.6" },
     { name = "flask", specifier = ">=2.2" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "json-log-formatter", specifier = ">=1.1" },
